@@ -127,7 +127,8 @@ header {
 .content ul, .content ol {
   font-size: 16px; }
   .content ul li, .content ol li {
-    margin-bottom: 5px; }
+    margin-bottom: 5px;
+    line-height: 150%; }
 
 .edit {
   width: 100%;
