@@ -123,7 +123,7 @@ header {
     margin-top: 0; }
     .content blockquote p:last-of-type {
       margin-bottom: 0; }
-.content ul {
+.content ul, .content ol {
   font-size: 16px; }
 
 .edit {

@@ -4,7 +4,6 @@
   "description": "Very simple wiki for personal use, using single markdown files as pages.",
   "main": "server.js",
   "scripts": {
-    "test": "test",
     "start": "node server.js"
   },
   "keywords": [
