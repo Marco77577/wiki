@@ -65,6 +65,7 @@ const loadIndex = function (req, res, urlOptions) {
             }
 
             html = replaceBlock('header', html, getTemplateSync('header'));
+            html = replaceBlock('title', html, (urlOptions[1] !== undefined ? urlOptions[1] : 'Index'));
             html = replaceBlock('tags', html, (urlOptions[1] !== undefined ?
                                                '<a class="tag" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' : ''));
             html = replaceBlock('content', html, list);
@@ -106,7 +107,7 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
                     for (var i = 0, j = tagArray.length; i < j; i++) {
                         if (tagArray[i] === '') continue;
                         tagArray[i] = tagArray[i].toLowerCase();
-                        tagArray[i] = '<a class="tag" href="/wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
+                        tagArray[i] = '<a class="tag" href="wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
                     }
 
                     html = replaceBlock('tags', html, tagArray.join(''));
