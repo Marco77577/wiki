@@ -1,0 +1,20 @@
+{
+  "name": "wiki",
+  "version": "1.0.0",
+  "description": "Very simple wiki for personal use, using single markdown files as pages.",
+  "main": "server.js",
+  "scripts": {
+    "test": "test",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "wiki",
+    "markdown"
+  ],
+  "author": "Marco Studer",
+  "license": "ISC",
+  "dependencies": {
+    "http": "0.0.0",
+    "marked": "^0.3.12"
+  }
+}

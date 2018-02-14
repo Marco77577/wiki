@@ -1,0 +1,60 @@
+<html>
+<head>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'/>
+	<title>{% block title %} - Personal Wiki</title>
+	<link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+	<link href="css/bootstrap-grid.min.css" rel="stylesheet"/>
+	<link href="css/styles.css" rel="stylesheet"/>
+	<link href="css/prism.css" rel="stylesheet"/>
+	<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+	<script src="js/prism.js"></script>
+	<script src="js/marked.min.js"></script>
+	<script src="js/functions.js"></script>
+	<script src="js/edit.js"></script>
+</head>
+<body>
+{% block header %}
+<div class="title edit">
+	<div class="container">
+		<div class="row">
+			<div class="col-12 col-md-8">
+				<label for="title">Title*:</label>
+				<input type="text" name="title" id="title" placeholder="Title" value="{% block title %}"
+				       tabindex="1"/>
+				<div class="slug-wrapper">
+					<label for="slug">Slug*:</label>
+					<input type="text" name="slug" id="slug" placeholder="slug" value="{% block slug %}"
+					       tabindex="2"/>
+					<label for="slug">Slug already taken</label>
+				</div>
+				<label for="tags">Tags:</label>
+				<input type="text" name="tags" id="tags" placeholder="Tags" value="{% block tags %}" tabindex="3"/>
+			</div>
+			<div class="col-12 col-md-4">
+				<label class="hidden">Save</label>
+				<a href="#" class="button save" id="save-button" title="Ctrl+Shift+S">Save</a>
+				<label class="hidden">Delete</label>
+				<a href="#" class="button delete" id="delete-button">Delete</a>
+				<label class="hidden">View</label>
+				<a href="wiki/view/{% block slug %}" class="button view" id="view-button">View</a>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-12 col-md-6">
+			<div class="edit">
+				<label for="content" class="collapse">Content</label>
+				<textarea id="content" tabindex="4">{% block content %}</textarea>
+			</div>
+		</div>
+		<div class="col-12 col-md-6">
+			<div class="content" id="preview">
+				{% block content %}
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<html>
+<head>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'/>
+	<title>Index - Personal Wiki</title>
+	<link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+	<link href="css/bootstrap-grid.min.css" rel="stylesheet"/>
+	<link href="css/styles.css" rel="stylesheet"/>
+	<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+	<script src="js/functions.js"></script>
+	<script src="js/index.js"></script>
+</head>
+<body>
+{% block header %}
+<div class="title">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<h1 class="entry-title">Index</h1>
+				<div class="tags">
+					{% block tags %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<div class="index content">
+				<div class="row">
+					<div class="col-12 col-md-8">
+						<strong>Title</strong>
+					</div>
+					<div class="col-12 col-md-2">
+						<strong>Last Modified</strong>
+					</div>
+					<div class="col-12 col-md-2">
+						<strong>Created</strong>
+					</div>
+				</div>
+				{% block content %}
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

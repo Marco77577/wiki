@@ -1,0 +1,42 @@
+<html>
+<head>
+	<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0'/>
+	<title>{% block title %} - Personal Wiki</title>
+	<link href="https://fonts.googleapis.com/css?family=Work+Sans" rel="stylesheet">
+	<link href="css/bootstrap-grid.min.css" rel="stylesheet"/>
+	<link href="css/styles.css" rel="stylesheet"/>
+	<link href="css/prism.css" rel="stylesheet"/>
+	<link href="https://use.fontawesome.com/releases/v5.0.6/css/all.css" rel="stylesheet">
+	<script src="js/prism.js"></script>
+	<script src="js/functions.js"></script>
+	<script src="js/index.js"></script>
+</head>
+<body>
+{% block header %}
+<div class="title">
+	<div class="container">
+		<div class="row">
+			<div class="col-12">
+				<h1 class="entry-title">{% block title %}</h1>
+				<div class="tags">
+					{% block tags %}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-12 col-md-8">
+			<div class="content">
+				{% block content %}
+			</div>
+		</div>
+		<div class="col-12 col-md-4 edit">
+			<a class="button editbutton" href="wiki/edit/{% block slug %}">Edit</a>
+			<a class="button delete" href="#" data-slug="{% block slug %}">Delete</a>
+		</div>
+	</div>
+</div>
+</body>
+</html>
