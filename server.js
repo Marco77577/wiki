@@ -78,6 +78,7 @@ router.register('\/wiki\/index\/(.*)', loadIndex);
 router.register('/wiki/index', loadIndex);
 router.register('/wiki/home', loadIndex);
 router.register('/wiki', loadIndex);
+router.register('/', loadIndex);
 
 router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/html'});
