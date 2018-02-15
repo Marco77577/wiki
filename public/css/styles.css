@@ -232,7 +232,7 @@ header {
     border-radius: 0;
     border: 0;
     text-decoration: none; }
-    .edit a.button.save:hover, .edit a.button.editbutton:hover {
+    .edit a.button.save:hover, .edit a.button.editbutton:hover, .edit a.button.success {
       background-color: #63bb7d; }
     .edit a.button.delete:hover {
       background-color: #ef525b; }
@@ -257,37 +257,73 @@ header {
       content: '\f06e'; }
     .edit a.button.save.error:before, .edit a.button.delete.error:before, .edit a.buttoneditbutton.error:before, .edit a.buttonview.error:before {
       content: '\f071'; }
-  .edit span.icon {
-    background-color: #f1f8ff;
-    color: #0366d6;
-    padding: 3px 10px;
-    border-radius: 3px;
-    margin-right: 6px;
-    margin-bottom: 6px;
-    line-height: 30px;
-    font-size: 1.2em;
-    text-decoration: none;
-    cursor: pointer; }
-    .edit span.icon:hover {
-      background-color: #dfecff; }
-    .edit span.icon:before {
-      font-family: 'Font Awesome 5 Free', sans-serif;
-      font-weight: 900;
-      margin-right: 5px; }
-  .edit span#bold:before {
-    content: '\f032'; }
-  .edit span#italic:before {
-    content: '\f033'; }
-  .edit span#link:before {
-    content: '\f0c1'; }
-  .edit span#strikethrough:before {
-    content: '\f0cc'; }
-  .edit span#blockquote:before {
-    content: '\f10d'; }
-  .edit span#code:before {
-    content: '\f054'; }
-  .edit span#codeBlock:before {
-    content: '\f121'; }
+  .edit #button-wrapper {
+    max-width: 100%; }
+    .edit #button-wrapper span.icon {
+      display: inline;
+      background-color: #f1f8ff;
+      color: #0366d6;
+      padding: 3px 10px;
+      border-radius: 3px;
+      margin-right: 6px;
+      margin-bottom: 6px;
+      line-height: 30px;
+      font-size: 1.2em;
+      text-decoration: none;
+      cursor: pointer; }
+      .edit #button-wrapper span.icon:hover {
+        background-color: #dfecff; }
+      .edit #button-wrapper span.icon:before {
+        font-family: 'Font Awesome 5 Free', sans-serif;
+        font-weight: 900;
+        margin-right: 5px; }
+    .edit #button-wrapper span#bold:before {
+      content: '\f032'; }
+    .edit #button-wrapper span#italic:before {
+      content: '\f033'; }
+    .edit #button-wrapper span#link:before, .edit #button-wrapper span#link-button:before {
+      content: '\f0c1'; }
+    .edit #button-wrapper span#strikethrough:before {
+      content: '\f0cc'; }
+    .edit #button-wrapper span#blockquote:before {
+      content: '\f10d'; }
+    .edit #button-wrapper span#code:before {
+      content: '\f054'; }
+    .edit #button-wrapper span#codeBlock:before {
+      content: '\f121'; }
+    .edit #button-wrapper span#h1:before {
+      content: '\f1dc'; }
+    .edit #button-wrapper span#h2:before {
+      content: '\f1dc'; }
+    .edit #button-wrapper span#h3:before {
+      content: '\f1dc'; }
+    .edit #button-wrapper span#h4:before {
+      content: '\f1dc'; }
+    .edit #button-wrapper span#h5:before {
+      content: '\f1dc'; }
+    .edit #button-wrapper span#h6:before {
+      content: '\f1dc'; }
+
+.linking-wrapper {
+  display: none;
+  background-color: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  align-items: center; }
+  .linking-wrapper.visible {
+    display: flex; }
+  .linking-wrapper .field-container {
+    padding: 20px;
+    background-color: #fafbfc;
+    border-radius: 3px; }
+    .linking-wrapper .field-container #link-search-wrapper {
+      padding: 15px; }
+  .linking-wrapper a.button {
+    margin-right: 0;
+    max-width: 100%; }
 
 .index {
   font-size: 1.6em;

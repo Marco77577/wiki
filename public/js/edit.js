@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const md = [
             {
                 name: 'link',
-                text: 'Link',
+                text: 'QuickLink',
                 delimiterStart: '[',
                 delimiterEnd: ']()',
                 addedLineBreaks: 0,
@@ -90,17 +90,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 0,
                 keyCode: 67,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: false
             },
             {
                 name: 'codeBlock',
-                text: 'Code Block',
+                text: 'CodeBlock',
                 delimiterStart: "\n```js\n",
                 delimiterEnd: "\n```",
                 addedLineBreaks: 3,
                 keyCode: 75,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: false
             },
             {
                 name: 'blockquote',
@@ -112,8 +112,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: false
             },
-            {name: 'h1', text: 'H1', delimiterStart: "\n# ", delimiterEnd: "", addedLineBreaks: 1, keyCode: 49, ctrlKey: true, shiftKey: true},
-            {name: 'h2', text: 'H2', delimiterStart: "\n## ", delimiterEnd: "", addedLineBreaks: 1, keyCode: 50, ctrlKey: true, shiftKey: true},
+            {name: 'h1', text: 'H1', delimiterStart: "\n# ", delimiterEnd: "", addedLineBreaks: 1, keyCode: 49, ctrlKey: true, shiftKey: false},
+            {name: 'h2', text: 'H2', delimiterStart: "\n## ", delimiterEnd: "", addedLineBreaks: 1, keyCode: 50, ctrlKey: true, shiftKey: false},
             {
                 name: 'h3',
                 text: 'H3',
@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 1,
                 keyCode: 51,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: false
             },
             {
                 name: 'h4',
@@ -132,7 +132,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 1,
                 keyCode: 52,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: false
             },
             {
                 name: 'h5',
@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 1,
                 keyCode: 53,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: false
             },
             {
                 name: 'h6',
@@ -152,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 1,
                 keyCode: 54,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: false
             }
         ];
         var dirty = false;
@@ -165,6 +165,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const saveButton = $1('#save-button');
         const deleteButton = $1('#delete-button');
         const viewButton = $1('#view-button');
+        const buttonWrapper = $1('#button-wrapper');
+
+        const linkWindow = $1('#link-window');
+        const linkSearchWrapper = $1('#link-search-wrapper');
+        const linkText = $1('#link-text');
+        const linkUrl = $1('#link-url');
+        const linkSearch = $1('#link-search');
+        const linkButton = $1('#link-button');
+        const linkSelectionStart = $1('#link-selection-start');
+        const linkSelectionEnd = $1('#link-selection-end');
+        const linkFinishButton = $1('#link-finish-button');
+        const linkCancelButton = $1('#link-cancel-button');
 
         const update = function () {
             preview.innerHTML = marked(content.value);
@@ -215,7 +227,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         };
-
         const setDirty = function (d) {
             dirty = d;
             if (dirty) {
@@ -225,6 +236,37 @@ document.addEventListener('DOMContentLoaded', function () {
                 saveButton.innerText = 'Saved';
                 saveButton.classList.add('success');
             }
+        };
+        const cancelLinkWindow = function () {
+            linkWindow.classList.remove('visible');
+            linkText.value = '';
+            linkUrl.value = 'http://';
+            linkSearch.value = '';
+            linkSelectionStart.value = '';
+            linkSelectionEnd.value = '';
+        };
+        const finishLinkWizard = function() {
+            if (linkText.value.length <= 0) {
+                linkText.classList.add('error');
+                linkText.focus();
+                return;
+            }
+            linkText.classList.remove('error');
+            if (linkUrl.value.length <= 0) {
+                linkUrl.classList.add('error');
+                linkUrl.focus();
+                return;
+            }
+            linkText.classList.remove('error');
+
+            const calculatedEnd = parseInt(linkSelectionStart.value) + linkText.value.length + 1;
+            console.log(calculatedEnd);
+            content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + linkText.value + content.value.slice(parseInt(linkSelectionEnd.value));
+            content.value = content.value.slice(0, calculatedEnd) + '](' + linkUrl.value + ')' + content.value.slice(calculatedEnd);
+            content.setSelectionRange(calculatedEnd, calculatedEnd);
+            content.focus();
+            update();
+            cancelLinkWindow();
         };
 
         window.addEventListener('beforeunload', function () {
@@ -261,37 +303,40 @@ document.addEventListener('DOMContentLoaded', function () {
                 slug.classList.remove('error');
             }
         });
-
         addEvent(tags, 'input', function () {
             setDirty(true);
         });
-
         addEvent(content, 'input', function () {
             setDirty(true);
             update();
         });
-
         addEvent(content, 'keydown', function (e) {
             if (e.ctrlKey) {
                 md.forEach(function (fct) {
                     if (e.keyCode === fct.keyCode && e.ctrlKey === fct.ctrlKey && e.shiftKey === fct.shiftKey) {
+                        e.preventDefault();
                         applyStyle(fct);
                     }
                 });
             }
         });
-
         addEvent(document, 'keydown', function (e) {
-            if (e.keyCode === 83 && e.ctrlKey && e.shiftKey) {
+            if (e.keyCode === 83 && e.ctrlKey) {
+                e.preventDefault();
                 attemptSaving();
             }
+            if (e.keyCode === 27) { //esc
+                cancelLinkWindow();
+            }
+            if (linkWindow.classList.contains('visible') && e.keyCode === 13) { //enter
+                e.preventDefault();
+                finishLinkWizard();
+            }
         });
-
         addEvent(saveButton, 'click', function (e) {
             e.preventDefault();
             attemptSaving();
         });
-
         addEvent(deleteButton, 'click', function (e) {
             e.preventDefault();
             const confirm = window.confirm('Are you sure you want to delete this entry?');
@@ -304,6 +349,54 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         });
+        addEvent(linkSearch, 'input', function () {
+            getAjax('http://localhost:3000/wiki/entries/' + encodeURIComponent(linkSearch.value), function (result) {
+                linkSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
+                result = JSON.parse(result);
+                for (var i = 0, j = result.length; i < j; i++) {
+                    const entry = result[i];
+                    const row = document.createElement('div');
+                    row.classList.add('row');
+                    linkSearchWrapper.appendChild(row);
+
+                    const col = document.createElement('div');
+                    col.classList.add('col-12');
+                    row.appendChild(col);
+
+                    const a = document.createElement('a');
+                    a.innerText = entry.title;
+                    col.appendChild(a);
+
+                    addEvent(a, 'click', function (e) {
+                        e.preventDefault();
+                        const text = linkText.value.length > 0 ? linkText.value : entry.title;
+                        const calculatedEnd = parseInt(linkSelectionStart.value) + text.length + 1;
+                        content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + text + content.value.slice(parseInt(linkSelectionEnd.value));
+                        content.value = content.value.slice(0, calculatedEnd) + '](http://localhost:3000/wiki/view/' + entry.slug + ')' + content.value.slice(calculatedEnd);
+                        content.setSelectionRange(calculatedEnd, calculatedEnd);
+                        content.focus();
+                        update();
+                        cancelLinkWindow();
+                    });
+                }
+            });
+        });
+        addEvent(linkButton, 'click', function () {
+            const positions = getTextSelection(content);
+            console.log(positions);
+            linkSelectionStart.value = positions.start;
+            linkSelectionEnd.value = positions.end;
+            linkText.value = content.value.slice(positions.start, positions.end);
+            linkWindow.classList.add('visible');
+        });
+        addEvent(linkFinishButton, 'click', function (e) {
+            e.preventDefault();
+            finishLinkWizard();
+        });
+        addEvent(linkCancelButton, 'click', function (e) {
+            e.preventDefault();
+            cancelLinkWindow();
+        });
 
         md.forEach(function (fct) {
             const span = document.createElement('span');
@@ -311,7 +404,8 @@ document.addEventListener('DOMContentLoaded', function () {
             span.setAttribute('id', fct.name);
             span.setAttribute('title', (fct.ctrlKey ? 'Ctrl+' : '') + (fct.shiftKey ? 'Shift+' : '') + String.fromCharCode(fct.keyCode));
             span.textContent = fct.text;
-            content.parentNode.insertBefore(span, content);
+            buttonWrapper.appendChild(span);
+            buttonWrapper.innerHTML += ' ';
 
             addEvent(span, 'click', function () {
                 applyStyle(fct);

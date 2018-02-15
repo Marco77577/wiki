@@ -29,6 +29,28 @@ const prepareUrls = function (container) {
     return container.replace(/(href|src)="(?!http)(.+?)"/g, '$1="http://localhost:' + port + '/$2"');
 };
 
+const getEntryList = function (search, callback) {
+    fs.readdir('./public/wiki', function (err, files) {
+        if (err) throw err;
+        var list = [];
+        for (var i = 0, j = files.length; i < j; i++) {
+            if (files[i].split('.').pop() !== 'md') continue;
+            try {
+                const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
+                if (search !== '' && file.match(/title: (.+)(?:\r\n|\r|\n)/)[1].toLowerCase().indexOf(search.toLowerCase()) === -1 && file.match(/tags: (.*)(?:\r\n|\r|\n)/)[1].toLowerCase().indexOf(search.toLowerCase()) === -1) continue;
+                list.push({
+                    title: file.match(/title: (.+)(?:\r\n|\r|\n)/)[1],
+                    tags: file.match(/tags: (.*)(?:\r\n|\r|\n)/)[1],
+                    slug: files[i].replace('.md', '')
+                });
+            } catch (err) {
+                //ignore
+            }
+        }
+        callback(list);
+    });
+};
+
 const loadIndex = function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/html'});
     getTemplateAsync('entryIndex', function (err, html) {
@@ -240,6 +262,14 @@ router.register('\/wiki\/checkslug\/(.+)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     fs.access('./public/wiki/' + urlOptions[1] + '.md', fs.constants.F_OK, function (err) {
         res.write(err ? 'free' : 'taken');
+        res.end();
+    });
+});
+
+router.register('\/wiki\/entries\/(.*)', function (req, res, urlOptions) {
+    res.writeHead(200, {'Content-Type': 'text/json'});
+    getEntryList(urlOptions[1], function (list) {
+        res.write(JSON.stringify(list));
         res.end();
     });
 });
