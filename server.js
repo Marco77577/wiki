@@ -193,11 +193,15 @@ router.register('/wiki/new', function (req, res, urlOptions) {
 
 router.register('\/wiki\/save\/(.+?)\/(.+?)\/(.*?)\/(.*?)\/((?:.|\s)+)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    urlOptions[5] = decodeURI(urlOptions[5]).replace(/\|\|/g, '#');
-    const saveText = "title: " + decodeURI(urlOptions[1]) + "\ntags: " + (urlOptions[4].length > 0 ? decodeURI(urlOptions[4]) :
-                                                                          '') + "\n\n" + urlOptions[5];
+
+    for (var i = 1; i <= 5; i++) {
+        urlOptions[i] = decodeURIComponent(urlOptions[i]);
+    }
+
+    const saveText = "title: " + urlOptions[1] + "\ntags: " + (urlOptions[4].length > 0 ? urlOptions[4] :
+                                                               '') + "\n\n" + urlOptions[5];
     const save = function () {
-        fs.writeFile('./public/wiki/' + urlOptions[2] + '.md', saveText, function (err) {
+        fs.writeFile('./public/wiki/' + urlOptions[2] + '.md', saveText, 'utf8', function (err) {
             if (err) {
                 res.write('Error: Could not save file.');
             } else {

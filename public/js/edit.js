@@ -185,7 +185,7 @@ document.addEventListener('DOMContentLoaded', function () {
             update();
         };
         const save = function (callback) {
-            getAjax('http://localhost:3000/wiki/save/' + title.value + '/' + slug.value + '/' + latestSaveSlug + '/' + tags.value + '/' + encodeURI(content.value.replace(/#/g, '||')), function (result) {
+            getAjax('http://localhost:3000/wiki/save/' + encodeURIComponent(title.value) + '/' + encodeURIComponent(slug.value) + '/' + encodeURIComponent(latestSaveSlug) + '/' + encodeURIComponent(tags.value) + '/' + encodeURIComponent(content.value), function (result) {
                 callback(result);
             });
         };
