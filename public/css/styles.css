@@ -299,16 +299,17 @@ header {
     border-top: 0;
     cursor: pointer;
     overflow: hidden; }
-    .index .row:hover {
+    .index .row:hover, .index .row.active {
       background-color: #f6f8fa; }
-      .index .row:hover div:first-of-type .option-wrapper {
+      .index .row:hover div:first-of-type .option-wrapper, .index .row.active div:first-of-type .option-wrapper {
         display: block; }
     .index .row:first-of-type {
       background-color: #f2f7ff;
       border-color: #c8e1ff;
       border-top: 1px solid #c8e1ff;
       border-top-left-radius: 3px;
-      border-top-right-radius: 3px; }
+      border-top-right-radius: 3px;
+      cursor: auto; }
     .index .row:last-of-type {
       border-bottom-left-radius: 3px;
       border-bottom-right-radius: 3px; }

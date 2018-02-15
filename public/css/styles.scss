@@ -349,7 +349,7 @@ header {
 		border-top: 0;
 		cursor: pointer;
 		overflow: hidden;
-		&:hover {
+		&:hover, &.active {
 			background-color: #f6f8fa;
 			div:first-of-type .option-wrapper {
 				display: block;
@@ -361,6 +361,7 @@ header {
 			border-top: 1px solid #c8e1ff;
 			border-top-left-radius: 3px;
 			border-top-right-radius: 3px;
+			cursor: auto;
 		}
 		&:last-of-type {
 			border-bottom-left-radius: 3px;
