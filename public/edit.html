@@ -9,24 +9,25 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-12 col-md-8">
-				<label for="title">Title*:</label>
-				<input type="text" name="title" id="title" placeholder="Title" value="{% block title %}"
-				       tabindex="1"/>
-				<div class="slug-wrapper">
+				<div class="label-positioner">
+					<label for="title">Title*:</label>
+					<input type="text" name="title" id="title" placeholder="Title" value="{% block title %}"
+					       tabindex="1"/>
+				</div>
+				<div class="label-positioner">
 					<label for="slug">Slug*:</label>
 					<input type="text" name="slug" id="slug" placeholder="slug" value="{% block slug %}"
 					       tabindex="2"/>
 					<label for="slug">Slug already taken</label>
 				</div>
-				<label for="tags">Tags:</label>
-				<input type="text" name="tags" id="tags" placeholder="Tags" value="{% block tags %}" tabindex="3"/>
+				<div class="label-positioner">
+					<label for="tags">Tags:</label>
+					<input type="text" name="tags" id="tags" placeholder="Tags" value="{% block tags %}" tabindex="3"/>
+				</div>
 			</div>
 			<div class="col-12 col-md-4">
-				<label class="hidden">Save</label>
 				<a href="#" class="button save success" id="save-button" title="Ctrl+S">Saved</a>
-				<label class="hidden">Delete</label>
 				<a href="#" class="button delete" id="delete-button">Delete</a>
-				<label class="hidden">View</label>
 				<a href="wiki/view/{% block slug %}" class="button view" id="view-button">View</a>
 			</div>
 		</div>

@@ -70,6 +70,13 @@ header {
 }
 
 $titleBackgroundColor: #fafbfc;
+$inputBorderColor: #d1d5da;
+$errorColor: #ef525b;
+$tagBackgroundColor: #f1f8ff;
+$tagHoverBackgroundColor: #dfecff;
+$tagFontColor: #0366d6;
+$headingBorderColor: #eaecef;
+
 .title {
 	background-color: $titleBackgroundColor;
 	border-bottom: 1px solid #e1e4e8;
@@ -78,8 +85,8 @@ $titleBackgroundColor: #fafbfc;
 	}
 	.tags {
 		a {
-			background-color: #f1f8ff;
-			color: #0366d6;
+			background-color: $tagBackgroundColor;
+			color: $tagFontColor;
 			padding: 3px 10px;
 			border-radius: 3px;
 			margin-right: 6px;
@@ -89,7 +96,7 @@ $titleBackgroundColor: #fafbfc;
 			text-decoration: none;
 			white-space: nowrap;
 			&:hover {
-				background-color: #dfecff;
+				background-color: $tagHoverBackgroundColor;
 			}
 		}
 	}
@@ -127,7 +134,7 @@ $titleBackgroundColor: #fafbfc;
 	}
 
 	h1, h2, h3, h4, h5, h6 {
-		border-bottom: 1px solid #eaecef;
+		border-bottom: 1px solid $headingBorderColor;
 	}
 
 	p {
@@ -199,8 +206,32 @@ $titleBackgroundColor: #fafbfc;
 	width: 100%;
 	padding-top: 20px;
 	overflow: hidden;
-	.slug-wrapper {
+	.label-positioner {
 		position: relative;
+		label {
+			box-sizing: border-box;
+			position: absolute;
+			left: 0;
+			height: 34px;
+			line-height: 32px;
+			width: 60px;
+			padding: 0 8px;
+			border-top-left-radius: 3px;
+			border-bottom-left-radius: 3px;
+			border: 1px solid $inputBorderColor;
+			background-color: $titleBackgroundColor;
+		}
+		input {
+			padding-left: 68px;
+			&#slug + label {
+				display: none;
+				position: absolute;
+				top: 0;
+				left: auto;
+				right: 8px;
+				color: $errorColor;
+			}
+		}
 	}
 	label {
 		display: block;
@@ -221,23 +252,17 @@ $titleBackgroundColor: #fafbfc;
 		margin-bottom: 15px;
 		color: #24292e;
 		background-color: $titleBackgroundColor;
-		border: 1px solid #d1d5da;
+		border: 1px solid $inputBorderColor;
 		border-radius: 3px;
 		box-shadow: inset 0 1px 2px rgba(27, 31, 35, 0.075);
 		font-size: 1.4em;
 		font-family: 'Work Sans', 'Arial', sans-serif;
 		&:focus {
 			background-color: #fff;
+			outline: none;
 		}
 		&.error {
-			border-color: #ef525b;
-		}
-		&#slug + label {
-			display: none;
-			position: absolute;
-			top: 0;
-			right: 0;
-			color: #ef525b;
+			border-color: $errorColor;
 		}
 		&#slug.error + label {
 			display: block;
@@ -272,7 +297,7 @@ $titleBackgroundColor: #fafbfc;
 			background-color: #63bb7d;
 		}
 		&.delete:hover {
-			background-color: #ef525b;
+			background-color: $errorColor;
 		}
 		&.view:hover, &.print:hover {
 			background-color: #4a81e4;
@@ -313,8 +338,8 @@ $titleBackgroundColor: #fafbfc;
 		max-width: 100%;
 		span {
 			&.icon {
-				background-color: #f1f8ff;
-				color: #0366d6;
+				background-color: $tagBackgroundColor;
+				color: $tagFontColor;
 				padding: 3px 10px;
 				border-radius: 3px;
 				margin-right: 6px;
@@ -324,7 +349,7 @@ $titleBackgroundColor: #fafbfc;
 				text-decoration: none;
 				cursor: pointer;
 				&:hover {
-					background-color: #dfecff;
+					background-color: $tagHoverBackgroundColor;
 				}
 				&:before {
 					font-family: 'Font Awesome 5 Free', sans-serif;
@@ -394,7 +419,7 @@ $titleBackgroundColor: #fafbfc;
 	}
 	.row {
 		padding: 10px;
-		border: 1px solid #eaecef;
+		border: 1px solid $headingBorderColor;
 		border-top: 0;
 		cursor: pointer;
 		overflow: hidden;

@@ -184,8 +184,29 @@ header {
   width: 100%;
   padding-top: 20px;
   overflow: hidden; }
-  .edit .slug-wrapper {
+  .edit .label-positioner {
     position: relative; }
+    .edit .label-positioner label {
+      box-sizing: border-box;
+      position: absolute;
+      left: 0;
+      height: 34px;
+      line-height: 32px;
+      width: 60px;
+      padding: 0 8px;
+      border-top-left-radius: 3px;
+      border-bottom-left-radius: 3px;
+      border: 1px solid #d1d5da;
+      background-color: #fafbfc; }
+    .edit .label-positioner input {
+      padding-left: 68px; }
+      .edit .label-positioner input#slug + label {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: auto;
+        right: 8px;
+        color: #ef525b; }
   .edit label {
     display: block;
     font-size: 1.4em;
@@ -208,15 +229,10 @@ header {
     font-size: 1.4em;
     font-family: 'Work Sans', 'Arial', sans-serif; }
     .edit input:focus, .edit textarea:focus {
-      background-color: #fff; }
+      background-color: #fff;
+      outline: none; }
     .edit input.error, .edit textarea.error {
       border-color: #ef525b; }
-    .edit input#slug + label, .edit textarea#slug + label {
-      display: none;
-      position: absolute;
-      top: 0;
-      right: 0;
-      color: #ef525b; }
     .edit input#slug.error + label, .edit textarea#slug.error + label {
       display: block; }
   .edit textarea {
