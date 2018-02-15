@@ -1,3 +1,49 @@
+/* 576    phone  */
+/* 768    tablet */
+/* 992    laptop */
+/* 1200   desktop */
+/* $point: xs, sm, md, lg, or xl */
+/* $first: mobile, or desktop   depending on what you are developing first */
+@media screen and (max-width: 0rem) {
+  .hidden-xs-down {
+    display: none; } }
+
+@media screen and (min-width: 0rem) {
+  .hidden-xs-up {
+    display: none; } }
+
+@media screen and (max-width: 36em) {
+  .hidden-sm-down {
+    display: none; } }
+
+@media screen and (min-width: 36em) {
+  .hidden-sm-up {
+    display: none; } }
+
+@media screen and (max-width: 48em) {
+  .hidden-md-down {
+    display: none; } }
+
+@media screen and (min-width: 48em) {
+  .hidden-md-up {
+    display: none; } }
+
+@media screen and (max-width: 62em) {
+  .hidden-lg-down {
+    display: none; } }
+
+@media screen and (min-width: 62em) {
+  .hidden-lg-up {
+    display: none; } }
+
+@media screen and (max-width: 75em) {
+  .hidden-xl-down {
+    display: none; } }
+
+@media screen and (min-width: 75em) {
+  .hidden-xl-up {
+    display: none; } }
+
 * {
   box-sizing: border-box; }
 
@@ -11,25 +57,20 @@ header {
   background-color: #292d32;
   font-size: 1.6em; }
   header nav {
-    display: flex;
-    align-items: center;
-    height: 50px; }
-    header nav:before {
-      content: '\f266';
-      font-family: 'Font Awesome 5 Brands', sans-serif;
-      font-weight: 900;
-      font-size: 1.6em;
-      color: #fff;
-      margin-right: 10px; }
+    height: 50px;
+    overflow: hidden; }
     header nav a {
       color: #fff;
-      box-sizing: border-box;
-      line-height: 50px;
       text-decoration: none;
       margin-right: 30px; }
       header nav a:hover {
         color: rgba(255, 255, 255, 0.75); }
+      header nav a.icon {
+        font-size: 1.4em; }
+      header nav a:first-of-type {
+        font-size: 1.6em; }
     header nav form {
+      height: 100%;
       margin: 0; }
       header nav form input {
         font-family: 'Work Sans', 'Arial', sans-serif;
@@ -39,7 +80,7 @@ header {
         border-radius: 3px;
         height: 30px;
         line-height: 30px;
-        min-width: 300px;
+        width: 100%;
         color: #fff;
         background-color: #44474c;
         padding: 0 8px; }
@@ -47,6 +88,9 @@ header {
           outline: none; }
         header nav form input[type=submit] {
           display: none; }
+    header nav .flex {
+      display: flex;
+      align-items: center; }
 
 .title {
   background-color: #fafbfc;
@@ -246,11 +290,15 @@ header {
 .index {
   font-size: 1.6em;
   padding-top: 20px; }
+  @media screen and (max-width: 36em) {
+    .index {
+      padding: 20px; } }
   .index .row {
     padding: 10px;
     border: 1px solid #eaecef;
     border-top: 0;
-    cursor: pointer; }
+    cursor: pointer;
+    overflow: hidden; }
     .index .row:hover {
       background-color: #f6f8fa; }
       .index .row:hover div:first-of-type .option-wrapper {

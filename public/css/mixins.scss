@@ -1,0 +1,76 @@
+$breakpoint-xs: 0rem;
+$breakpoint-sm: 36em; /* 576    phone  */
+$breakpoint-md: 48em; /* 768    tablet */
+$breakpoint-lg: 62em; /* 992    laptop */
+$breakpoint-xl: 75em; /* 1200   desktop */
+
+/* $point: xs, sm, md, lg, or xl */
+/* $first: mobile, or desktop   depending on what you are developing first */
+@mixin responsive($point, $first: desktop) {
+	@if $first == mobile {
+		@if $point == xl {
+			@media screen and (min-width: $breakpoint-xl) {
+				@content;
+			}
+		} @else if $point == lg {
+			@media screen and (min-width: $breakpoint-lg) {
+				@content;
+			}
+		} @else if $point == md {
+			@media screen and (min-width: $breakpoint-md) {
+				@content;
+			}
+		} @else if $point == sm {
+			@media screen and (min-width: $breakpoint-sm) {
+				@content;
+			}
+		} @else if $point == xs {
+			@media screen and (min-width: $breakpoint-xs) {
+				@content;
+			}
+		}
+	} @else if $first == desktop {
+		@if $point == xl {
+			@media screen and (max-width: $breakpoint-xl) {
+				@content;
+			}
+		} @else if $point == lg {
+			@media screen and (max-width: $breakpoint-lg) {
+				@content;
+			}
+		} @else if $point == md {
+			@media screen and (max-width: $breakpoint-md) {
+				@content;
+			}
+		} @else if $point == sm {
+			@media screen and (max-width: $breakpoint-sm) {
+				@content;
+			}
+		} @else if $point == xs {
+			@media screen and (max-width: $breakpoint-xs) {
+				@content;
+			}
+		}
+	}
+}
+
+@mixin prefix($property, $value, $prefixes: (webkit, moz, o, ms)) {
+	#{$property}: $value;
+	@each $prefix in $prefixes {
+		#{'-' + $prefix + '-' + $property}: $value;
+	}
+}
+
+$hide: xs sm md lg xl;
+@each $point in $hide {
+	.hidden-#{$point}-down {
+		@include responsive($point) {
+			display: none;
+		}
+	}
+	.hidden-#{$point}-up {
+		@include responsive($point, mobile) {
+			display: none;
+		}
+	}
+}

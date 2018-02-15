@@ -1,3 +1,5 @@
+@import "mixins";
+
 * {
 	box-sizing: border-box;
 }
@@ -14,28 +16,24 @@ header {
 	background-color: #292d32;
 	font-size: 1.6em;
 	nav {
-		display: flex;
-		align-items: center;
 		height: $navHeight;
-		&:before {
-			content: '\f266';
-			font-family: 'Font Awesome 5 Brands', sans-serif;
-			font-weight: 900;
-			font-size: 1.6em;
-			color: #fff;
-			margin-right: 10px;
-		}
+		overflow: hidden;
 		a {
 			color: #fff;
-			box-sizing: border-box;
-			line-height: $navHeight;
 			text-decoration: none;
 			margin-right: 30px;
 			&:hover {
 				color: rgba(255, 255, 255, 0.75);
 			}
+			&.icon {
+				font-size: 1.4em;
+			}
+			&:first-of-type {
+				font-size: 1.6em;
+			}
 		}
 		form {
+			height: 100%;
 			margin: 0;
 			input {
 				font-family: 'Work Sans', 'Arial', sans-serif;
@@ -45,7 +43,7 @@ header {
 				border-radius: 3px;
 				height: 30px;
 				line-height: 30px;
-				min-width: 300px;
+				width: 100%;
 				color: #fff;
 				background-color: #44474c;
 				padding: 0 8px;
@@ -56,6 +54,10 @@ header {
 					display: none;
 				}
 			}
+		}
+		.flex {
+			display: flex;
+			align-items: center;
 		}
 	}
 }
@@ -338,11 +340,15 @@ header {
 .index {
 	font-size: 1.6em;
 	padding-top: 20px;
+	@include responsive(sm) {
+		padding: 20px;
+	}
 	.row {
 		padding: 10px;
 		border: 1px solid #eaecef;
 		border-top: 0;
 		cursor: pointer;
+		overflow: hidden;
 		&:hover {
 			background-color: #f6f8fa;
 			div:first-of-type .option-wrapper {
