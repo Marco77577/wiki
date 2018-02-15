@@ -53,6 +53,9 @@ html, body {
   font-family: 'Work Sans', 'Arial', sans-serif;
   font-size: 10px; }
 
+@media print {
+  @page {
+    margin: 0; } }
 header {
   background-color: #292d32;
   font-size: 1.6em; }
@@ -91,6 +94,9 @@ header {
     header nav .flex {
       display: flex;
       align-items: center; }
+  @media print {
+    header {
+      display: none; } }
 
 .title {
   background-color: #fafbfc;
@@ -232,17 +238,22 @@ header {
     border-radius: 0;
     border: 0;
     text-decoration: none; }
+    @media print {
+      .edit a.button {
+        display: none; } }
     .edit a.button.save:hover, .edit a.button.editbutton:hover, .edit a.button.success {
       background-color: #63bb7d; }
     .edit a.button.delete:hover {
       background-color: #ef525b; }
-    .edit a.button.view:hover {
+    .edit a.button.view:hover, .edit a.button.print:hover {
       background-color: #4a81e4; }
     .edit a.button:before {
       font-family: 'Font Awesome 5 Free', sans-serif;
       font-weight: 900;
       margin-right: 10px;
       content: ''; }
+    .edit a.button.print:before {
+      content: '\f02f'; }
     .edit a.button.save:before {
       content: '\f0c7'; }
     .edit a.button.save.saving:before {
@@ -255,7 +266,7 @@ header {
       content: '\f303'; }
     .edit a.button.view:before {
       content: '\f06e'; }
-    .edit a.button.save.error:before, .edit a.button.delete.error:before, .edit a.buttoneditbutton.error:before, .edit a.buttonview.error:before {
+    .edit a.button.save.error:before, .edit a.button.delete.error:before, .edit a.button.editbutton.error:before, .edit a.button.view.error:before, .edit a.button.print.error:before {
       content: '\f071'; }
   .edit #button-wrapper {
     max-width: 100%; }
