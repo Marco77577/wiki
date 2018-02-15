@@ -155,6 +155,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 shiftKey: true
             }
         ];
+        var dirty = false;
         const content = $1('#content');
         const title = $1('#title');
         const slug = $1('#slug');
@@ -164,6 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const saveButton = $1('#save-button');
         const deleteButton = $1('#delete-button');
         const viewButton = $1('#view-button');
+
         const update = function () {
             preview.innerHTML = marked(content.value);
             Prism.highlightAll();
@@ -192,6 +194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 latestSaveSlug = slug.value;
                 viewButton.href = '/wiki/view/' + latestSaveSlug;
                 saveButton.classList.remove('error');
+                setDirty(false);
             } else {
                 //error while saving
                 saveButton.classList.add('error');
@@ -213,9 +216,26 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
 
+        const setDirty = function (d) {
+            dirty = d;
+            if (dirty) {
+                saveButton.innerText = 'Save Changes!';
+                saveButton.classList.remove('success');
+            } else {
+                saveButton.innerText = 'Saved';
+                saveButton.classList.add('success');
+            }
+        };
+
+        window.addEventListener('beforeunload', function () {
+            if (dirty) attemptSaving();
+            return !dirty;
+        });
+
         update();
 
         addEvent(title, 'input', function () {
+            setDirty(true);
             slug.value = title.value.toLowerCase().replace(/\s/g, '-').replace(/[^a-z0-9-]/g, '').replace(/-+/g, '-');
             if (slug.value !== latestSaveSlug) {
                 checkSlug(function (result) {
@@ -228,6 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         addEvent(slug, 'input', function () {
+            setDirty(true);
             if (slug.value !== latestSaveSlug) {
                 checkSlug(function (result) {
                     if (result === 'free') {
@@ -241,7 +262,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
 
+        addEvent(tags, 'input', function () {
+            setDirty(true);
+        });
+
         addEvent(content, 'input', function () {
+            setDirty(true);
             update();
         });
 
@@ -292,6 +318,6 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        setInterval(attemptSaving, 3000);
+        setInterval(attemptSaving, 2000);
     }
 );

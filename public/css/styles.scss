@@ -278,6 +278,9 @@ header {
 		&.save.saving:before {
 			content: '\f2f1';
 		}
+		&.save.success:before {
+			content: '\f00c';
+		}
 		&.delete:before {
 			content: '\f1f8';
 		}

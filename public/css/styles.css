@@ -247,6 +247,8 @@ header {
       content: '\f0c7'; }
     .edit a.button.save.saving:before {
       content: '\f2f1'; }
+    .edit a.button.save.success:before {
+      content: '\f00c'; }
     .edit a.button.delete:before {
       content: '\f1f8'; }
     .edit a.button.editbutton:before {
