@@ -5,9 +5,9 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const confirm = window.confirm('Are you sure you want to delete this entry?');
             if (!confirm) return;
-            getAjax('http://localhost:3000/wiki/delete/' + deleteButton.getAttribute('data-slug'), function (result) {
+            getAjax('http://localhost:' + PORT + '/wiki/delete/' + deleteButton.getAttribute('data-slug'), function (result) {
                 if (result === 'success') {
-                    location.href = 'http://localhost:3000/wiki/index';
+                    location.href = 'http://localhost:' + PORT + '/wiki/index';
                 } else {
                     this.classList.add('error');
                 }
@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
             entries[currentlyActive].classList.add('active');
         }
-        if(e.keyCode === 13) { //enter
+        if (e.keyCode === 13) { //enter
             location.href = $1('.row.active div a').href;
         }
     });

@@ -90,7 +90,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 0,
                 keyCode: 67,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: true
             },
             {
                 name: 'codeBlock',
@@ -113,7 +113,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 shiftKey: false
             },
             {name: 'h1', text: 'H1', delimiterStart: "\n# ", delimiterEnd: "", addedLineBreaks: 1, keyCode: 49, ctrlKey: true, shiftKey: false},
-            {name: 'h2', text: 'H2', delimiterStart: "\n## ", delimiterEnd: "", addedLineBreaks: 1, keyCode: 50, ctrlKey: true, shiftKey: false},
+            {
+                name: 'h2',
+                text: 'H2',
+                delimiterStart: "\n## ",
+                delimiterEnd: "",
+                addedLineBreaks: 1,
+                keyCode: 50,
+                ctrlKey: true,
+                shiftKey: false
+            },
             {
                 name: 'h3',
                 text: 'H3',
@@ -183,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
             Prism.highlightAll();
         };
         const checkSlug = function (callback) {
-            getAjax('http://localhost:3000/wiki/checkslug/' + slug.value, function (result) {
+            getAjax('http://localhost:' + PORT + '/wiki/checkslug/' + slug.value, function (result) {
                 callback(result);
             });
         };
@@ -197,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
             update();
         };
         const save = function (callback) {
-            getAjax('http://localhost:3000/wiki/save/' + encodeURIComponent(title.value) + '/' + encodeURIComponent(slug.value) + '/' + encodeURIComponent(latestSaveSlug) + '/' + encodeURIComponent(tags.value) + '/' + encodeURIComponent(content.value), function (result) {
+            getAjax('http://localhost:' + PORT + '/wiki/save/' + encodeURIComponent(title.value) + '/' + encodeURIComponent(slug.value) + '/' + encodeURIComponent(latestSaveSlug) + '/' + encodeURIComponent(tags.value) + '/' + encodeURIComponent(content.value), function (result) {
                 callback(result);
             });
         };
@@ -245,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
             linkSelectionStart.value = '';
             linkSelectionEnd.value = '';
         };
-        const finishLinkWizard = function() {
+        const finishLinkWizard = function () {
             if (linkText.value.length <= 0) {
                 linkText.classList.add('error');
                 linkText.focus();
@@ -341,16 +350,16 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             const confirm = window.confirm('Are you sure you want to delete this entry?');
             if (!confirm) return;
-            getAjax('http://localhost:3000/wiki/delete/' + latestSaveSlug, function (result) {
+            getAjax('http://localhost:' + PORT + '/wiki/delete/' + latestSaveSlug, function (result) {
                 if (result === 'success') {
-                    location.href = 'http://localhost:3000/wiki/index';
+                    location.href = 'http://localhost:' + PORT + '/wiki/index';
                 } else {
                     deleteButton.classList.add('error');
                 }
             });
         });
         addEvent(linkSearch, 'input', function () {
-            getAjax('http://localhost:3000/wiki/entries/' + encodeURIComponent(linkSearch.value), function (result) {
+            getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent(linkSearch.value), function (result) {
                 linkSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
                 result = JSON.parse(result);
                 for (var i = 0, j = result.length; i < j; i++) {
@@ -372,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const text = linkText.value.length > 0 ? linkText.value : entry.title;
                         const calculatedEnd = parseInt(linkSelectionStart.value) + text.length + 1;
                         content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + text + content.value.slice(parseInt(linkSelectionEnd.value));
-                        content.value = content.value.slice(0, calculatedEnd) + '](http://localhost:3000/wiki/view/' + entry.slug + ')' + content.value.slice(calculatedEnd);
+                        content.value = content.value.slice(0, calculatedEnd) + '](http://localhost:' + PORT + '/wiki/view/' + entry.slug + ')' + content.value.slice(calculatedEnd);
                         content.setSelectionRange(calculatedEnd, calculatedEnd);
                         content.focus();
                         update();
@@ -383,7 +392,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         addEvent(linkButton, 'click', function () {
             const positions = getTextSelection(content);
-            console.log(positions);
             linkSelectionStart.value = positions.start;
             linkSelectionEnd.value = positions.end;
             linkText.value = content.value.slice(positions.start, positions.end);
@@ -405,7 +413,10 @@ document.addEventListener('DOMContentLoaded', function () {
             span.setAttribute('title', (fct.ctrlKey ? 'Ctrl+' : '') + (fct.shiftKey ? 'Shift+' : '') + String.fromCharCode(fct.keyCode));
             span.textContent = fct.text;
             buttonWrapper.appendChild(span);
-            buttonWrapper.innerHTML += ' ';
+
+            const divider = document.createElement('span');
+            divider.textContent = ' ';
+            buttonWrapper.appendChild(divider);
 
             addEvent(span, 'click', function () {
                 applyStyle(fct);

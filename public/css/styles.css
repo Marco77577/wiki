@@ -271,7 +271,6 @@ header {
   .edit #button-wrapper {
     max-width: 100%; }
     .edit #button-wrapper span.icon {
-      display: inline;
       background-color: #f1f8ff;
       color: #0366d6;
       padding: 3px 10px;

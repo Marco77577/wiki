@@ -31,6 +31,6 @@ document.addEventListener('DOMContentLoaded', function () {
     addEvent(searchForm, 'submit', function (e) {
         e.preventDefault();
         if (search.value.length === 0) return;
-        location.href = 'http://localhost:3000/wiki/index/' + search.value;
+        location.href = 'http://localhost:' + PORT + '/wiki/index/' + search.value;
     });
 });

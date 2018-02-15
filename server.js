@@ -1,14 +1,14 @@
-const port = 3000;
 const http = require('http');
 const fs = require('fs');
+const config = require('./config');
 const router = require('./router');
 const marked = require('marked');
 
-const getTemplateSync = function (name) {
+const loadTemplateSync = function (name) {
     return fs.readFileSync('./public/' + name + '.html');
 };
 
-const getTemplateAsync = function (name, callback) {
+const loadTemplateAsync = function (name, callback) {
     fs.readFile('./public/' + name + '.html', 'utf8', function (err, html) {
         callback(err, html);
     });
@@ -26,7 +26,23 @@ const replaceBlock = function (blockName, container, substitute, global) {
 };
 
 const prepareUrls = function (container) {
-    return container.replace(/(href|src)="(?!http)(.+?)"/g, '$1="http://localhost:' + port + '/$2"');
+    return container.replace(/(href|src)="(?!http)(.+?)"/g, '$1="http://localhost:' + config.PORT + '/$2"');
+};
+
+const loadEnvVarTemplate = function () {
+    return '<script>const PORT = ' + config.PORT + '; const WIKI_NAME = \'' + config.WIKI_NAME + '\';</script>';
+};
+
+const preparePageForDisplay = function (res, html, pageTitle) {
+    html = replaceBlock('head', html, loadTemplateSync('head'));
+    html = replaceBlock('title', html, pageTitle);
+    html = replaceBlock('wikiname', html, config.WIKI_NAME, true);
+    html = replaceBlock('envvars', html, loadEnvVarTemplate());
+    html = replaceBlock('header', html, loadTemplateSync('header'));
+    html = prepareUrls(html);
+    res.writeHead(200, {'Content-Type': 'text/html'});
+    res.write(html);
+    res.end();
 };
 
 const getEntryList = function (search, callback) {
@@ -52,8 +68,7 @@ const getEntryList = function (search, callback) {
 };
 
 const loadIndex = function (req, res, urlOptions) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    getTemplateAsync('entryIndex', function (err, html) {
+    loadTemplateAsync('entryIndex', function (err, html) {
         if (err) throw err;
         fs.readdir('./public/wiki', function (err2, files) {
             if (err2) throw err2;
@@ -78,14 +93,13 @@ const loadIndex = function (req, res, urlOptions) {
                 }
             }
 
-            html = replaceBlock('header', html, getTemplateSync('header'));
-            html = replaceBlock('title', html, (urlOptions[1] !== undefined ? urlOptions[1] : 'Index'));
+            const pageTitle = (urlOptions[1] !== undefined ? urlOptions[1] : 'Index');
+            html = replaceBlock('title', html, pageTitle);
             html = replaceBlock('tags', html, (urlOptions[1] !== undefined ?
                                                '<a class="tag" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' : ''));
             html = replaceBlock('content', html, list);
-            html = prepareUrls(html);
-            res.write(html);
-            res.end();
+
+            preparePageForDisplay(res, html, pageTitle);
         });
     });
 };
@@ -96,22 +110,23 @@ router.register('/wiki', loadIndex);
 router.register('/', loadIndex);
 
 router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    getTemplateAsync('view', function (err, html) {
+    loadTemplateAsync('view', function (err, html) {
         if (err) throw err;
 
         //load wiki entry
         loadWikiEntryAsync(urlOptions[1], function (wikiErr, wikiEntry) {
+            var pageTitle = 'Entry Not Found';
             if (wikiErr && wikiErr.code === 'ENOENT') {
                 //fill in data
-                html = replaceBlock('title', html, 'Entry Not Found', true); //TODO find customizable way to do this
+                html = replaceBlock('title', html, pageTitle, true); //TODO find customizable way to do this
                 html = replaceBlock('tags', html, '');
                 html = replaceBlock('content', html, '');
             } else {
                 //extract title and tags
                 const title = wikiEntry.match(/^title: (.+)/);
                 if (title) {
-                    html = replaceBlock('title', html, title[1], true);
+                    pageTitle = title[1];
+                    html = replaceBlock('title', html, pageTitle, true);
                     wikiEntry = wikiEntry.replace(/^title: (.+)/, '');
                 }
 
@@ -133,43 +148,37 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
             }
 
             //prepare links
-            html = replaceBlock('header', html, getTemplateSync('header'));
             html = replaceBlock('slug', html, urlOptions[1], true);
-            html = prepareUrls(html);
-            res.write(html);
-            res.end();
+            preparePageForDisplay(res, html, pageTitle);
         });
     });
 });
 
 router.register('\/wiki\/edit\/(.+)', function (req, res, urlOptions) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    getTemplateAsync('edit', function (err, html) {
+    loadTemplateAsync('edit', function (err, html) {
         if (err) throw err;
 
         //load wiki entry
         loadWikiEntryAsync(urlOptions[1], function (wikiErr, wikiEntry) {
+            var pageTitle = "Entry Not Found";
             if (wikiErr && wikiErr.code === 'ENOENT') {
                 //fill in data
-                getTemplateAsync('view', function (errView, htmlView) {
+                loadTemplateAsync('view', function (errView, htmlView) {
                     if (errView) throw errView;
 
-                    html = replaceBlock('header', htmlView, getTemplateSync('header'));
-                    html = replaceBlock('title', html, 'Entry Not Found', true); //TODO find customizable way to do this
+                    html = replaceBlock('title', html, pageTitle, true); //TODO find customizable way to do this
                     html = replaceBlock('slug', html, '');
                     html = replaceBlock('tags', html, '');
                     html = replaceBlock('content', html, '');
 
-                    //prepare links
-                    html = prepareUrls(html);
-                    res.write(html);
-                    res.end();
+                    preparePageForDisplay(res, html, pageTitle);
                 });
             } else {
                 //extract title and tags
                 const title = wikiEntry.match(/^title: (.+)/);
                 if (title) {
-                    html = replaceBlock('title', html, title[1], true);
+                    pageTitle = title[1];
+                    html = replaceBlock('title', html, pageTitle, true);
                     wikiEntry = wikiEntry.replace(/^title: (.+)/, '');
                 }
 
@@ -182,34 +191,26 @@ router.register('\/wiki\/edit\/(.+)', function (req, res, urlOptions) {
                 }
 
                 //fill in data
-                html = replaceBlock('header', html, getTemplateSync('header'));
                 html = replaceBlock('content', html, wikiEntry.trim(), true);
 
-                //prepare links
-                html = prepareUrls(html);
-                res.write(html);
-                res.end();
+                preparePageForDisplay(res, html, pageTitle);
             }
         });
     });
 });
 
-router.register('/wiki/new', function (req, res, urlOptions) {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    getTemplateAsync('edit', function (err, html) {
+router.register('/wiki/new', function (req, res) {
+    loadTemplateAsync('edit', function (err, html) {
         if (err) throw err;
 
-        html = replaceBlock('header', html, getTemplateSync('header'));
-        html = replaceBlock('title', html, 'New');
+        const pageTitle = 'New';
         html = replaceBlock('title', html, '');
         html = replaceBlock('slug', html, '');
         html = replaceBlock('tags', html, '');
         html = replaceBlock('content', html, '');
 
         //prepare links
-        html = prepareUrls(html);
-        res.write(html);
-        res.end();
+        preparePageForDisplay(res, html, pageTitle);
     });
 });
 
@@ -278,6 +279,6 @@ const server = http.createServer(function (req, res) {
     const handler = router.route(req);
     handler.method.process(req, res, handler.urlOptions);
 });
-server.listen(port, function () {
-    console.log('listening on port ' + port);
+server.listen(config.PORT, function () {
+    console.log('listening on port ' + config.PORT);
 });
