@@ -1,0 +1,41 @@
+<html>
+<head>
+	{% block head %}
+	<script src="js/settings.js"></script>
+</head>
+<body>
+{% block header %}
+<div class="title edit">
+	<div class="container">
+		<div class="row">
+			<div class="col-12 col-md-8">
+				<div class="label-positioner">
+					<label for="port">Port:</label>
+					<input type="text" id="port" placeholder="3000" value="{% block port %}"
+					       tabindex="1"/>
+				</div>
+				<div class="label-positioner">
+					<label for="wikiname">Name:</label>
+					<input type="text" id="wikiname" placeholder="Personal Wiki" value="{% block wikiname %}"
+					       tabindex="2"/>
+				</div>
+			</div>
+			<div class="col-12 col-md-4">
+				<a href="#" class="button save success" id="save-button" title="Ctrl+S">Saved</a>
+				<a href="#" class="button update" id="update-button">Update Wiki</a>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container">
+	<div class="row">
+		<div class="col-12 col-md-8">
+			<div class="content">
+				<p>In order for the changes to take effect, a restart of the wiki is required.</p>
+				<p>The update feature may not be working fully yet.</p>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>

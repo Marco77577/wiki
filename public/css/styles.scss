@@ -26,6 +26,9 @@ header {
 			color: #fff;
 			text-decoration: none;
 			margin-right: 30px;
+			@include responsive(sm) {
+				margin-right: 15px;
+			}
 			&:hover {
 				color: rgba(255, 255, 255, 0.75);
 			}
@@ -299,7 +302,7 @@ $headingBorderColor: #eaecef;
 		&.delete:hover {
 			background-color: $errorColor;
 		}
-		&.view:hover, &.print:hover {
+		&.view:hover, &.print:hover, &.update:hover {
 			background-color: #4a81e4;
 		}
 		&:before {
@@ -314,7 +317,10 @@ $headingBorderColor: #eaecef;
 		&.save:before {
 			content: '\f0c7';
 		}
-		&.save.saving:before {
+		&.update:before {
+			content: '\f0ad';
+		}
+		&.save.saving:before, &.update.saving:before {
 			content: '\f2f1';
 		}
 		&.save.success:before {
@@ -329,7 +335,7 @@ $headingBorderColor: #eaecef;
 		&.view:before {
 			content: '\f06e';
 		}
-		&.save.error:before, &.delete.error:before, &.editbutton.error:before, &.view.error:before, &.print.error:before {
+		&.save.error:before, &.delete.error:before, &.editbutton.error:before, &.view.error:before, &.print.error:before, &.update.error:before {
 			content: '\f071';
 		}
 	}

@@ -3,6 +3,7 @@ const fs = require('fs');
 const config = require('./config');
 const router = require('./router');
 const marked = require('marked');
+const childProcess = require('child_process');
 
 const loadTemplateSync = function (name) {
     return fs.readFileSync('./public/' + name + '.html');
@@ -214,6 +215,15 @@ router.register('/wiki/new', function (req, res) {
     });
 });
 
+router.register('/wiki/settings', function (req, res) {
+    loadTemplateAsync('settings', function (err, html) {
+        if (err) throw err;
+
+        html = replaceBlock('port', html, config.PORT);
+        preparePageForDisplay(res, html, 'Settings');
+    });
+});
+
 router.register('\/wiki\/save\/(.+?)\/(.+?)\/(.*?)\/(.*?)\/((?:.|\s)+)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
 
@@ -245,6 +255,28 @@ router.register('\/wiki\/save\/(.+?)\/(.+?)\/(.*?)\/(.*?)\/((?:.|\s)+)', functio
             }
         });
     }
+});
+
+router.register('\/wiki\/savesettings\/([0-9]{4,5})\/(.+)', function (req, res, urlOptions) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+
+    const configText = "exports.PORT = " + urlOptions[1] + ";\nexports.WIKI_NAME = \"" + decodeURIComponent(urlOptions[2]) + "\";";
+    fs.writeFile('./config.js', configText, 'utf8', function (err) {
+        if (err) {
+            res.write('Error: Could not save file.');
+        } else {
+            res.write('success');
+        }
+        res.end();
+    });
+});
+
+router.register('/wiki/update', function (req, res) {
+    childProcess.exec('update.bat', function () {
+        res.writeHead(200, {'Content-Type': 'text/plain'});
+        res.write('finished');
+        res.end();
+    });
 });
 
 router.register('\/wiki\/delete\/(.+)', function (req, res, urlOptions) {

@@ -66,6 +66,9 @@ header {
       color: #fff;
       text-decoration: none;
       margin-right: 30px; }
+      @media screen and (max-width: 36em) {
+        header nav a {
+          margin-right: 15px; } }
       header nav a:hover {
         color: rgba(255, 255, 255, 0.75); }
       header nav a.icon {
@@ -261,7 +264,7 @@ header {
       background-color: #63bb7d; }
     .edit a.button.delete:hover {
       background-color: #ef525b; }
-    .edit a.button.view:hover, .edit a.button.print:hover {
+    .edit a.button.view:hover, .edit a.button.print:hover, .edit a.button.update:hover {
       background-color: #4a81e4; }
     .edit a.button:before {
       font-family: 'Font Awesome 5 Free', sans-serif;
@@ -272,7 +275,9 @@ header {
       content: '\f02f'; }
     .edit a.button.save:before {
       content: '\f0c7'; }
-    .edit a.button.save.saving:before {
+    .edit a.button.update:before {
+      content: '\f0ad'; }
+    .edit a.button.save.saving:before, .edit a.button.update.saving:before {
       content: '\f2f1'; }
     .edit a.button.save.success:before {
       content: '\f00c'; }
@@ -282,7 +287,7 @@ header {
       content: '\f303'; }
     .edit a.button.view:before {
       content: '\f06e'; }
-    .edit a.button.save.error:before, .edit a.button.delete.error:before, .edit a.button.editbutton.error:before, .edit a.button.view.error:before, .edit a.button.print.error:before {
+    .edit a.button.save.error:before, .edit a.button.delete.error:before, .edit a.button.editbutton.error:before, .edit a.button.view.error:before, .edit a.button.print.error:before, .edit a.button.update.error:before {
       content: '\f071'; }
   .edit #button-wrapper {
     max-width: 100%; }
