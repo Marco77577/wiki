@@ -257,6 +257,9 @@ header {
     border-radius: 0;
     border: 0;
     text-decoration: none; }
+    @media screen and (max-width: 48em) {
+      .edit a.button {
+        max-width: 100%; } }
     @media print {
       .edit a.button {
         display: none; } }
