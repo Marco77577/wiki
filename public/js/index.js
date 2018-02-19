@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const entries = $('.index .row');
     var currentlyActive = -1;
     addEvent(document, 'keydown', function (e) {
-        console.log(e.keyCode);
         if (e.keyCode >= 37 && e.keyCode <= 40) {
             if (currentlyActive === -1) {
                 currentlyActive = 1;
