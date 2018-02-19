@@ -97,7 +97,7 @@ const loadIndex = function (req, res, urlOptions) {
             const pageTitle = (urlOptions[1] !== undefined ? urlOptions[1] : 'Index');
             html = replaceBlock('title', html, pageTitle);
             html = replaceBlock('tags', html, (urlOptions[1] !== undefined ?
-                                               '<a class="tag" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' : ''));
+                                               '<a class="tag" href="wiki/index/' + urlOptions[1] + '">' + decodeURIComponent(urlOptions[1]) + '</a>' : ''));
             html = replaceBlock('content', html, list);
 
             preparePageForDisplay(res, html, pageTitle);
