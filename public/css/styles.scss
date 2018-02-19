@@ -12,7 +12,15 @@ html, body {
 }
 
 @include print { //prevents automatic margins in Chrome
-	@page { margin: 0; }
+	@page {
+		margin: 2cm 0;
+		orphans: 4;
+		widows: 2;
+	}
+
+	@page:first {
+		margin: 0 0 2cm;
+	}
 }
 
 $navHeight: 50px;

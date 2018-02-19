@@ -55,7 +55,11 @@ html, body {
 
 @media print {
   @page {
-    margin: 0; } }
+    margin: 2cm 0;
+    orphans: 4;
+    widows: 2; }
+  @page :first {
+    margin: 0 0 2cm; } }
 header {
   background-color: #292d32;
   font-size: 1.6em; }
