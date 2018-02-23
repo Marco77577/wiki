@@ -33,4 +33,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (search.value.length === 0) return;
         location.href = 'http://localhost:' + PORT + '/wiki/index/' + search.value;
     });
+
+    addEvent(document, 'keydown', function(e) {
+        if(e.ctrlKey && e.keyCode === 70) {
+            e.preventDefault();
+            search.focus();
+        }
+    });
 });
