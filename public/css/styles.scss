@@ -161,7 +161,7 @@ $headingBorderColor: #eaecef;
 	}
 
 	pre {
-		font-size: 1.4em;
+		font-size: 14px;
 	}
 
 	code:not([class^=' lang']) {
@@ -179,11 +179,12 @@ $headingBorderColor: #eaecef;
 		background-color: #f4f2f0;
 		margin: 7px 0;
 		padding: 14px 40px 14px 40px;
+		min-height: 52px;
 		&:before, &:after {
 			position: absolute;
 			font-family: 'Font Awesome 5 Free', sans-serif;
 			font-weight: 900;
-			font-size: 2em;
+			font-size: 20px;
 		}
 		&:before {
 			top: 14px;
@@ -197,6 +198,7 @@ $headingBorderColor: #eaecef;
 		}
 		p {
 			margin-top: 0;
+			font-size: 16px;
 			&:last-of-type {
 				margin-bottom: 0;
 			}
