@@ -333,6 +333,9 @@ header {
         font-family: 'Font Awesome 5 Free', sans-serif;
         font-weight: 900;
         margin-right: 5px; }
+    .edit #button-wrapper span#youtube:before {
+      font-family: "Font Awesome 5 Brands", sans-serif;
+      content: '\f167'; }
     .edit #button-wrapper span#image:before {
       content: '\f03e'; }
     .edit #button-wrapper span#bold:before {

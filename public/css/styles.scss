@@ -390,6 +390,10 @@ $headingBorderColor: #eaecef;
 					margin-right: 5px;
 				}
 			}
+			&#youtube:before {
+				font-family: "Font Awesome 5 Brands", sans-serif;
+				content: '\f167';
+			}
 			&#image:before {
 				content: '\f03e';
 			}

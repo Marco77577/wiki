@@ -239,6 +239,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const imageDeleteButton = $1('#image-delete-button');
         const imageButton = $1('#image');
 
+        const youtubeWindow = $1('#youtube-window');
+        const youtubeText = $1('#youtube-text');
+        const youtubeUrl = $1('#youtube-url');
+        const youtubeSelectionStart = $1('#youtube-selection-start');
+        const youtubeSelectionEnd = $1('#youtube-selection-end');
+        const youtubeFinishButton = $1('#youtube-finish-button');
+        const youtubeCancelButton = $1('#youtube-cancel-button');
+        const youtubeButton = $1('#youtube');
+
         const update = function () {
             preview.innerHTML = marked(content.value);
             Prism.highlightAll();
@@ -318,6 +327,7 @@ document.addEventListener('DOMContentLoaded', function () {
             linkSelectionStart.value = '';
             linkSelectionEnd.value = '';
             linkSearchWrapper.innerHTML = '';
+            content.focus();
         };
         const finishLinkWizardWithSearchResult = function (entry) {
             const text = linkText.value.length > 0 ? linkText.value : entry.getAttribute('data-title');
@@ -382,6 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
             imageDownloadButton.classList.remove('downloading');
             imageDeleteButton.classList.remove('deleting');
             imageDeleteButton.classList.remove('error');
+            content.focus();
         };
         const finishImageWizard = function () {
             if (imageText.value.length <= 0) {
@@ -407,6 +418,47 @@ document.addEventListener('DOMContentLoaded', function () {
             content.focus();
             update();
             cancelImageWindow();
+        };
+        const openYoutubeWindow = function () {
+            const positions = getTextSelection(content);
+            youtubeSelectionStart.value = positions.start;
+            youtubeSelectionEnd.value = positions.end;
+            youtubeText.value = content.value.slice(positions.start, positions.end);
+            youtubeWindow.classList.add('visible');
+            youtubeText.focus();
+        };
+        const cancelYoutubeWindow = function () {
+            youtubeWindow.classList.remove('visible');
+            youtubeText.value = '';
+            youtubeUrl.value = '';
+            youtubeSelectionStart.value = '';
+            youtubeSelectionEnd.value = '';
+            content.focus();
+        };
+        const finishYoutubeWizard = function () {
+            if (youtubeText.value.length <= 0) {
+                youtubeText.classList.add('error');
+                youtubeText.focus();
+                return;
+            }
+            youtubeText.classList.remove('error');
+            if (youtubeUrl.value.length <= 0 || youtubeUrl.value === 'http://') {
+                youtubeUrl.classList.add('error');
+                youtubeUrl.focus();
+                return;
+            }
+            youtubeUrl.classList.remove('error');
+
+            const text = '[![' + youtubeText.value;
+            const link = '](http://img.youtube.com/vi/' + youtubeUrl.value.match(/\?v=([a-zA-Z0-9]+)/)[1] + '/0.jpg)](' + youtubeUrl.value + ')';
+            const calculatedSecondPartStart = parseInt(youtubeSelectionStart.value) + text.length;
+            const calculatedEnd = calculatedSecondPartStart + link.length;
+            content.value = content.value.slice(0, parseInt(youtubeSelectionStart.value)) + text + content.value.slice(parseInt(youtubeSelectionEnd.value));
+            content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
+            content.setSelectionRange(calculatedEnd, calculatedEnd);
+            content.focus();
+            update();
+            cancelYoutubeWindow();
         };
 
         window.addEventListener('beforeunload', function () {
@@ -466,6 +518,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     e.preventDefault();
                     openImageWindow();
                 }
+                if (e.shiftKey && e.keyCode === 89) { //Shift + Y
+                    e.preventDefault();
+                    openYoutubeWindow();
+                }
             }
         });
         addEvent(document, 'keydown', function (e) {
@@ -474,8 +530,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 attemptSaving();
             }
             if (e.keyCode === 27) { //esc
+                e.preventDefault();
                 cancelLinkWindow();
                 cancelImageWindow();
+                cancelYoutubeWindow();
             }
             if (linkWindow.classList.contains('visible') && e.keyCode === 13) { //enter
                 e.preventDefault();
@@ -485,15 +543,19 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault();
                 finishImageWizard();
             }
+            if (youtubeWindow.classList.contains('visible') && e.keyCode === 13) { //enter
+                e.preventDefault();
+                finishYoutubeWizard();
+            }
         });
-        addEvent(document, 'scroll', function(e) {
-           const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-           console.log(scrollTop);
-           if(scrollTop > 240) {
-               editor.style.top = '0';
-           } else {
-               editor.style.top = 240 - scrollTop + 'px';
-           }
+        addEvent(document, 'scroll', function () {
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            console.log(scrollTop);
+            if (scrollTop > 240) {
+                editor.style.top = '0';
+            } else {
+                editor.style.top = 240 - scrollTop + 'px';
+            }
         });
         addEvent(saveButton, 'click', function (e) {
             e.preventDefault();
@@ -618,7 +680,7 @@ document.addEventListener('DOMContentLoaded', function () {
             imageDeleteButton.classList.add('deleting');
             getAjax('http://localhost:' + PORT + '/wiki/deleteImage/' + imageTimestamp.value, function (result) {
                 imageDeleteButton.classList.remove('deleting');
-                if(result === 'error') {
+                if (result === 'error') {
                     imageDeleteButton.classList.add('error');
                 } else {
                     imageContainer.innerHTML = '';
@@ -626,6 +688,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     imageDeleteButton.classList.remove('error');
                 }
             });
+        });
+        addEvent(youtubeButton, 'click', function () {
+            openYoutubeWindow();
+        });
+        addEvent(youtubeFinishButton, 'click', function (e) {
+            e.preventDefault();
+            finishYoutubeWizard();
+        });
+        addEvent(youtubeCancelButton, 'click', function (e) {
+            e.preventDefault();
+            cancelYoutubeWindow();
         });
 
 

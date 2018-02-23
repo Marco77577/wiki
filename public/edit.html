@@ -39,6 +39,7 @@
 			<div class="col-12 col-md-6">
 				<div class="edit">
 					<div id="button-wrapper">
+						<span class="icon" id="youtube" title="Ctrl+Shift+Y">YouTube Video</span>
 						<span class="icon" id="image" title="Ctrl+Shift+P">Image</span>
 						<span class="icon" id="link-button" title="Ctrl+Shift+A">Link</span>
 					</div>
@@ -77,11 +78,12 @@
 			</div>
 		</div>
 	</div>
-</div><div class="insertion-wrapper edit" id="image-window">
+</div>
+<div class="insertion-wrapper edit" id="image-window">
 	<div class="container">
 		<div class="row">
 			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
-				<label for="image-text">Alt-Text*:</label>
+				<label for="image-text">Alt Text*:</label>
 				<input type="text" id="image-text" placeholder="Google Logo" />
 				<label for="image-url">Image URL*:</label>
 				<input type="text" id="image-url" placeholder="https://google.com/image.jpg" value="http://"/>
@@ -101,6 +103,22 @@
 				<a class="button delete" id="image-delete-button">Delete Image</a>
 				<a class="button save success" id="image-finish-button" title="Enter">Finish</a>
 				<a class="button delete" id="image-cancel-button" title="Esc">Cancel</a>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="insertion-wrapper edit" id="youtube-window">
+	<div class="container">
+		<div class="row">
+			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
+				<label for="youtube-text">Alt Text*:</label>
+				<input type="text" id="youtube-text" placeholder="Youtube Video Title" />
+				<label for="image-url">Video URL*:</label>
+				<input type="text" id="youtube-url" placeholder="https://www.youtube.com/watch?v=yr6cp7cppCc"/>
+				<input type="hidden" id="youtube-selection-start"/>
+				<input type="hidden" id="youtube-selection-end"/>
+				<a class="button save success" id="youtube-finish-button" title="Enter">Finish</a>
+				<a class="button delete" id="youtube-cancel-button" title="Esc">Cancel</a>
 			</div>
 		</div>
 	</div>
