@@ -414,6 +414,12 @@ $headingBorderColor: #eaecef;
 			}
 		}
 	}
+	p {
+		font-size: 1.6em;
+		@include print {
+			display: none;
+		}
+	}
 }
 
 #editor {

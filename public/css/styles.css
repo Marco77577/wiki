@@ -356,6 +356,11 @@ header {
       content: '\f1dc'; }
     .edit #button-wrapper span#h6:before {
       content: '\f1dc'; }
+  .edit p {
+    font-size: 1.6em; }
+    @media print {
+      .edit p {
+        display: none; } }
 
 #editor {
   position: fixed;
