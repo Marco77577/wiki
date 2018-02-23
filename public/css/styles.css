@@ -374,8 +374,9 @@ header {
     border: 1px solid #eaecef;
     border-top: 0;
     cursor: pointer;
-    overflow: hidden;
-    margin: 0; }
+    overflow: hidden; }
+    .index .row.index-row {
+      margin: 0; }
     .index .row:hover, .index .row.active {
       background-color: #f6f8fa; }
       .index .row:hover div:first-of-type .option-wrapper, .index .row.active div:first-of-type .option-wrapper {
