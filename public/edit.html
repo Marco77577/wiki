@@ -38,6 +38,7 @@
 		<div class="col-12 col-md-6">
 			<div class="edit">
 				<div id="button-wrapper">
+					<span class="icon" id="image" title="Ctrl+Shift+P">Image</span>
 					<span class="icon" id="link-button" title="Ctrl+Shift+A">Link</span>
 				</div>
 				<label for="content" class="collapse">Content</label>
@@ -51,21 +52,48 @@
 		</div>
 	</div>
 </div>
-<div class="linking-wrapper edit" id="link-window">
+<div class="insertion-wrapper edit" id="link-window">
 	<div class="container">
 		<div class="row">
 			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
-				<label for="text">Text*:</label>
+				<label for="link-text">Text*:</label>
 				<input type="text" id="link-text" placeholder="Google"/>
-				<label for="url">URL*:</label>
+				<label for="link-url">Link URL*:</label>
 				<input type="text" id="link-url" placeholder="https://google.com" value="http://"/>
-				<label for="search">Link Entry:</label>
+				<label for="link-search">Link Entry:</label>
 				<input type="text" id="link-search" placeholder="Search ..."/>
 				<input type="hidden" id="link-selection-start"/>
 				<input type="hidden" id="link-selection-end"/>
 				<div id="link-search-wrapper" class="index"></div>
-				<a class="button save success" id="link-finish-button">Finish</a>
+				<a class="button save success" id="link-finish-button" title="Enter">Finish</a>
 				<a class="button delete" id="link-cancel-button" title="Esc">Cancel</a>
+			</div>
+		</div>
+	</div>
+</div><div class="insertion-wrapper edit" id="image-window">
+	<div class="container">
+		<div class="row">
+			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
+				<label for="image-text">Alt-Text*:</label>
+				<input type="text" id="image-text" placeholder="Google Logo" />
+				<label for="image-url">Image URL*:</label>
+				<input type="text" id="image-url" placeholder="https://google.com/image.jpg" value="http://"/>
+				<input type="hidden" id="image-selection-start"/>
+				<input type="hidden" id="image-selection-end"/>
+				<input type="hidden" id="image-timestamp"/>
+				<div class="row">
+					<div class="col-4">
+						<label for="image-quality" class="hidden">Quality:</label>
+						<select id="image-quality" dir="rtl" title="Compression Quality"></select>
+					</div>
+					<div class="col-8">
+						<a class="button download" id="image-download-button">Save Image Locally</a>
+					</div>
+				</div>
+				<div id="image-container"></div>
+				<a class="button delete" id="image-delete-button">Delete Image</a>
+				<a class="button save success" id="image-finish-button" title="Enter">Finish</a>
+				<a class="button delete" id="image-cancel-button" title="Esc">Cancel</a>
 			</div>
 		</div>
 	</div>

@@ -4,6 +4,7 @@ const config = require('./config');
 const router = require('./router');
 const marked = require('marked');
 const childProcess = require('child_process');
+const jimp = require('jimp');
 
 const loadTemplateSync = function (name) {
     return fs.readFileSync('./public/' + name + '.html');
@@ -305,6 +306,31 @@ router.register('\/wiki\/entries\/(.*)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/json'});
     getEntryList(urlOptions[1], function (list) {
         res.write(JSON.stringify(list));
+        res.end();
+    });
+});
+
+router.register('\/wiki\/download\/(.+)\/(.+)\/([0-9]{1,2})', function (req, res, urlOptions) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    jimp.read(decodeURIComponent(urlOptions[1]), function (err, image) {
+        if (err || image === undefined) {
+            res.write('error');
+        } else {
+            image.resize(image.bitmap.width, image.bitmap.height).quality(parseInt(urlOptions[3])).write('public/wiki/img/' + decodeURIComponent(urlOptions[2]) + '.jpg');
+            res.write('success');
+        }
+        res.end();
+    });
+});
+
+router.register('\/wiki\/deleteImage\/(.+)', function (req, res, urlOptions) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    fs.unlink('./public/wiki/img/' + urlOptions[1] + '.jpg', function(err) {
+        if(err) {
+            res.write('error');
+        } else {
+            res.write('success');
+        }
         res.end();
     });
 });

@@ -36,7 +36,7 @@ exports.missing = function (req) {
     var path = __dirname + "/public" + url.pathname.replace(/\.\.\//g, '');
     try {
         data = fs.readFileSync(path);
-        const mimeAddition = path.split('.').pop() === 'css' ? 'text/css' : 'text/html';
+        const mimeAddition = path.split('.').pop() === 'css' ? 'text/css' : (path.split('.').pop() === 'jpg' ? 'image' : 'text/html');
         mime = req.headers.accepts || mimeAddition;
         return handlerFactory.createHandler(function (req, res) {
             res.writeHead(200, {'Content-Type': mime});

@@ -224,6 +224,20 @@ document.addEventListener('DOMContentLoaded', function () {
         var linkSearchEntries = $('#link-search-wrapper .row');
         var linkSearchCurrentlyActive = -1;
 
+        const imageWindow = $1('#image-window');
+        const imageText = $1('#image-text');
+        const imageUrl = $1('#image-url');
+        const imageSelectionStart = $1('#image-selection-start');
+        const imageSelectionEnd = $1('#image-selection-end');
+        const imageTimestamp = $1('#image-timestamp');
+        const imageQuality = $1('#image-quality');
+        const imageContainer = $1('#image-container');
+        const imageFinishButton = $1('#image-finish-button');
+        const imageCancelButton = $1('#image-cancel-button');
+        const imageDownloadButton = $1('#image-download-button');
+        const imageDeleteButton = $1('#image-delete-button');
+        const imageButton = $1('#image');
+
         const update = function () {
             preview.innerHTML = marked(content.value);
             Prism.highlightAll();
@@ -328,23 +342,70 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
             linkText.classList.remove('error');
-            if (linkUrl.value.length <= 0) {
+            if (linkUrl.value.length <= 0 || linkUrl.value === 'http://') {
                 linkUrl.classList.add('error');
                 linkUrl.focus();
                 return;
             }
-            linkText.classList.remove('error');
+            linkUrl.classList.remove('error');
 
+            const text = '[' + linkText.value;
             const link = '](' + linkUrl.value + ')';
-            const calculatedSecondPartStart = parseInt(linkSelectionStart.value) + linkText.value.length + 1;
+            const calculatedSecondPartStart = parseInt(linkSelectionStart.value) + text.length;
             const calculatedEnd = calculatedSecondPartStart + link.length;
-            console.log(calculatedSecondPartStart);
-            content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + linkText.value + content.value.slice(parseInt(linkSelectionEnd.value));
+            content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + text + content.value.slice(parseInt(linkSelectionEnd.value));
             content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
             content.setSelectionRange(calculatedEnd, calculatedEnd);
             content.focus();
             update();
             cancelLinkWindow();
+        };
+        const openImageWindow = function () {
+            const positions = getTextSelection(content);
+            imageTimestamp.value = Date.now();
+            imageSelectionStart.value = positions.start;
+            imageSelectionEnd.value = positions.end;
+            imageText.value = content.value.slice(positions.start, positions.end);
+            imageWindow.classList.add('visible');
+            imageText.focus();
+        };
+        const cancelImageWindow = function () {
+            imageWindow.classList.remove('visible');
+            imageText.value = '';
+            imageUrl.value = 'http://';
+            imageSelectionStart.value = '';
+            imageSelectionEnd.value = '';
+            imageTimestamp.value = '';
+            imageContainer.innerHTML = '';
+            imageDownloadButton.classList.remove('error');
+            imageDownloadButton.classList.remove('downloading');
+            imageDeleteButton.classList.remove('deleting');
+            imageDeleteButton.classList.remove('error');
+        };
+        const finishImageWizard = function () {
+            if (imageText.value.length <= 0) {
+                imageText.classList.add('error');
+                imageText.focus();
+                return;
+            }
+            imageText.classList.remove('error');
+            if (imageUrl.value.length <= 0 || imageUrl.value === 'http://') {
+                imageUrl.classList.add('error');
+                imageUrl.focus();
+                return;
+            }
+            imageUrl.classList.remove('error');
+
+            const text = '[![' + imageText.value;
+            const link = '](' + imageUrl.value + ')](' + imageUrl.value + ')';
+            const calculatedSecondPartStart = parseInt(imageSelectionStart.value) + text.length;
+            const calculatedEnd = calculatedSecondPartStart + link.length;
+            content.value = content.value.slice(0, parseInt(imageSelectionStart.value)) + text + content.value.slice(parseInt(imageSelectionEnd.value));
+            content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
+            content.setSelectionRange(calculatedEnd, calculatedEnd);
+            content.focus();
+            update();
+            cancelImageWindow();
         };
 
         window.addEventListener('beforeunload', function () {
@@ -396,8 +457,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         applyStyle(fct);
                     }
                 });
-                if (e.shiftKey && e.keyCode === 65) {
+                if (e.shiftKey && e.keyCode === 65) { //Shift + A
+                    e.preventDefault();
                     openLinkWindow();
+                }
+                if (e.shiftKey && e.keyCode === 80) { //Shift + P
+                    e.preventDefault();
+                    openImageWindow();
                 }
             }
         });
@@ -408,10 +474,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             if (e.keyCode === 27) { //esc
                 cancelLinkWindow();
+                cancelImageWindow();
             }
             if (linkWindow.classList.contains('visible') && e.keyCode === 13) { //enter
                 e.preventDefault();
                 finishLinkWizard();
+            }
+            if (imageWindow.classList.contains('visible') && e.keyCode === 13) { //enter
+                e.preventDefault();
+                finishImageWizard();
             }
         });
         addEvent(saveButton, 'click', function (e) {
@@ -489,6 +560,64 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault();
             }
         });
+        addEvent(imageButton, 'click', function () {
+            openImageWindow();
+        });
+        addEvent(imageFinishButton, 'click', function (e) {
+            e.preventDefault();
+            finishImageWizard();
+        });
+        addEvent(imageCancelButton, 'click', function (e) {
+            e.preventDefault();
+            cancelImageWindow();
+        });
+        addEvent(imageDownloadButton, 'click', function (e) {
+            e.preventDefault();
+            if (imageUrl.value.length <= 0 || imageUrl.value === 'http://') {
+                imageUrl.classList.add('error');
+                return;
+            }
+            imageUrl.classList.remove('error');
+            imageDownloadButton.classList.remove('error');
+            imageDownloadButton.classList.add('downloading');
+            imageContainer.innerHTML = '';
+            imageDeleteButton.classList.remove('visible');
+            getAjax('http://localhost:' + PORT + '/wiki/download/' + encodeURIComponent(imageUrl.value) + '/' + imageTimestamp.value + '/' + imageQuality.value, function (result) {
+                imageDownloadButton.classList.remove('downloading');
+                if (result === 'error') {
+                    imageDownloadButton.classList.add('error');
+                    return;
+                }
+                imageDownloadButton.classList.remove('error');
+                const imagePath = 'http://localhost:' + PORT + '/wiki/img/' + imageTimestamp.value + '.jpg';
+                const a = document.createElement('a');
+                a.target = '_blank';
+                a.href = imagePath;
+                imageContainer.appendChild(a);
+
+                const img = document.createElement('img');
+                img.src = imagePath;
+                a.appendChild(img);
+
+                imageUrl.value = imagePath;
+                imageDeleteButton.classList.add('visible');
+            });
+        });
+        addEvent(imageDeleteButton, 'click', function (e) {
+            e.preventDefault();
+            imageDeleteButton.classList.add('deleting');
+            getAjax('http://localhost:' + PORT + '/wiki/deleteImage/' + imageTimestamp.value, function (result) {
+                imageDeleteButton.classList.remove('deleting');
+                if(result === 'error') {
+                    imageDeleteButton.classList.add('error');
+                } else {
+                    imageContainer.innerHTML = '';
+                    imageDeleteButton.classList.remove('visible');
+                    imageDeleteButton.classList.remove('error');
+                }
+            });
+        });
+
 
         md.forEach(function (fct) {
             const span = document.createElement('span');
@@ -508,5 +637,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         setInterval(attemptSaving, 2000);
+
+        for (var i = 1; i <= 10; i++) {
+            const option = document.createElement('option');
+            option.text = i * 10 + '%';
+            option.value = '' + i * 10;
+            imageQuality.appendChild(option);
+        }
+        imageQuality.value = '60';
     }
 );
