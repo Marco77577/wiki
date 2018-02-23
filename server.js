@@ -277,11 +277,18 @@ router.register('\/wiki\/savesettings\/([0-9]{4,5})\/(.+)', function (req, res, 
     const configText = "exports.PORT = " + urlOptions[1] + ";\nexports.WIKI_NAME = \"" + decodeURIComponent(urlOptions[2]) + "\";";
     fs.writeFile('./config.js', configText, 'utf8', function (err) {
         if (err) {
-            res.write('Error: Could not save file.');
+            res.write('Error: Could not save config file.');
         } else {
-            res.write('success');
+            const batchText = "start \"\" http://localhost:" + urlOptions[1] + "\nnpm start";
+            fs.writeFile('./start.bat', batchText, 'utf8', function (err2) {
+                if (err2) {
+                    res.write('Error: Could not save batch file.');
+                } else {
+                    res.write('success');
+                }
+                res.end();
+            });
         }
-        res.end();
     });
 });
 
