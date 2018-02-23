@@ -200,6 +200,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         ];
         var dirty = false;
+        const editor = $1('#editor');
         const content = $1('#content');
         const title = $1('#title');
         const slug = $1('#slug');
@@ -277,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function () {
             saveButton.classList.remove('saving');
         };
         const attemptSaving = function () {
-            if (title.value.length > 0 && slug.value.length > 0 && content.value.length > 0 && title.value !== '{% block title %}' && slug.value !== '{% block slug %}' && tags.value !== '{% block tags %}' && content.value !== '{% block content %}') {
+            if (title !== document.activeElement && slug !== document.activeElement && title.value.length > 0 && slug.value.length > 0 && content.value.length > 0 && title.value !== '{% block title %}' && slug.value !== '{% block slug %}' && tags.value !== '{% block tags %}' && content.value !== '{% block content %}') {
                 saveButton.classList.add('saving');
                 if (slug.value !== latestSaveSlug) {
                     checkSlug(function (result) {
@@ -484,6 +485,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault();
                 finishImageWizard();
             }
+        });
+        addEvent(document, 'scroll', function(e) {
+           const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+           console.log(scrollTop);
+           if(scrollTop > 240) {
+               editor.style.top = '0';
+           } else {
+               editor.style.top = 240 - scrollTop + 'px';
+           }
         });
         addEvent(saveButton, 'click', function (e) {
             e.preventDefault();

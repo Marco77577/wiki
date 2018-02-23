@@ -151,6 +151,7 @@ $headingBorderColor: #eaecef;
 	p {
 		font-size: 1.6em;
 		line-height: 150%;
+		text-align: justify;
 	}
 
 	a {
@@ -189,12 +190,12 @@ $headingBorderColor: #eaecef;
 		}
 		&:before {
 			top: 14px;
-			left: 10px;
+			left: 14px;
 			content: '\f10d';
 		}
 		&:after {
 			bottom: 14px;
-			right: 10px;
+			right: 14px;
 			content: '\f10e';
 		}
 		p {
@@ -211,6 +212,7 @@ $headingBorderColor: #eaecef;
 		li {
 			margin-bottom: 5px;
 			line-height: 150%;
+			text-align: justify;
 		}
 	}
 }
@@ -284,13 +286,10 @@ $headingBorderColor: #eaecef;
 	select {
 		@include prefix(appearance, none);
 	}
-
 	textarea {
-		height: 100%;
-		min-height: 250px;
+		height: calc(100% - 150px);
 		margin-top: 10px;
 	}
-
 	a.button {
 		display: block;
 		cursor: pointer;
@@ -361,7 +360,6 @@ $headingBorderColor: #eaecef;
 			content: '\f071';
 		}
 	}
-
 	#button-wrapper {
 		max-width: 100%;
 		span {
@@ -416,6 +414,15 @@ $headingBorderColor: #eaecef;
 			}
 		}
 	}
+}
+
+#editor {
+	position: fixed;
+	top: 240px;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
 }
 
 .insertion-wrapper {
