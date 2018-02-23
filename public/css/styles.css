@@ -190,6 +190,11 @@ header {
     margin-bottom: 5px;
     line-height: 150%;
     text-align: justify; }
+.content img {
+  max-width: 100%;
+  float: left;
+  margin-right: 15px;
+  margin-bottom: 15px; }
 
 .edit {
   width: 100%;
@@ -378,7 +383,8 @@ header {
   bottom: 0;
   left: 0;
   right: 0;
-  align-items: center; }
+  align-items: center;
+  z-index: 2; }
   .insertion-wrapper.visible {
     display: flex; }
   .insertion-wrapper .field-container {

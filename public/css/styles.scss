@@ -215,6 +215,13 @@ $headingBorderColor: #eaecef;
 			text-align: justify;
 		}
 	}
+
+	img {
+		max-width: 100%;
+		float: left;
+		margin-right: 15px;
+		margin-bottom: 15px;
+	}
 }
 
 .edit {
@@ -438,6 +445,7 @@ $headingBorderColor: #eaecef;
 	top: 0; bottom: 0;
 	left: 0; right: 0;
 	align-items: center;
+	z-index: 2;
 	&.visible {
 		display: flex;
 	}
