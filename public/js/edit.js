@@ -50,7 +50,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 0,
                 keyCode: 65,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: false,
+                endPositionNoSelection: 3,
+                endPositionWithSelection: 1
             },
             {
                 name: 'bold',
@@ -60,7 +62,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 0,
                 keyCode: 66,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: false,
+                endPositionNoSelection: 2,
+                endPositionWithSelection: 0
             },
             {
                 name: 'italic',
@@ -70,7 +74,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 0,
                 keyCode: 73,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: false,
+                endPositionNoSelection: 1,
+                endPositionWithSelection: 0
             },
             {
                 name: 'strikethrough',
@@ -80,7 +86,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 0,
                 keyCode: 83,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: true,
+                endPositionNoSelection: 2,
+                endPositionWithSelection: 0
             },
             {
                 name: 'code',
@@ -90,78 +98,105 @@ document.addEventListener('DOMContentLoaded', function () {
                 addedLineBreaks: 0,
                 keyCode: 67,
                 ctrlKey: true,
-                shiftKey: true
+                shiftKey: true,
+                endPositionNoSelection: 1,
+                endPositionWithSelection: 0
             },
             {
                 name: 'codeBlock',
                 text: 'CodeBlock',
-                delimiterStart: "\n```js\n",
+                delimiterStart: "```js\n",
                 delimiterEnd: "\n```",
-                addedLineBreaks: 3,
+                addedLineBreaks: 2,
                 keyCode: 75,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: false,
+                endPositionNoSelection: 4,
+                endPositionWithSelection: 4
             },
             {
                 name: 'blockquote',
                 text: 'Blockquote',
-                delimiterStart: "\n> ",
+                delimiterStart: "> ",
                 delimiterEnd: "",
-                addedLineBreaks: 1,
+                addedLineBreaks: 0,
                 keyCode: 81,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: false,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0
             },
-            {name: 'h1', text: 'H1', delimiterStart: "\n# ", delimiterEnd: "", addedLineBreaks: 1, keyCode: 49, ctrlKey: true, shiftKey: false},
+            {
+                name: 'h1',
+                text: 'H1',
+                delimiterStart: "# ",
+                delimiterEnd: "",
+                addedLineBreaks: 0,
+                keyCode: 49,
+                ctrlKey: true,
+                shiftKey: true,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0
+            },
             {
                 name: 'h2',
                 text: 'H2',
-                delimiterStart: "\n## ",
+                delimiterStart: "## ",
                 delimiterEnd: "",
-                addedLineBreaks: 1,
+                addedLineBreaks: 0,
                 keyCode: 50,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: true,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0
             },
             {
                 name: 'h3',
                 text: 'H3',
-                delimiterStart: "\n### ",
+                delimiterStart: "### ",
                 delimiterEnd: "",
-                addedLineBreaks: 1,
+                addedLineBreaks: 0,
                 keyCode: 51,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: true,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0
             },
             {
                 name: 'h4',
                 text: 'H4',
-                delimiterStart: "\n#### ",
+                delimiterStart: "#### ",
                 delimiterEnd: "",
-                addedLineBreaks: 1,
+                addedLineBreaks: 0,
                 keyCode: 52,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: true,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0
             },
             {
                 name: 'h5',
                 text: 'H5',
-                delimiterStart: "\n##### ",
+                delimiterStart: "##### ",
                 delimiterEnd: "",
-                addedLineBreaks: 1,
+                addedLineBreaks: 0,
                 keyCode: 53,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: true,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0
             },
             {
                 name: 'h6',
                 text: 'H6',
-                delimiterStart: "\n###### ",
+                delimiterStart: "###### ",
                 delimiterEnd: "",
-                addedLineBreaks: 1,
+                addedLineBreaks: 0,
                 keyCode: 54,
                 ctrlKey: true,
-                shiftKey: false
+                shiftKey: true,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0
             }
         ];
         var dirty = false;
@@ -186,6 +221,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const linkSelectionEnd = $1('#link-selection-end');
         const linkFinishButton = $1('#link-finish-button');
         const linkCancelButton = $1('#link-cancel-button');
+        var linkSearchEntries = $('#link-search-wrapper .row');
+        var linkSearchCurrentlyActive = -1;
 
         const update = function () {
             preview.innerHTML = marked(content.value);
@@ -198,10 +235,13 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         const applyStyle = function (fct) {
             const positions = getTextSelection(content);
-            const calculatedEnd = positions.end + fct.delimiterStart.length + fct.addedLineBreaks;
+            var calculatedSecondPartStart = positions.end + fct.delimiterStart.length + fct.addedLineBreaks;
             content.value = content.value.slice(0, positions.start) + fct.delimiterStart + content.value.slice(positions.start);
-            content.value = content.value.slice(0, calculatedEnd) + fct.delimiterEnd + content.value.slice(calculatedEnd);
-            content.setSelectionRange(calculatedEnd, calculatedEnd);
+            content.value = content.value.slice(0, calculatedSecondPartStart) + fct.delimiterEnd + content.value.slice(calculatedSecondPartStart);
+            const calculatedEndPosition = positions.end + fct.delimiterStart.length + fct.delimiterEnd.length - (positions.start === positions.end ?
+                                                                                                                 fct.endPositionNoSelection :
+                                                                                                                 fct.endPositionWithSelection);
+            content.setSelectionRange(calculatedEndPosition, calculatedEndPosition);
             content.focus();
             update();
         };
@@ -246,6 +286,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 saveButton.classList.add('success');
             }
         };
+        const openLinkWindow = function () {
+            const positions = getTextSelection(content);
+            linkSelectionStart.value = positions.start;
+            linkSelectionEnd.value = positions.end;
+            linkText.value = content.value.slice(positions.start, positions.end);
+            linkWindow.classList.add('visible');
+            linkText.focus();
+            linkSearchCurrentlyActive = 1;
+        };
         const cancelLinkWindow = function () {
             linkWindow.classList.remove('visible');
             linkText.value = '';
@@ -253,8 +302,26 @@ document.addEventListener('DOMContentLoaded', function () {
             linkSearch.value = '';
             linkSelectionStart.value = '';
             linkSelectionEnd.value = '';
+            linkSearchWrapper.innerHTML = '';
+        };
+        const finishLinkWizardWithSearchResult = function (entry) {
+            const text = linkText.value.length > 0 ? linkText.value : entry.getAttribute('data-title');
+            const link = '](http://localhost:' + PORT + '/wiki/view/' + entry.getAttribute('data-slug') + ')';
+            const calculatedSecondPartStart = parseInt(linkSelectionStart.value) + text.length + 1;
+            const calculatedEnd = calculatedSecondPartStart + link.length;
+            content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + text + content.value.slice(parseInt(linkSelectionEnd.value));
+            content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
+            content.setSelectionRange(calculatedEnd, calculatedEnd);
+            content.focus();
+            update();
+            cancelLinkWindow();
         };
         const finishLinkWizard = function () {
+            const activatedSearchResult = $1('#link-search-wrapper .row.active');
+            if (activatedSearchResult != null) {
+                finishLinkWizardWithSearchResult(activatedSearchResult);
+                return;
+            }
             if (linkText.value.length <= 0) {
                 linkText.classList.add('error');
                 linkText.focus();
@@ -268,10 +335,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             linkText.classList.remove('error');
 
-            const calculatedEnd = parseInt(linkSelectionStart.value) + linkText.value.length + 1;
-            console.log(calculatedEnd);
+            const link = '](' + linkUrl.value + ')';
+            const calculatedSecondPartStart = parseInt(linkSelectionStart.value) + linkText.value.length + 1;
+            const calculatedEnd = calculatedSecondPartStart + link.length;
+            console.log(calculatedSecondPartStart);
             content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + linkText.value + content.value.slice(parseInt(linkSelectionEnd.value));
-            content.value = content.value.slice(0, calculatedEnd) + '](' + linkUrl.value + ')' + content.value.slice(calculatedEnd);
+            content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
             content.setSelectionRange(calculatedEnd, calculatedEnd);
             content.focus();
             update();
@@ -327,6 +396,9 @@ document.addEventListener('DOMContentLoaded', function () {
                         applyStyle(fct);
                     }
                 });
+                if (e.shiftKey && e.keyCode === 65) {
+                    openLinkWindow();
+                }
             }
         });
         addEvent(document, 'keydown', function (e) {
@@ -366,6 +438,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     const entry = result[i];
                     const row = document.createElement('div');
                     row.classList.add('row');
+                    row.setAttribute('data-title', entry.title);
+                    row.setAttribute('data-slug', entry.slug);
                     linkSearchWrapper.appendChild(row);
 
                     const col = document.createElement('div');
@@ -378,24 +452,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     addEvent(a, 'click', function (e) {
                         e.preventDefault();
-                        const text = linkText.value.length > 0 ? linkText.value : entry.title;
-                        const calculatedEnd = parseInt(linkSelectionStart.value) + text.length + 1;
-                        content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + text + content.value.slice(parseInt(linkSelectionEnd.value));
-                        content.value = content.value.slice(0, calculatedEnd) + '](http://localhost:' + PORT + '/wiki/view/' + entry.slug + ')' + content.value.slice(calculatedEnd);
-                        content.setSelectionRange(calculatedEnd, calculatedEnd);
-                        content.focus();
-                        update();
-                        cancelLinkWindow();
+                        finishLinkWizardWithSearchResult(row);
                     });
                 }
+                linkSearchEntries = $('#link-search-wrapper .row');
             });
         });
         addEvent(linkButton, 'click', function () {
-            const positions = getTextSelection(content);
-            linkSelectionStart.value = positions.start;
-            linkSelectionEnd.value = positions.end;
-            linkText.value = content.value.slice(positions.start, positions.end);
-            linkWindow.classList.add('visible');
+            openLinkWindow();
         });
         addEvent(linkFinishButton, 'click', function (e) {
             e.preventDefault();
@@ -404,6 +468,26 @@ document.addEventListener('DOMContentLoaded', function () {
         addEvent(linkCancelButton, 'click', function (e) {
             e.preventDefault();
             cancelLinkWindow();
+        });
+        addEvent(linkSearch, 'keydown', function (e) {
+            if (e.keyCode >= 37 && e.keyCode <= 40) {
+                if (linkSearchCurrentlyActive === -1) {
+                    linkSearchCurrentlyActive = 1;
+                } else if (e.keyCode === 39 || e.keyCode === 40) { //right/down arrow
+                    if (++linkSearchCurrentlyActive >= linkSearchEntries.length) {
+                        linkSearchCurrentlyActive = 1;
+                    }
+                } else if (e.keyCode === 37 || e.keyCode === 38) { //left/up arrow
+                    if (--linkSearchCurrentlyActive <= 0) {
+                        linkSearchCurrentlyActive = linkSearchEntries.length - 1;
+                    }
+                }
+                linkSearchEntries.forEach(function (row) {
+                    row.classList.remove('active');
+                });
+                linkSearchEntries[linkSearchCurrentlyActive].classList.add('active');
+                e.preventDefault();
+            }
         });
 
         md.forEach(function (fct) {

@@ -112,7 +112,6 @@ $headingBorderColor: #eaecef;
 		}
 	}
 }
-
 .content {
 	h1 {
 		font-size: 3.2em;
@@ -212,7 +211,6 @@ $headingBorderColor: #eaecef;
 		}
 	}
 }
-
 .edit {
 	width: 100%;
 	padding-top: 20px;
@@ -403,7 +401,6 @@ $headingBorderColor: #eaecef;
 		}
 	}
 }
-
 .linking-wrapper {
 	display: none;
 	background-color: rgba(0, 0, 0, 0.6);
@@ -416,10 +413,13 @@ $headingBorderColor: #eaecef;
 	}
 	.field-container {
 		padding: 20px;
-		background-color: $titleBackgroundColor;
+		background-color: #fff;
 		border-radius: 3px;
 		#link-search-wrapper {
 			padding: 15px;
+			.row.active {
+				background-color: #dee0e2;
+			}
 		}
 	}
 	a.button {
@@ -427,7 +427,6 @@ $headingBorderColor: #eaecef;
 		max-width: 100%;
 	}
 }
-
 .index {
 	font-size: 1.6em;
 	padding: 20px 0;

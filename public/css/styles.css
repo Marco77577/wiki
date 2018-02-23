@@ -355,10 +355,12 @@ header {
     display: flex; }
   .linking-wrapper .field-container {
     padding: 20px;
-    background-color: #fafbfc;
+    background-color: #fff;
     border-radius: 3px; }
     .linking-wrapper .field-container #link-search-wrapper {
       padding: 15px; }
+      .linking-wrapper .field-container #link-search-wrapper .row.active {
+        background-color: #dee0e2; }
   .linking-wrapper a.button {
     margin-right: 0;
     max-width: 100%; }

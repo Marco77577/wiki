@@ -38,7 +38,7 @@
 		<div class="col-12 col-md-6">
 			<div class="edit">
 				<div id="button-wrapper">
-					<span class="icon" id="link-button">Link</span>
+					<span class="icon" id="link-button" title="Ctrl+Shift+A">Link</span>
 				</div>
 				<label for="content" class="collapse">Content</label>
 				<textarea id="content" tabindex="4">{% block content %}</textarea>
@@ -63,13 +63,7 @@
 				<input type="text" id="link-search" placeholder="Search ..."/>
 				<input type="hidden" id="link-selection-start"/>
 				<input type="hidden" id="link-selection-end"/>
-				<div id="link-search-wrapper" class="index">
-					<div class="row">
-						<div class="col-12">
-							<strong>Title</strong>
-						</div>
-					</div>
-				</div>
+				<div id="link-search-wrapper" class="index"></div>
 				<a class="button save success" id="link-finish-button">Finish</a>
 				<a class="button delete" id="link-cancel-button" title="Esc">Cancel</a>
 			</div>
