@@ -212,7 +212,6 @@ $headingBorderColor: #eaecef;
 		}
 	}
 }
-
 .edit {
 	width: 100%;
 	padding-top: 20px;
@@ -403,7 +402,6 @@ $headingBorderColor: #eaecef;
 		}
 	}
 }
-
 .linking-wrapper {
 	display: none;
 	background-color: rgba(0, 0, 0, 0.6);
@@ -427,10 +425,9 @@ $headingBorderColor: #eaecef;
 		max-width: 100%;
 	}
 }
-
 .index {
 	font-size: 1.6em;
-	padding-top: 20px;
+	padding: 20px 0;
 	@include responsive(sm) {
 		padding: 20px;
 	}
@@ -440,6 +437,7 @@ $headingBorderColor: #eaecef;
 		border-top: 0;
 		cursor: pointer;
 		overflow: hidden;
+		margin: 0;
 		&:hover, &.active {
 			background-color: #f6f8fa;
 			div:first-of-type .option-wrapper {

@@ -365,7 +365,7 @@ header {
 
 .index {
   font-size: 1.6em;
-  padding-top: 20px; }
+  padding: 20px 0; }
   @media screen and (max-width: 36em) {
     .index {
       padding: 20px; } }
@@ -374,7 +374,8 @@ header {
     border: 1px solid #eaecef;
     border-top: 0;
     cursor: pointer;
-    overflow: hidden; }
+    overflow: hidden;
+    margin: 0; }
     .index .row:hover, .index .row.active {
       background-color: #f6f8fa; }
       .index .row:hover div:first-of-type .option-wrapper, .index .row.active div:first-of-type .option-wrapper {
