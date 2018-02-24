@@ -550,7 +550,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         addEvent(document, 'scroll', function () {
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            console.log(scrollTop);
             if (scrollTop > 240) {
                 editor.style.top = '0';
             } else {

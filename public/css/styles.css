@@ -377,6 +377,9 @@ header {
   right: 0;
   bottom: 0;
   z-index: 1; }
+  @media screen and (max-width: 48em) {
+    #editor {
+      position: static; } }
 
 .insertion-wrapper {
   display: none;
