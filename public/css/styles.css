@@ -152,6 +152,37 @@ header {
   text-decoration: none; }
   .content a:hover {
     text-decoration: underline; }
+  .content a.related {
+    display: block;
+    margin: 15px 0;
+    padding: 0 15px;
+    height: 60px;
+    line-height: 60px;
+    background-color: #2e3035;
+    color: #fff;
+    font-size: 1.8em;
+    clear: both;
+    overflow: hidden;
+    transition: background-color 0.5s, color 0.5s;
+    -webkit-transition: background-color 0.5s, color 0.5s;
+    -moz-transition: background-color 0.5s, color 0.5s;
+    -o-transition: background-color 0.5s, color 0.5s;
+    -ms-transition: background-color 0.5s, color 0.5s; }
+    @media print {
+      .content a.related {
+        display: none; } }
+    .content a.related:before {
+      position: relative;
+      bottom: 2px;
+      content: '\f35d';
+      font-family: 'Font Awesome 5 Free', sans-serif;
+      font-weight: 900;
+      margin-right: 15px;
+      font-size: 0.75em; }
+    .content a.related:hover {
+      text-decoration: none;
+      background-color: #fafbfc;
+      color: #000; }
 .content pre {
   font-size: 14px; }
 .content code:not([class^=' lang']) {
@@ -333,6 +364,8 @@ header {
         font-family: 'Font Awesome 5 Free', sans-serif;
         font-weight: 900;
         margin-right: 5px; }
+    .edit #button-wrapper span#related:before {
+      content: '\f35d'; }
     .edit #button-wrapper span#youtube:before {
       font-family: "Font Awesome 5 Brands", sans-serif;
       content: '\f167'; }
@@ -397,9 +430,9 @@ header {
     padding: 20px;
     background-color: #fff;
     border-radius: 3px; }
-    .insertion-wrapper .field-container #link-search-wrapper {
+    .insertion-wrapper .field-container .search-wrapper {
       padding: 15px; }
-      .insertion-wrapper .field-container #link-search-wrapper .row.active {
+      .insertion-wrapper .field-container .search-wrapper .row.active {
         background-color: #dee0e2; }
     .insertion-wrapper .field-container #image-container {
       width: 100%; }

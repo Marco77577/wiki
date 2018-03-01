@@ -87,6 +87,7 @@ $tagBackgroundColor: #f1f8ff;
 $tagHoverBackgroundColor: #dfecff;
 $tagFontColor: #0366d6;
 $headingBorderColor: #eaecef;
+$headerBackgroundColor: #2e3035;
 
 .title {
 	background-color: $titleBackgroundColor;
@@ -159,6 +160,36 @@ $headingBorderColor: #eaecef;
 		text-decoration: none;
 		&:hover {
 			text-decoration: underline;
+		}
+		&.related {
+			display: block;
+			margin: 15px 0;
+			padding: 0 15px;
+			height: 60px;
+			line-height: 60px;
+			background-color: $headerBackgroundColor;
+			color: #fff;
+			font-size: 1.8em;
+			clear: both;
+			overflow: hidden;
+			@include prefix(transition, (background-color 0.5s, color 0.5s));
+			@include print {
+				display: none;
+			}
+			&:before {
+				position: relative;
+				bottom: 2px;
+				content: '\f35d';
+				font-family: 'Font Awesome 5 Free', sans-serif;
+				font-weight: 900;
+				margin-right: 15px;
+				font-size: 0.75em;
+			}
+			&:hover {
+				text-decoration: none;
+				background-color: $titleBackgroundColor;
+				color: #000;
+			}
 		}
 	}
 
@@ -311,7 +342,7 @@ $headingBorderColor: #eaecef;
 		font-weight: 600;
 		text-align: center;
 		color: #fff;
-		background-color: #2e3035;
+		background-color: $headerBackgroundColor;
 		border-radius: 0;
 		border: 0;
 		text-decoration: none;
@@ -390,6 +421,9 @@ $headingBorderColor: #eaecef;
 					margin-right: 5px;
 				}
 			}
+			&#related:before {
+				content: '\f35d';
+			}
 			&#youtube:before {
 				font-family: "Font Awesome 5 Brands", sans-serif;
 				content: '\f167';
@@ -460,7 +494,7 @@ $headingBorderColor: #eaecef;
 		padding: 20px;
 		background-color: #fff;
 		border-radius: 3px;
-		#link-search-wrapper {
+		.search-wrapper {
 			padding: 15px;
 			.row.active {
 				background-color: #dee0e2;

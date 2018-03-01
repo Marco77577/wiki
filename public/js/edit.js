@@ -212,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const viewButton = $1('#view-button');
         const buttonWrapper = $1('#button-wrapper');
 
+        //link wizard fields
         const linkWindow = $1('#link-window');
         const linkSearchWrapper = $1('#link-search-wrapper');
         const linkText = $1('#link-text');
@@ -225,6 +226,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var linkSearchEntries = $('#link-search-wrapper .row');
         var linkSearchCurrentlyActive = -1;
 
+        //image wizard fields
         const imageWindow = $1('#image-window');
         const imageText = $1('#image-text');
         const imageUrl = $1('#image-url');
@@ -239,6 +241,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const imageDeleteButton = $1('#image-delete-button');
         const imageButton = $1('#image');
 
+        //Youtube wizard fields
         const youtubeWindow = $1('#youtube-window');
         const youtubeText = $1('#youtube-text');
         const youtubeUrl = $1('#youtube-url');
@@ -247,6 +250,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const youtubeFinishButton = $1('#youtube-finish-button');
         const youtubeCancelButton = $1('#youtube-cancel-button');
         const youtubeButton = $1('#youtube');
+
+        //related wizard fields
+        const relatedWindow = $1('#related-window');
+        const relatedSearchWrapper = $1('#related-search-wrapper');
+        const relatedSearch = $1('#related-search');
+        const relatedButton = $1('#related');
+        const relatedSelectionStart = $1('#related-selection-start');
+        const relatedSelectionEnd = $1('#related-selection-end');
+        const relatedFinishButton = $1('#related-finish-button');
+        const relatedCancelButton = $1('#related-cancel-button');
+        var relatedSearchEntries = $('#related-search-wrapper .row');
+        var relatedSearchCurrentlyActive = -1;
 
         const update = function () {
             preview.innerHTML = marked(content.value);
@@ -460,6 +475,31 @@ document.addEventListener('DOMContentLoaded', function () {
             update();
             cancelYoutubeWindow();
         };
+        const openRelatedWindow = function () {
+            const positions = getTextSelection(content);
+            relatedSelectionStart.value = positions.start;
+            relatedSelectionEnd.value = positions.end;
+            relatedWindow.classList.add('visible');
+            relatedSearch.focus();
+            relatedSearchCurrentlyActive = 1;
+        };
+        const cancelRelatedWindow = function () {
+            relatedWindow.classList.remove('visible');
+            relatedSearch.value = '';
+            relatedSelectionStart.value = '';
+            relatedSelectionEnd.value = '';
+            relatedSearchWrapper.innerHTML = '';
+            content.focus();
+        };
+        const finishRelatedWizard = function (entry) {
+            const text = '<a class="related" href="http://localhost:' + PORT + '/wiki/view/' + entry.getAttribute('data-slug') + '">' + entry.getAttribute('data-title') + '</a>';
+            const calculatedEnd = parseInt(relatedSelectionStart.value) + text.length;
+            content.value = content.value.slice(0, parseInt(relatedSelectionStart.value)) + text + content.value.slice(parseInt(relatedSelectionStart.value));
+            content.setSelectionRange(calculatedEnd, calculatedEnd);
+            content.focus();
+            update();
+            cancelRelatedWindow();
+        };
 
         window.addEventListener('beforeunload', function () {
             if (dirty) attemptSaving();
@@ -522,6 +562,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     e.preventDefault();
                     openYoutubeWindow();
                 }
+                if (e.keyCode === 82) { //R
+                    e.preventDefault();
+                    openRelatedWindow();
+                }
             }
         });
         addEvent(document, 'keydown', function (e) {
@@ -534,6 +578,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 cancelLinkWindow();
                 cancelImageWindow();
                 cancelYoutubeWindow();
+                cancelRelatedWindow();
             }
             if (linkWindow.classList.contains('visible') && e.keyCode === 13) { //enter
                 e.preventDefault();
@@ -546,6 +591,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (youtubeWindow.classList.contains('visible') && e.keyCode === 13) { //enter
                 e.preventDefault();
                 finishYoutubeWizard();
+            }
+            if (relatedWindow.classList.contains('visible') && e.keyCode === 13) { //enter
+                e.preventDefault();
+                const activatedSearchResult = $1('#related-search-wrapper .row.active');
+                if (activatedSearchResult != null) {
+                    finishRelatedWizard(activatedSearchResult);
+                }
             }
         });
         addEvent(document, 'scroll', function () {
@@ -700,6 +752,67 @@ document.addEventListener('DOMContentLoaded', function () {
             cancelYoutubeWindow();
         });
 
+        addEvent(relatedSearch, 'input', function () {
+            getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent(relatedSearch.value), function (result) {
+                relatedSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
+                result = JSON.parse(result);
+                for (var i = 0, j = result.length; i < j; i++) {
+                    const entry = result[i];
+                    const row = document.createElement('div');
+                    row.classList.add('row');
+                    row.setAttribute('data-title', entry.title);
+                    row.setAttribute('data-slug', entry.slug);
+                    relatedSearchWrapper.appendChild(row);
+
+                    const col = document.createElement('div');
+                    col.classList.add('col-12');
+                    row.appendChild(col);
+
+                    const a = document.createElement('a');
+                    a.innerText = entry.title;
+                    col.appendChild(a);
+
+                    addEvent(a, 'click', function (e) {
+                        e.preventDefault();
+                        finishRelatedWizard(row);
+                    });
+                }
+                relatedSearchEntries = $('#related-search-wrapper .row');
+            });
+        });
+        addEvent(relatedSearch, 'keydown', function (e) {
+            if (e.keyCode >= 37 && e.keyCode <= 40) {
+                if (relatedSearchCurrentlyActive === -1) {
+                    relatedSearchCurrentlyActive = 1;
+                } else if (e.keyCode === 39 || e.keyCode === 40) { //right/down arrow
+                    if (++relatedSearchCurrentlyActive >= relatedSearchEntries.length) {
+                        relatedSearchCurrentlyActive = 1;
+                    }
+                } else if (e.keyCode === 37 || e.keyCode === 38) { //left/up arrow
+                    if (--relatedSearchCurrentlyActive <= 0) {
+                        relatedSearchCurrentlyActive = relatedSearchEntries.length - 1;
+                    }
+                }
+                relatedSearchEntries.forEach(function (row) {
+                    row.classList.remove('active');
+                });
+                relatedSearchEntries[relatedSearchCurrentlyActive].classList.add('active');
+                e.preventDefault();
+            }
+        });
+        addEvent(relatedButton, 'click', function () {
+            openRelatedWindow();
+        });
+        addEvent(relatedFinishButton, 'click', function (e) {
+            e.preventDefault();
+            const activatedSearchResult = $1('#related-search-wrapper .row.active');
+            if (activatedSearchResult == null) return;
+            finishRelatedWizard(activatedSearchResult);
+        });
+        addEvent(relatedCancelButton, 'click', function (e) {
+            e.preventDefault();
+            cancelRelatedWindow();
+        });
 
         md.forEach(function (fct) {
             const span = document.createElement('span');
