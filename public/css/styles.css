@@ -219,8 +219,7 @@ header {
   font-size: 16px; }
   .content ul li, .content ol li {
     margin-bottom: 5px;
-    line-height: 150%;
-    text-align: justify; }
+    line-height: 150%; }
 .content img {
   max-width: 100%;
   float: left;
