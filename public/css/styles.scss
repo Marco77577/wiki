@@ -211,7 +211,7 @@ $headerBackgroundColor: #2e3035;
 		position: relative;
 		background-color: #f4f2f0;
 		margin: 7px 0;
-		padding: 14px 40px 14px 40px;
+		padding: 14px 50px 14px 50px;
 		min-height: 52px;
 		&:before, &:after {
 			position: absolute;
@@ -220,13 +220,13 @@ $headerBackgroundColor: #2e3035;
 			font-size: 20px;
 		}
 		&:before {
-			top: 14px;
-			left: 14px;
+			top: 18px;
+			left: 16px;
 			content: '\f10d';
 		}
 		&:after {
-			bottom: 14px;
-			right: 14px;
+			bottom: 18px;
+			right: 16px;
 			content: '\f10e';
 		}
 		p {
