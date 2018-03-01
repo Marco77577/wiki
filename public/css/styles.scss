@@ -21,6 +21,10 @@ html, body {
 	@page :first {
 		margin: 0 0 2cm;
 	}
+
+	.container {
+		max-width: 90%;
+	}
 }
 
 $navHeight: 50px;

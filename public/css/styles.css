@@ -59,7 +59,9 @@ html, body {
     orphans: 4;
     widows: 2; }
   @page :first {
-    margin: 0 0 2cm; } }
+    margin: 0 0 2cm; }
+  .container {
+    max-width: 90% !important; } }
 header {
   background-color: #292d32;
   font-size: 1.6em; }
