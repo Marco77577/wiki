@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', function () {
         deleteEntry();
     });
     addEvent(document, 'keydown', function (e) {
+        if($1('#search') === document.activeElement) return;
         switch (e.keyCode) {
             case 68: //(D)elete
                 deleteEntry();
