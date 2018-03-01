@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         const finishLinkWizardWithSearchResult = function (entry) {
             const text = linkText.value.length > 0 ? linkText.value : entry.getAttribute('data-title');
-            const link = '](http://localhost:' + PORT + '/wiki/view/' + entry.getAttribute('data-slug') + ')';
+            const link = '](wiki/view/' + entry.getAttribute('data-slug') + ')';
             const calculatedSecondPartStart = parseInt(linkSelectionStart.value) + text.length + 1;
             const calculatedEnd = calculatedSecondPartStart + link.length;
             content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + text + content.value.slice(parseInt(linkSelectionEnd.value));
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function () {
             content.focus();
         };
         const finishRelatedWizard = function (entry) {
-            const text = '<a class="related" href="http://localhost:' + PORT + '/wiki/view/' + entry.getAttribute('data-slug') + '">' + entry.getAttribute('data-title') + '</a>';
+            const text = '<a class="related" href="wiki/view/' + entry.getAttribute('data-slug') + '">' + entry.getAttribute('data-title') + '</a>';
             const calculatedEnd = parseInt(relatedSelectionStart.value) + text.length;
             content.value = content.value.slice(0, parseInt(relatedSelectionStart.value)) + text + content.value.slice(parseInt(relatedSelectionStart.value));
             content.setSelectionRange(calculatedEnd, calculatedEnd);
