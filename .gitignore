@@ -1,6 +1,9 @@
 node_modules
 public/wiki/*.md
-public/wiki/img
+public/wiki/img/*.jpg
+public/wiki/img/*.jpeg
+public/wiki/img/*.png
+public/wiki/img/*.gif
 .idea
 *.log
 *.rsls
