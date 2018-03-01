@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    const entries = $('.index .row');
+    const entries = $('.index:not(.size) .row');
     var currentlyActive = -1;
     addEvent(document, 'keydown', function (e) {
         if (e.keyCode >= 37 && e.keyCode <= 40) {

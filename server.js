@@ -84,14 +84,20 @@ const loadIndex = function (req, res, urlOptions) {
         if (err) throw err;
         fs.readdir('./public/wiki', function (err2, files) {
             if (err2) throw err2;
+            var imageSize = 0, fileSize = 0;
+            const images = fs.readdirSync('./public/wiki/img');
+            for (var i = 0, j = images.length; i < j; i++) {
+                imageSize += fs.statSync('./public/wiki/img/' + images[i]).size;
+            }
             var list = '';
-            for (var i = 0, j = files.length; i < j; i++) {
+            for (i = 0, j = files.length; i < j; i++) {
                 if (files[i].split('.').pop() !== 'md') continue;
                 try {
                     const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
                     urlOptions[1] = decodeURIComponent(urlOptions[1]);
                     if (urlOptions[1] !== 'undefined' && !(file.toLowerCase().indexOf(urlOptions[1]) !== -1 || file.toLowerCase().match(new RegExp(urlOptions[1])))) continue;
                     const stats = fs.statSync('./public/wiki/' + files[i]);
+                    fileSize += stats.size;
                     list += '<div class="row index-row"><div class="col-12 col-md-8"><a href="wiki/view/' + files[i].replace('.md', '') + '">' + file.replace(/title: (.+)(?:.|\s)*/, '$1') + '</a><div class="option-wrapper"><a href="wiki/edit/' + files[i].replace('.md', '') + '" class="edit">Edit</a><a href="#" class="delete" data-slug="' + files[i].replace('.md', '') + '">Delete</a></div></div><div class="col-12 col-md-2">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2" onclick="location.href=\'/wiki/view/' + files[i].replace('.md', '') + '\'">' + (stats.mtime.getDate() < 10 ?
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   '0' :
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   '') + stats.mtime.getDate() + '.' + (stats.mtime.getMonth() + 1 < 10 ?
@@ -108,6 +114,9 @@ const loadIndex = function (req, res, urlOptions) {
 
             const pageTitle = (urlOptions[1] !== 'undefined' ? 'Search' : 'Index');
             html = replaceBlock('title', html, pageTitle);
+            html = replaceBlock('totalfilesize', html, fileSizeConverter(fileSize + imageSize));
+            html = replaceBlock('filesize', html, fileSizeConverter(fileSize));
+            html = replaceBlock('imagesize', html, fileSizeConverter(imageSize));
             html = replaceBlock('tags', html, (urlOptions[1] !== 'undefined' ?
                                                '<a class="tag" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' : ''));
             html = replaceBlock('content', html, list);
