@@ -703,10 +703,12 @@ document.addEventListener('DOMContentLoaded', function () {
             imageUrl.classList.remove('error');
             imageDownloadButton.classList.remove('error');
             imageDownloadButton.classList.add('downloading');
+            imageDownloadButton.innerText = "Downloading";
             imageContainer.innerHTML = '';
             imageDeleteButton.classList.remove('visible');
             getAjax('http://localhost:' + PORT + '/wiki/download/' + encodeURIComponent(imageUrl.value) + '/' + imageTimestamp.value + '/' + imageQuality.value, function (result) {
                 imageDownloadButton.classList.remove('downloading');
+                imageDownloadButton.innerText = "Save Image Locally";
                 if (result === 'error') {
                     imageDownloadButton.classList.add('error');
                     return;
