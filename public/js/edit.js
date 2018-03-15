@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
             linkText.value = content.value.slice(positions.start, positions.end);
             linkWindow.classList.add('visible');
             linkText.focus();
-            linkSearchCurrentlyActive = 1;
+            linkSearchCurrentlyActive = -1;
         };
         const cancelLinkWindow = function () {
             linkWindow.classList.remove('visible');
