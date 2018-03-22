@@ -28,7 +28,7 @@ const replaceBlock = function (blockName, container, substitute, global) {
 };
 
 const prepareUrls = function (container) {
-    return container.replace(/(href|src)="(?!http)(.+?)"/g, '$1="http://localhost:' + config.PORT + '/$2"');
+    return container.replace(/(href|src)="(?!http|mailto:|tel:)(.+?)"/g, '$1="http://localhost:' + config.PORT + '/$2"');
 };
 
 const loadEnvVarTemplate = function () {
