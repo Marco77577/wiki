@@ -8,7 +8,8 @@ function fallbackCopyTextToClipboard(text) {
 
     try {
         document.execCommand('copy');
-    } catch (err) {}
+    } catch (err) {
+    }
 
     document.body.removeChild(textArea);
 }
@@ -66,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
         addEvent(clickToCopy, 'click', function () {
             copyTextToClipboard(codeArray[i]);
             $1('.toast').classList.add('visible');
-            setTimeout(function() {
+            setTimeout(function () {
                 $1('.toast').classList.remove('visible');
             }, 1000);
         });
@@ -87,5 +88,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
         element.innerHTML = html;
+    });
+
+    $('a img').forEach(function (element) {
+        addEvent(element, 'click', function (e) {
+            e.preventDefault();
+            if (element.classList.contains('zoom')) {
+                element.classList.remove('zoom');
+                element.style.left = 0;
+            } else {
+                element.classList.add('zoom');
+                var rect = element.getBoundingClientRect();
+                element.style.left = window.innerWidth / 10 - (rect.left + document.body.scrollLeft) + 'px';
+            }
+        });
     });
 });

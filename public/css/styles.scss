@@ -278,10 +278,20 @@ $headerBackgroundColor: #2e3035;
 	}
 
 	img {
+		position: relative;
 		max-width: 100%;
+		width: auto;
+		left: 0;
 		float: left;
 		margin-right: 15px;
 		margin-bottom: 15px;
+		cursor: zoom-in;
+		@include prefix(transition, (max-width 0.5s, left 0.5s));
+		&.zoom {
+			z-index: 1;
+			max-width: 80vw;
+			cursor: zoom-out;
+		}
 	}
 }
 

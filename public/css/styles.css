@@ -244,10 +244,23 @@ header {
     margin-bottom: 5px;
     line-height: 150%; }
 .content img {
+  position: relative;
   max-width: 100%;
+  width: auto;
+  left: 0;
   float: left;
   margin-right: 15px;
-  margin-bottom: 15px; }
+  margin-bottom: 15px;
+  cursor: zoom-in;
+  transition: max-width 0.5s, left 0.5s;
+  -webkit-transition: max-width 0.5s, left 0.5s;
+  -moz-transition: max-width 0.5s, left 0.5s;
+  -o-transition: max-width 0.5s, left 0.5s;
+  -ms-transition: max-width 0.5s, left 0.5s; }
+  .content img.zoom {
+    z-index: 1;
+    max-width: 80vw;
+    cursor: zoom-out; }
 
 .edit {
   width: 100%;
