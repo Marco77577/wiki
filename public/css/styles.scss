@@ -171,12 +171,15 @@ $headerBackgroundColor: #2e3035;
 			padding: 0 15px;
 			height: 60px;
 			line-height: 60px;
-			background-color: $headerBackgroundColor;
-			color: #fff;
-			font-size: 1.8em;
+			background-color: $titleBackgroundColor;
+			border: 1px solid rgba(0, 0, 0, 0.04);
+			border-radius: 4px;
+			box-shadow: 0 1px 7px rgba(0,0,0,.05);
+			color: rgba(0,0,0,.84)!important;
+			font-size: 1.31em;
+			font-weight: bold;
 			clear: both;
 			overflow: hidden;
-			@include prefix(transition, (background-color 0.5s, color 0.5s));
 			@include print {
 				display: none;
 			}
@@ -191,19 +194,43 @@ $headerBackgroundColor: #2e3035;
 			}
 			&:hover {
 				text-decoration: none;
-				background-color: $titleBackgroundColor;
-				color: #000;
 			}
 		}
 	}
 
 	pre {
+		position: relative;
 		font-size: 14px;
+		&:hover .clipboard {
+			display: inline-block;
+		}
+		&.line-numbers {
+			.line-number {
+				display: inline-block;
+				width: 30px;
+				padding-right: 10px;
+				margin-right: 10px;
+				border-right: 1px solid #989898;
+				text-align: right;
+				color: #989898;
+				@include prefix(user-select, none);
+			}
+		}
+		.line-number {
+			display: none;
+		}
+		.clipboard {
+			display: none;
+			position: absolute;
+			top: 14px;
+			right: 10px;
+			cursor: pointer;
+		}
 	}
 
 	code:not([class^=' lang']) {
 		padding: 3px 5px;
-		background-color: rgba(27, 31, 35, 0.05);
+		background-color: rgba(0, 0, 0, 0.05);
 		border-radius: 3px;
 	}
 
@@ -586,5 +613,28 @@ $headerBackgroundColor: #2e3035;
 		div:nth-of-type(2), div:nth-of-type(3) {
 			text-align: right;
 		}
+	}
+}
+
+.toast {
+	position: fixed;
+	top: 0; bottom: 0;
+	left: 0; right: 0;
+	text-align: center;
+	pointer-events: none;
+	opacity: 0;
+	@include prefix(transition, opacity 0.5s);
+	&.visible {
+		opacity: 1;
+	}
+	span {
+		position: absolute;
+		bottom: 30px;
+		padding: 10px;
+		display: inline-block;
+		background-color: rgba(0, 0, 0, 0.8);
+		color: #fff;
+		font-size: 1.6em;
+		border-radius: 6px;
 	}
 }
