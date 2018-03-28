@@ -175,7 +175,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'QuickLink',
                 delimiterStart: '[',
                 delimiterEnd: ']()',
-                addedLineBreaks: 0,
                 keyCode: 65,
                 ctrlKey: true,
                 shiftKey: false,
@@ -187,7 +186,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'Bold',
                 delimiterStart: '**',
                 delimiterEnd: '**',
-                addedLineBreaks: 0,
                 keyCode: 66,
                 ctrlKey: true,
                 shiftKey: false,
@@ -199,7 +197,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'Italic',
                 delimiterStart: '_',
                 delimiterEnd: '_',
-                addedLineBreaks: 0,
                 keyCode: 73,
                 ctrlKey: true,
                 shiftKey: false,
@@ -211,7 +208,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'Strikethrough',
                 delimiterStart: '~~',
                 delimiterEnd: '~~',
-                addedLineBreaks: 0,
                 keyCode: 83,
                 ctrlKey: true,
                 shiftKey: true,
@@ -223,7 +219,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'Code',
                 delimiterStart: '`',
                 delimiterEnd: '`',
-                addedLineBreaks: 0,
                 keyCode: 67,
                 ctrlKey: true,
                 shiftKey: true,
@@ -235,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'CodeBlock',
                 delimiterStart: "```js\n",
                 delimiterEnd: "\n```",
-                addedLineBreaks: 2,
                 keyCode: 75,
                 ctrlKey: true,
                 shiftKey: false,
@@ -247,7 +241,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'Blockquote',
                 delimiterStart: "> ",
                 delimiterEnd: "",
-                addedLineBreaks: 0,
                 keyCode: 81,
                 ctrlKey: true,
                 shiftKey: false,
@@ -259,7 +252,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'H1',
                 delimiterStart: "# ",
                 delimiterEnd: "",
-                addedLineBreaks: 0,
                 keyCode: 49,
                 ctrlKey: true,
                 shiftKey: true,
@@ -271,7 +263,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'H2',
                 delimiterStart: "## ",
                 delimiterEnd: "",
-                addedLineBreaks: 0,
                 keyCode: 50,
                 ctrlKey: true,
                 shiftKey: true,
@@ -283,7 +274,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'H3',
                 delimiterStart: "### ",
                 delimiterEnd: "",
-                addedLineBreaks: 0,
                 keyCode: 51,
                 ctrlKey: true,
                 shiftKey: true,
@@ -295,7 +285,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'H4',
                 delimiterStart: "#### ",
                 delimiterEnd: "",
-                addedLineBreaks: 0,
                 keyCode: 52,
                 ctrlKey: true,
                 shiftKey: true,
@@ -307,7 +296,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'H5',
                 delimiterStart: "##### ",
                 delimiterEnd: "",
-                addedLineBreaks: 0,
                 keyCode: 53,
                 ctrlKey: true,
                 shiftKey: true,
@@ -319,7 +307,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 text: 'H6',
                 delimiterStart: "###### ",
                 delimiterEnd: "",
-                addedLineBreaks: 0,
                 keyCode: 54,
                 ctrlKey: true,
                 shiftKey: true,
@@ -468,7 +455,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         const applyStyle = function (fct) {
             const positions = getTextSelection(content);
-            const calculatedSecondPartStart = positions.end + fct.delimiterStart.length + fct.addedLineBreaks;
+            const calculatedSecondPartStart = positions.end + fct.delimiterStart.length;
             content.value = content.value.slice(0, positions.start) + fct.delimiterStart + content.value.slice(positions.start);
             content.value = content.value.slice(0, calculatedSecondPartStart) + fct.delimiterEnd + content.value.slice(calculatedSecondPartStart);
             const calculatedEndPosition = positions.end + fct.delimiterStart.length + fct.delimiterEnd.length - (positions.start === positions.end ?
@@ -732,7 +719,7 @@ document.addEventListener('DOMContentLoaded', function () {
         addEvent(tags, 'input', function () {
             setDirty(true);
         });
-        addEvent(content, 'input', function () {
+        addEvent(content, 'input', function (e) {
             setDirty(true);
             update();
         });
