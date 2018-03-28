@@ -179,7 +179,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: false,
                 endPositionNoSelection: 3,
-                endPositionWithSelection: 1
+                endPositionWithSelection: 1,
+                displayButton: true,
             },
             {
                 name: 'bold',
@@ -190,7 +191,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: false,
                 endPositionNoSelection: 2,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'italic',
@@ -201,7 +203,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: false,
                 endPositionNoSelection: 1,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'strikethrough',
@@ -212,7 +215,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: true,
                 endPositionNoSelection: 2,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'code',
@@ -223,7 +227,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: true,
                 endPositionNoSelection: 1,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'codeBlock',
@@ -234,7 +239,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: false,
                 endPositionNoSelection: 4,
-                endPositionWithSelection: 4
+                endPositionWithSelection: 4,
+                displayButton: true,
             },
             {
                 name: 'blockquote',
@@ -245,7 +251,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: false,
                 endPositionNoSelection: 0,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'h1',
@@ -256,7 +263,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: true,
                 endPositionNoSelection: 0,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'h2',
@@ -267,7 +275,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: true,
                 endPositionNoSelection: 0,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'h3',
@@ -278,7 +287,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: true,
                 endPositionNoSelection: 0,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'h4',
@@ -289,7 +299,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: true,
                 endPositionNoSelection: 0,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'h5',
@@ -300,7 +311,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: true,
                 endPositionNoSelection: 0,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
             },
             {
                 name: 'h6',
@@ -311,7 +323,65 @@ document.addEventListener('DOMContentLoaded', function () {
                 ctrlKey: true,
                 shiftKey: true,
                 endPositionNoSelection: 0,
-                endPositionWithSelection: 0
+                endPositionWithSelection: 0,
+                displayButton: true,
+            },
+            {
+                name: 'tab',
+                text: 'Tab',
+                delimiterStart: '\t',
+                delimiterEnd: '',
+                keyCode: 9,
+                ctrlKey: false,
+                shiftKey: false,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0,
+                displayButton: false,
+                customCommand: function () {
+                    const positions = getTextSelection(content);
+                    if (positions.start === positions.end) { //insert tab at start position
+                        content.value = content.value.slice(0, positions.start) + '\t' + content.value.slice(positions.start);
+                        content.setSelectionRange(++positions.start, positions.start);
+                    } else { //insert multiple tabs
+                        const selectedLines = content.value.slice(positions.start, positions.end);
+                        const numberOfLines = (selectedLines.match(/\n/g) || []).length + 1;
+                        content.value = content.value.slice(0, positions.start) + selectedLines.replace(/^(.*)$/gm, '\t$1') + content.value.slice(positions.end);
+                        content.setSelectionRange(positions.start, positions.end + numberOfLines);
+                    }
+                    content.focus();
+                    update();
+                }
+            },
+            {
+                name: 'untab',
+                text: 'Untab',
+                delimiterStart: '',
+                delimiterEnd: '',
+                keyCode: 9,
+                ctrlKey: false,
+                shiftKey: true,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0,
+                displayButton: false,
+                customCommand: function () {
+                    const positions = getTextSelection(content);
+                    console.log(positions);
+                    if (positions.start > 0) {
+                        if (positions.start === positions.end) { //remove tab before start position
+                            if (content.value.slice(positions.start - 1, positions.start) === '\t') {
+                                content.value = content.value.slice(0, positions.start - 1) + content.value.slice(positions.start);
+                                content.setSelectionRange(--positions.start, positions.start);
+                            }
+                        } else { //delete multiple tabs
+                            const selectedLines = content.value.slice(positions.start, positions.end);
+                            const numberOfLines = (selectedLines.match(/\n/g) || []).length + 1;
+                            content.value = content.value.slice(0, positions.start) + selectedLines.replace(/^\t(.*)$/gm, '$1') + content.value.slice(positions.end);
+                            content.setSelectionRange(positions.start, positions.end - numberOfLines);
+                        }
+                        content.focus();
+                        update();
+                    }
+                }
             }
         ];
         let dirty = false;
@@ -454,16 +524,20 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         };
         const applyStyle = function (fct) {
-            const positions = getTextSelection(content);
-            const calculatedSecondPartStart = positions.end + fct.delimiterStart.length;
-            content.value = content.value.slice(0, positions.start) + fct.delimiterStart + content.value.slice(positions.start);
-            content.value = content.value.slice(0, calculatedSecondPartStart) + fct.delimiterEnd + content.value.slice(calculatedSecondPartStart);
-            const calculatedEndPosition = positions.end + fct.delimiterStart.length + fct.delimiterEnd.length - (positions.start === positions.end ?
-                                                                                                                 fct.endPositionNoSelection :
-                                                                                                                 fct.endPositionWithSelection);
-            content.setSelectionRange(calculatedEndPosition, calculatedEndPosition);
-            content.focus();
-            update();
+            if (fct.customCommand !== undefined) {
+                fct.customCommand();
+            } else {
+                const positions = getTextSelection(content);
+                const calculatedSecondPartStart = positions.end + fct.delimiterStart.length;
+                content.value = content.value.slice(0, positions.start) + fct.delimiterStart + content.value.slice(positions.start);
+                content.value = content.value.slice(0, calculatedSecondPartStart) + fct.delimiterEnd + content.value.slice(calculatedSecondPartStart);
+                const calculatedEndPosition = positions.end + fct.delimiterStart.length + fct.delimiterEnd.length - (positions.start === positions.end ?
+                                                                                                                     fct.endPositionNoSelection :
+                                                                                                                     fct.endPositionWithSelection);
+                content.setSelectionRange(calculatedEndPosition, calculatedEndPosition);
+                content.focus();
+                update();
+            }
         };
         const save = function (callback) {
             getAjax('http://localhost:' + PORT + '/wiki/save/' + encodeURIComponent(title.value) + '/' + encodeURIComponent(slug.value) + '/' + encodeURIComponent(latestSaveSlug) + '/' + encodeURIComponent(tags.value) + '/' + encodeURIComponent(content.value), function (result) {
@@ -719,12 +793,12 @@ document.addEventListener('DOMContentLoaded', function () {
         addEvent(tags, 'input', function () {
             setDirty(true);
         });
-        addEvent(content, 'input', function (e) {
+        addEvent(content, 'input', function () {
             setDirty(true);
             update();
         });
         addEvent(content, 'keydown', function (e) {
-            if (e.ctrlKey) {
+            if (e.ctrlKey || e.keyCode === 9) { //ctrl key or tab
                 md.forEach(function (fct) {
                     if (e.keyCode === fct.keyCode && e.ctrlKey === fct.ctrlKey && e.shiftKey === fct.shiftKey) {
                         e.preventDefault();
@@ -754,6 +828,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         addEvent(content, 'click', update);
         addEvent(document, 'keydown', function (e) {
+            if (e.keyCode === 9 && content === document.activeElement) { //tab
+                e.preventDefault();
+            }
             if (e.keyCode === 83 && e.ctrlKey) {
                 e.preventDefault();
                 attemptSaving();
@@ -1002,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', function () {
             content.focus();
         });
 
-        md.forEach(function (fct) {
+        md.filter(fct => fct.displayButton).forEach(function (fct) {
             const span = document.createElement('span');
             span.classList.add('icon');
             span.setAttribute('id', fct.name);
