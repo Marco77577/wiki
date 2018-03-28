@@ -1,5 +1,5 @@
 function fallbackCopyTextToClipboard(text) {
-    var textArea = document.createElement("textarea");
+    const textArea = document.createElement("textarea");
     textArea.value = text;
     textArea.style.position = 'fixed';
     document.body.appendChild(textArea);
@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    var counter = 0;
+    let counter = 0;
     $('pre').forEach(function (element) {
         element.classList.add('line-numbers');
 
@@ -76,12 +76,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     $('pre code').forEach(function (element) {
-        var counter = 0;
+        let counter = 0;
         html = element.innerHTML;
         codeArray.push(element.innerText);
-        for (var i = 0, j = html.length; i < j; i++) {
+        for (let i = 0, j = html.length; i < j; i++) {
             if (i !== j - 1 && (html[i] === "\n" || i === 0)) {
-                var inject = '<span class="line-number">' + (++counter) + '</span>';
+                const inject = '<span class="line-number">' + (++counter) + '</span>';
                 html = html.slice(0, i === 0 ? 0 : i + 1) + inject + html.slice(i === 0 ? 0 : i + 1, j);
                 i += inject.length;
                 j += inject.length;
@@ -98,8 +98,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 element.style.left = 0;
             } else {
                 element.classList.add('zoom');
-                var rect = element.getBoundingClientRect();
-                element.style.left = window.innerWidth / 10 - (rect.left + document.body.scrollLeft) + 'px';
+                const rect = element.getBoundingClientRect();
+                const formerWidth = element.width;
+                element.style.width = (formerWidth + 1) + 'px';
+                if(element.width === formerWidth) {
+                    element.style.width = '';
+                    element.style.left = window.innerWidth / 10 - (rect.left + document.body.scrollLeft) + 'px';
+                } else {
+                    element.style.left = (window.innerWidth - rect.width) / 2 - (rect.left + document.body.scrollLeft) + 'px';
+                }
             }
         });
     });
