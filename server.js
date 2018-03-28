@@ -337,13 +337,16 @@ router.register('\/wiki\/entries\/(.*)', function (req, res, urlOptions) {
     });
 });
 
-router.register('\/wiki\/download\/(.+)\/(.+)\/([0-9]{1,2})', function (req, res, urlOptions) {
+router.register('\/wiki\/download\/(.+)\/(.+)\/([0-9]{1,3})', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     jimp.read(decodeURIComponent(urlOptions[1]), function (err, image) {
         if (err || image === undefined) {
             res.write('error');
         } else {
-            image.resize(image.bitmap.width, image.bitmap.height).quality(parseInt(urlOptions[3])).write('public/wiki/img/' + decodeURIComponent(urlOptions[2]) + '.jpg');
+            var quality = parseInt(urlOptions[3]);
+            if (quality > 100) quality = 100;
+            if (quality < 10) quality = 10;
+            image.resize(image.bitmap.width, image.bitmap.height).quality(quality).write('public/wiki/img/' + decodeURIComponent(urlOptions[2]) + '.jpg');
             res.write('success');
         }
         res.end();
