@@ -119,6 +119,8 @@ $headerBackgroundColor: #2e3035;
 }
 
 .content {
+	overflow: hidden;
+
 	h1 {
 		font-size: 3.2em;
 		padding-bottom: 9.5px;
@@ -174,8 +176,8 @@ $headerBackgroundColor: #2e3035;
 			background-color: $titleBackgroundColor;
 			border: 1px solid rgba(0, 0, 0, 0.04);
 			border-radius: 4px;
-			box-shadow: 0 1px 7px rgba(0,0,0,.05);
-			color: rgba(0,0,0,.84)!important;
+			box-shadow: 0 1px 7px rgba(0, 0, 0, .05);
+			color: rgba(0, 0, 0, .84) !important;
 			font-size: 1.31em;
 			font-weight: bold;
 			clear: both;
@@ -292,6 +294,27 @@ $headerBackgroundColor: #2e3035;
 			max-width: 80vw;
 			cursor: zoom-out;
 		}
+	}
+
+	span#cursor {
+		position: relative;
+		&:before {
+			content: '';
+			position: absolute;
+			display: inline-block;
+			width: 0;
+			height: 1.3em;
+			border-right: 2px solid #0366d6;
+			animation-name: cursor;
+			animation-duration: 1.5s;
+			animation-iteration-count: infinite;
+		}
+	}
+
+	@keyframes cursor {
+		0% { border-color: #0366d6; }
+		50% { border-color: #0366d6; }
+		100% { border-color: transparent; }
 	}
 }
 

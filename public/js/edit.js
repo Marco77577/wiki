@@ -1,5 +1,85 @@
+function scrollIt(destination, duration = 200, easing = 'linear', callback) {
+    const easings = {
+        linear(t) {
+            return t;
+        },
+        easeInQuad(t) {
+            return t * t;
+        },
+        easeOutQuad(t) {
+            return t * (2 - t);
+        },
+        easeInOutQuad(t) {
+            return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+        },
+        easeInCubic(t) {
+            return t * t * t;
+        },
+        easeOutCubic(t) {
+            return (--t) * t * t + 1;
+        },
+        easeInOutCubic(t) {
+            return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
+        },
+        easeInQuart(t) {
+            return t * t * t * t;
+        },
+        easeOutQuart(t) {
+            return 1 - (--t) * t * t * t;
+        },
+        easeInOutQuart(t) {
+            return t < 0.5 ? 8 * t * t * t * t : 1 - 8 * (--t) * t * t * t;
+        },
+        easeInQuint(t) {
+            return t * t * t * t * t;
+        },
+        easeOutQuint(t) {
+            return 1 + (--t) * t * t * t * t;
+        },
+        easeInOutQuint(t) {
+            return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * (--t) * t * t * t * t;
+        }
+    };
+
+    const start = window.pageYOffset;
+    const startTime = 'now' in window.performance ? performance.now() : new Date().getTime();
+
+    const documentHeight = Math.max(document.body.scrollHeight, document.body.offsetHeight, document.documentElement.clientHeight, document.documentElement.scrollHeight, document.documentElement.offsetHeight);
+    const windowHeight = window.innerHeight || document.documentElement.clientHeight || document.getElementsByTagName('body')[0].clientHeight;
+    const destinationOffset = typeof destination === 'number' ? destination :
+                              destination.getBoundingClientRect().top + document.body.scrollTop - 200;
+    const destinationOffsetToScroll = Math.round(documentHeight - destinationOffset < windowHeight ? documentHeight - windowHeight :
+                                                 destinationOffset);
+
+    if ('requestAnimationFrame' in window === false) {
+        window.scroll(0, destinationOffsetToScroll);
+        if (callback) {
+            callback();
+        }
+        return;
+    }
+
+    function scroll() {
+        const now = 'now' in window.performance ? performance.now() : new Date().getTime();
+        const time = Math.min(1, ((now - startTime) / duration));
+        const timeFunction = easings[easing](time);
+        window.scroll(0, Math.ceil((timeFunction * (destinationOffsetToScroll - start)) + start));
+
+        if (window.pageYOffset === destinationOffsetToScroll) {
+            if (callback) {
+                callback();
+            }
+            return;
+        }
+
+        requestAnimationFrame(scroll);
+    }
+
+    scroll();
+}
+
 function getTextSelection(el) {
-    var start = 0, end = 0, normalizedValue, range,
+    let start = 0, end = 0, normalizedValue, range,
         textInputRange, len, endRange;
 
     if (typeof el.selectionStart === "number" && typeof el.selectionEnd === "number") {
@@ -40,6 +120,54 @@ function getTextSelection(el) {
     return {start: start, end: end}
 }
 
+function debounce(func, interval) {
+    let lastCall = -1;
+    return function () {
+        clearTimeout(lastCall);
+        const args = arguments;
+        const self = this;
+        lastCall = setTimeout(function () {
+            func.apply(self, args);
+        }, interval);
+    };
+}
+
+function getMouseEventCaretRange(evt) {
+    let range, x = evt.clientX, y = evt.clientY;
+
+    // Try the simple IE way first
+    if (document.body.createTextRange) {
+        range = document.body.createTextRange();
+        range.moveToPoint(x, y);
+    }
+
+    else if (typeof document.createRange !== "undefined") {
+        // Try Mozilla's rangeOffset and rangeParent properties,
+        // which are exactly what we want
+        if (typeof evt.rangeParent !== "undefined") {
+            range = document.createRange();
+            range.setStart(evt.rangeParent, evt.rangeOffset);
+            range.collapse(true);
+        }
+
+        // Try the standards-based way next
+        else if (document.caretPositionFromPoint) {
+            const pos = document.caretPositionFromPoint(x, y);
+            range = document.createRange();
+            range.setStart(pos.offsetNode, pos.offset);
+            range.collapse(true);
+        }
+
+        // Next, the WebKit way
+        else if (document.caretRangeFromPoint) {
+            range = document.caretRangeFromPoint(x, y);
+        }
+    }
+
+    return range;
+}
+
+
 document.addEventListener('DOMContentLoaded', function () {
         const md = [
             {
@@ -69,8 +197,8 @@ document.addEventListener('DOMContentLoaded', function () {
             {
                 name: 'italic',
                 text: 'Italic',
-                delimiterStart: '*',
-                delimiterEnd: '*',
+                delimiterStart: '_',
+                delimiterEnd: '_',
                 addedLineBreaks: 0,
                 keyCode: 73,
                 ctrlKey: true,
@@ -199,12 +327,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 endPositionWithSelection: 0
             }
         ];
-        var dirty = false;
+        let dirty = false;
         const editor = $1('#editor');
+        const displayActivator = $1('#display-activator');
+        const editorActivator = $1('#editor-activator');
         const content = $1('#content');
         const title = $1('#title');
         const slug = $1('#slug');
-        var latestSaveSlug = slug.value;
+        let latestSaveSlug = slug.value;
         const tags = $1('#tags');
         const preview = $1('#preview');
         const saveButton = $1('#save-button');
@@ -223,8 +353,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const linkSelectionEnd = $1('#link-selection-end');
         const linkFinishButton = $1('#link-finish-button');
         const linkCancelButton = $1('#link-cancel-button');
-        var linkSearchEntries = $('#link-search-wrapper .row');
-        var linkSearchCurrentlyActive = -1;
+        let linkSearchEntries = $('#link-search-wrapper .row');
+        let linkSearchCurrentlyActive = -1;
 
         //image wizard fields
         const imageWindow = $1('#image-window');
@@ -260,12 +390,76 @@ document.addEventListener('DOMContentLoaded', function () {
         const relatedSelectionEnd = $1('#related-selection-end');
         const relatedFinishButton = $1('#related-finish-button');
         const relatedCancelButton = $1('#related-cancel-button');
-        var relatedSearchEntries = $('#related-search-wrapper .row');
-        var relatedSearchCurrentlyActive = -1;
+        let relatedSearchEntries = $('#related-search-wrapper .row');
+        let relatedSearchCurrentlyActive = -1;
 
         const update = function () {
             preview.innerHTML = marked(content.value);
-            Prism.highlightAll();
+            preview.innerHTML = preview.innerHTML.replace(/\s(href|alt|id)=".*?"/g, '');
+
+            //replacing prism because prism interferes with cursor
+            preview.innerHTML = preview.innerHTML.replace(/<pre><code class="lang-(.+)">/g, '<pre class=" language-$1"><code class=" language-$1">');
+            debounce(setCursor, 200)();
+        };
+        const setCursor = function () {
+            const positions = getTextSelection(content);
+            let originalText = content.value.substr(0, positions.start);
+
+            //do a first markdown to html conversion to get trailing, unconverted markdown elements (e.g., ** without counterpart)
+            let translatedText = marked(originalText).trim();
+
+            //search for unmatched (elements without closing partner) markdown elements
+            const matches = translatedText.replace(/\s(src|href)=".+?"/g, '').match(/(\[(.*)])|\[.+](\().*$|(\[)|(~~)|(\*\*\*)|(\*\*)|(___)|(_)|(```)|(`)/g);
+            if (matches != null) {
+                //close elements in reverse order by appending to the original text
+                matches.reverse().forEach(function (markdown) {
+                    if (markdown.match(/\[.+]\(.*/)) markdown = ')';
+                    if (markdown.match(/\[.*]/)) markdown = '()';
+                    if (markdown.match(/\[.*/)) markdown = ']()';
+                    originalText += markdown;
+                });
+            }
+
+            //do a second markdown to html conversion, this time with all tags properly closed
+            translatedText = marked(originalText).trim();
+
+            //get rid of links, ids and alternative texts (they are not important for the display of elements and they get in the way of cursor placement)
+            translatedText = translatedText.replace(/\s(href|alt|id)=".*?"/g, '');
+
+            //prepare prism
+            translatedText = translatedText.replace(/<pre><code class="lang-(.+)">/g, '<pre class=" language-$1"><code class=" language-$1">');
+
+            //get rid of trailing closing tags
+            while (translatedText.match(/<\/[a-zA-Z0-9]{1,10}>$/)) translatedText = translatedText.replace(/<\/[a-zA-Z0-9]{1,10}>$/, '');
+
+            //ensure that cursor is not in an HTML tag
+            const prevHtml = preview.innerHTML;
+            const prevHtmlLength = prevHtml.length;
+            let cursorPosition = translatedText.length - 1;
+            let opened = 0;
+            const countOpened = function (i) {
+                if (prevHtml[i] === '<') {
+                    opened++;
+                } else if (prevHtml[i] === '>') {
+                    opened--;
+                }
+            };
+            do {
+                opened = 0;
+                cursorPosition++;
+                if (cursorPosition > prevHtmlLength / 2) {
+                    for (let i = prevHtmlLength - 1; i >= cursorPosition; i--) countOpened(i)
+                } else {
+                    for (let i = 0; i < cursorPosition; i++) countOpened(i);
+                }
+            } while (opened !== 0 && cursorPosition <= prevHtmlLength);
+
+
+            //remove any set cursors and set new cursor
+            const cursorHtml = cursorPosition === 0 ? '<p><span id="cursor"></span></p>' : '<span id="cursor"></span>';
+            preview.innerHTML = preview.innerHTML.slice(0, cursorPosition) + cursorHtml + preview.innerHTML.slice(cursorPosition);
+
+            debounce(scrollIt($1('#cursor', preview)), 200);
         };
         const checkSlug = function (callback) {
             getAjax('http://localhost:' + PORT + '/wiki/checkslug/' + slug.value, function (result) {
@@ -274,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function () {
         };
         const applyStyle = function (fct) {
             const positions = getTextSelection(content);
-            var calculatedSecondPartStart = positions.end + fct.delimiterStart.length + fct.addedLineBreaks;
+            const calculatedSecondPartStart = positions.end + fct.delimiterStart.length + fct.addedLineBreaks;
             content.value = content.value.slice(0, positions.start) + fct.delimiterStart + content.value.slice(positions.start);
             content.value = content.value.slice(0, calculatedSecondPartStart) + fct.delimiterEnd + content.value.slice(calculatedSecondPartStart);
             const calculatedEndPosition = positions.end + fct.delimiterStart.length + fct.delimiterEnd.length - (positions.start === positions.end ?
@@ -465,7 +659,7 @@ document.addEventListener('DOMContentLoaded', function () {
             youtubeUrl.classList.remove('error');
 
             const text = '[![' + youtubeText.value;
-            const link = '](http://img.youtube.com/vi/' + youtubeUrl.value.match(/\?v=([a-zA-Z0-9]+)/)[1] + '/0.jpg)](' + youtubeUrl.value + ')';
+            const link = '](http://img.youtube.com/vi/' + youtubeUrl.value.match(/\?v=([a-zA-Z0-9\-]+)/)[1] + '/0.jpg)](' + youtubeUrl.value + ')';
             const calculatedSecondPartStart = parseInt(youtubeSelectionStart.value) + text.length;
             const calculatedEnd = calculatedSecondPartStart + link.length;
             content.value = content.value.slice(0, parseInt(youtubeSelectionStart.value)) + text + content.value.slice(parseInt(youtubeSelectionEnd.value));
@@ -568,6 +762,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         });
+        addEvent(content, 'keyup', function (e) {
+            if (e.keyCode >= 33 && e.keyCode <= 40) update();
+        });
+        addEvent(content, 'click', update);
         addEvent(document, 'keydown', function (e) {
             if (e.keyCode === 83 && e.ctrlKey) {
                 e.preventDefault();
@@ -628,7 +826,7 @@ document.addEventListener('DOMContentLoaded', function () {
             getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent(linkSearch.value), function (result) {
                 linkSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
                 result = JSON.parse(result);
-                for (var i = 0, j = result.length; i < j; i++) {
+                for (let i = 0, j = result.length; i < j; i++) {
                     const entry = result[i];
                     const row = document.createElement('div');
                     row.classList.add('row');
@@ -644,7 +842,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     a.innerText = entry.title;
                     col.appendChild(a);
 
-                    addEvent(a, 'click', function (e) {
+                    addEvent(a, 'click', e => {
                         e.preventDefault();
                         finishLinkWizardWithSearchResult(row);
                     });
@@ -652,18 +850,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 linkSearchEntries = $('#link-search-wrapper .row');
             });
         });
-        addEvent(linkButton, 'click', function () {
-            openLinkWindow();
-        });
-        addEvent(linkFinishButton, 'click', function (e) {
+        addEvent(linkButton, 'click', openLinkWindow);
+        addEvent(linkFinishButton, 'click', e => {
             e.preventDefault();
             finishLinkWizard();
         });
-        addEvent(linkCancelButton, 'click', function (e) {
+        addEvent(linkCancelButton, 'click', e => {
             e.preventDefault();
             cancelLinkWindow();
         });
-        addEvent(linkSearch, 'keydown', function (e) {
+        addEvent(linkSearch, 'keydown', e => {
             if (e.keyCode >= 37 && e.keyCode <= 40) {
                 if (linkSearchCurrentlyActive === -1) {
                     linkSearchCurrentlyActive = 1;
@@ -676,16 +872,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         linkSearchCurrentlyActive = linkSearchEntries.length - 1;
                     }
                 }
-                linkSearchEntries.forEach(function (row) {
-                    row.classList.remove('active');
-                });
+                linkSearchEntries.forEach(row => row.classList.remove('active'));
                 linkSearchEntries[linkSearchCurrentlyActive].classList.add('active');
                 e.preventDefault();
             }
         });
-        addEvent(imageButton, 'click', function () {
-            openImageWindow();
-        });
+        addEvent(imageButton, 'click', openImageWindow);
         addEvent(imageFinishButton, 'click', function (e) {
             e.preventDefault();
             finishImageWizard();
@@ -742,9 +934,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         });
-        addEvent(youtubeButton, 'click', function () {
-            openYoutubeWindow();
-        });
+        addEvent(youtubeButton, 'click', openYoutubeWindow);
         addEvent(youtubeFinishButton, 'click', function (e) {
             e.preventDefault();
             finishYoutubeWizard();
@@ -758,7 +948,7 @@ document.addEventListener('DOMContentLoaded', function () {
             getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent(relatedSearch.value), function (result) {
                 relatedSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
                 result = JSON.parse(result);
-                for (var i = 0, j = result.length; i < j; i++) {
+                for (let i = 0, j = result.length; i < j; i++) {
                     const entry = result[i];
                     const row = document.createElement('div');
                     row.classList.add('row');
@@ -795,16 +985,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         relatedSearchCurrentlyActive = relatedSearchEntries.length - 1;
                     }
                 }
-                relatedSearchEntries.forEach(function (row) {
-                    row.classList.remove('active');
-                });
+                relatedSearchEntries.forEach(row => row.classList.remove('active'));
                 relatedSearchEntries[relatedSearchCurrentlyActive].classList.add('active');
                 e.preventDefault();
             }
         });
-        addEvent(relatedButton, 'click', function () {
-            openRelatedWindow();
-        });
+        addEvent(relatedButton, 'click', openRelatedWindow);
         addEvent(relatedFinishButton, 'click', function (e) {
             e.preventDefault();
             const activatedSearchResult = $1('#related-search-wrapper .row.active');
@@ -814,6 +1000,19 @@ document.addEventListener('DOMContentLoaded', function () {
         addEvent(relatedCancelButton, 'click', function (e) {
             e.preventDefault();
             cancelRelatedWindow();
+        });
+
+        addEvent(displayActivator, 'mouseover', function () {
+            editor.style['z-index'] = '0';
+        });
+        addEvent(editorActivator, 'mouseover', function () {
+            editor.style['z-index'] = '1';
+        });
+        addEvent(preview, 'click', function (e) {
+            const search = getMouseEventCaretRange(e).endContainer.data;
+            const contentPosition = content.value.indexOf(search);
+            content.setSelectionRange(contentPosition, contentPosition);
+            content.focus();
         });
 
         md.forEach(function (fct) {
@@ -828,14 +1027,12 @@ document.addEventListener('DOMContentLoaded', function () {
             divider.textContent = ' ';
             buttonWrapper.appendChild(divider);
 
-            addEvent(span, 'click', function () {
-                applyStyle(fct);
-            });
+            addEvent(span, 'click', () => applyStyle(fct));
         });
 
         setInterval(attemptSaving, 2000);
 
-        for (var i = 1; i <= 10; i++) {
+        for (let i = 1; i <= 10; i++) {
             const option = document.createElement('option');
             option.text = i * 10 + '%';
             option.value = '' + i * 10;
