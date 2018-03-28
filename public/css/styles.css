@@ -207,7 +207,10 @@ header {
     position: absolute;
     top: 14px;
     right: 10px;
-    cursor: pointer; }
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 3px;
+    padding: 0 10px; }
 .content code:not([class^=' lang']) {
   padding: 3px 5px;
   background-color: rgba(0, 0, 0, 0.05);
