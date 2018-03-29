@@ -167,6 +167,15 @@ function getMouseEventCaretRange(evt) {
     return range;
 }
 
+function isOffScreen(el) {
+    const rect = el.getBoundingClientRect();
+    return (
+        (rect.x + rect.width) < 0
+        || (rect.y + rect.height) < 0
+        || (rect.x > window.innerWidth || rect.y + rect.height > window.innerHeight)
+    );
+}
+
 
 document.addEventListener('DOMContentLoaded', function () {
         const md = [
@@ -453,9 +462,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const update = function () {
             preview.innerHTML = marked(content.value);
             preview.innerHTML = preview.innerHTML.replace(/\s(href|alt|id)=".*?"/g, '');
-
-            //replacing prism because prism interferes with cursor
-            preview.innerHTML = preview.innerHTML.replace(/<pre><code class="lang-(.+)">/g, '<pre class=" language-$1"><code class=" language-$1">');
+            Prism.highlightAll();
             debounce(setCursor, 200)();
         };
         const setCursor = function () {
@@ -486,8 +493,13 @@ document.addEventListener('DOMContentLoaded', function () {
             //prepare prism
             translatedText = translatedText.replace(/<pre><code class="lang-(.+)">/g, '<pre class=" language-$1"><code class=" language-$1">');
 
+            //use prism
+            translatedText = translatedText.replace(/<pre class="\s?language-([a-zA-Z0-9]+)"><code class="\s?language-[a-zA-Z0-9]+">([\s\S]*)<\/code><\/pre>/g, function (match, language, code) {
+                return '<pre class=" language-' + language + '"><code class=" language-' + language + '">' + Prism.highlight(code, Prism.languages[language], language).trim() + '</code></pre>';
+            });
+
             //get rid of trailing closing tags
-            while (translatedText.match(/<\/[a-zA-Z0-9]{1,10}>$/)) translatedText = translatedText.replace(/<\/[a-zA-Z0-9]{1,10}>$/, '');
+            while (translatedText.match(/<\/[a-zA-Z0-9]{1,10}>$/)) translatedText = translatedText.replace(/<\/[a-zA-Z0-9]{1,10}>$/, '').trim();
 
             //ensure that cursor is not in an HTML tag
             const prevHtml = preview.innerHTML;
@@ -511,12 +523,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             } while (opened !== 0 && cursorPosition <= prevHtmlLength);
 
-
             //remove any set cursors and set new cursor
             const cursorHtml = cursorPosition === 0 ? '<p><span id="cursor"></span></p>' : '<span id="cursor"></span>';
             preview.innerHTML = preview.innerHTML.slice(0, cursorPosition) + cursorHtml + preview.innerHTML.slice(cursorPosition);
 
-            debounce(scrollIt($1('#cursor', preview)), 200);
+            const cursor = $1('#cursor', preview);
+            if(isOffScreen(cursor)) debounce(scrollIt(cursor), 200);
         };
         const checkSlug = function (callback) {
             getAjax('http://localhost:' + PORT + '/wiki/checkslug/' + slug.value, function (result) {
