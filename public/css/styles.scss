@@ -97,23 +97,42 @@ $headerBackgroundColor: #2e3035;
 	background-color: $titleBackgroundColor;
 	border-bottom: 1px solid #e1e4e8;
 	padding: 20px 0;
-	.entry-title {
+}
+
+#tag-cloud-header {
+	cursor: pointer;
+	strong:before {
+		font-family: 'Font Awesome 5 Free', sans-serif;
+		font-weight: 900;
+		content: '\f0fe';
+		margin-right: 10px;
 	}
-	.tags {
-		a {
-			background-color: $tagBackgroundColor;
-			color: $tagFontColor;
-			padding: 3px 10px;
-			border-radius: 3px;
-			margin-right: 6px;
-			margin-bottom: 6px;
-			line-height: 30px;
-			font-size: 1.2em;
-			text-decoration: none;
-			white-space: nowrap;
-			&:hover {
-				background-color: $tagHoverBackgroundColor;
-			}
+	&.opened strong:before {
+		content: '\f146';
+	}
+}
+
+#tag-cloud-container {
+	max-height: 0;
+	opacity: 0;
+	overflow: hidden;
+	@include prefix(transition, max-height 0.4s ease 0s);
+}
+
+.tags {
+	a {
+		background-color: $tagBackgroundColor;
+		color: $tagFontColor;
+		padding: 3px 10px;
+		border-radius: 3px;
+		margin-right: 6px;
+		margin-bottom: 6px;
+		line-height: 30px;
+		font-size: 1.2em;
+		text-decoration: none;
+		white-space: nowrap;
+		&:hover {
+			background-color: $tagHoverBackgroundColor;
 		}
 	}
 }

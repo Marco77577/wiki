@@ -111,19 +111,40 @@ header {
   background-color: #fafbfc;
   border-bottom: 1px solid #e1e4e8;
   padding: 20px 0; }
-  .title .tags a {
-    background-color: #f1f8ff;
-    color: #0366d6;
-    padding: 3px 10px;
-    border-radius: 3px;
-    margin-right: 6px;
-    margin-bottom: 6px;
-    line-height: 30px;
-    font-size: 1.2em;
-    text-decoration: none;
-    white-space: nowrap; }
-    .title .tags a:hover {
-      background-color: #dfecff; }
+
+#tag-cloud-header {
+  cursor: pointer; }
+  #tag-cloud-header strong:before {
+    font-family: 'Font Awesome 5 Free', sans-serif;
+    font-weight: 900;
+    content: '\f0fe';
+    margin-right: 10px; }
+  #tag-cloud-header.opened strong:before {
+    content: '\f146'; }
+
+#tag-cloud-container {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease 0s;
+  -webkit-transition: max-height 0.4s ease 0s;
+  -moz-transition: max-height 0.4s ease 0s;
+  -o-transition: max-height 0.4s ease 0s;
+  -ms-transition: max-height 0.4s ease 0s; }
+
+.tags a {
+  background-color: #f1f8ff;
+  color: #0366d6;
+  padding: 3px 10px;
+  border-radius: 3px;
+  margin-right: 6px;
+  margin-bottom: 6px;
+  line-height: 30px;
+  font-size: 1.2em;
+  text-decoration: none;
+  white-space: nowrap; }
+  .tags a:hover {
+    background-color: #dfecff; }
 
 .content h1 {
   font-size: 3.2em;

@@ -51,8 +51,8 @@ const getEntryList = function (search, callback) {
     fs.readdir('./public/wiki', function (err, files) {
         if (err) throw err;
         search = decodeURIComponent(search);
-        var list = [];
-        for (var i = 0, j = files.length; i < j; i++) {
+        const list = [];
+        for (let i = 0, j = files.length; i < j; i++) {
             if (files[i].split('.').pop() !== 'md') continue;
             try {
                 const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
@@ -71,7 +71,7 @@ const getEntryList = function (search, callback) {
 };
 
 const fileSizeConverter = function (size) {
-    var counter = 0;
+    let counter = 0;
     while (size > 1024) {
         size /= 1024;
         counter++;
@@ -79,23 +79,38 @@ const fileSizeConverter = function (size) {
     return size.toFixed(2) + ' ' + ['Bytes', 'KB', 'MB', 'GB', 'TB'][counter];
 };
 
+const loadTagCloud = function (files) {
+    const tags = [];
+    files.forEach(file => {
+        const fileContent = fs.readFileSync('./public/wiki/' + file, 'utf-8');
+        const match = fileContent.match(/tags: (.*)(?:\r\n|\r|\n)/)[1].replace(/\s*,\s*/g, ',');
+        if (match.length <= 0) return;
+        match.split(',').forEach(tag => {
+            if (!tags.includes(tag)) tags.push(tag);
+        });
+    });
+    return tags.map(tag => '<a class="tag" href="wiki/index/' + tag + '">' + tag + '</a>').join('');
+};
+
 const loadIndex = function (req, res, urlOptions) {
     loadTemplateAsync('entryIndex', function (err, html) {
         if (err) throw err;
         fs.readdir('./public/wiki', function (err2, files) {
             if (err2) throw err2;
-            var imageSize = 0, fileSize = 0;
+            let imageSize = 0, fileSize = 0;
             const images = fs.readdirSync('./public/wiki/img');
-            for (var i = 0, j = images.length; i < j; i++) {
+            for (let i = 0, j = images.length; i < j; i++) {
                 imageSize += fs.statSync('./public/wiki/img/' + images[i]).size;
             }
-            var list = '';
+            let list = '';
+            let tagCloudFiles = [];
             for (i = 0, j = files.length; i < j; i++) {
                 if (files[i].split('.').pop() !== 'md') continue;
                 try {
                     const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
                     urlOptions[1] = decodeURIComponent(urlOptions[1]);
                     if (urlOptions[1] !== 'undefined' && !(file.toLowerCase().indexOf(urlOptions[1]) !== -1 || file.toLowerCase().match(new RegExp(urlOptions[1])))) continue;
+                    tagCloudFiles.push(files[i]);
                     const stats = fs.statSync('./public/wiki/' + files[i]);
                     fileSize += stats.size;
                     list += '<div class="row index-row"><div class="col-12 col-md-8"><a href="wiki/view/' + files[i].replace('.md', '') + '">' + file.replace(/title: (.+)(?:.|\s)*/, '$1') + '</a><div class="option-wrapper"><a href="wiki/edit/' + files[i].replace('.md', '') + '" class="edit">Edit</a><a href="#" class="delete" data-slug="' + files[i].replace('.md', '') + '">Delete</a></div></div><div class="col-12 col-md-2">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2" onclick="location.href=\'/wiki/view/' + files[i].replace('.md', '') + '\'">' + (stats.mtime.getDate() < 10 ?
@@ -118,7 +133,8 @@ const loadIndex = function (req, res, urlOptions) {
             html = replaceBlock('filesize', html, fileSizeConverter(fileSize));
             html = replaceBlock('imagesize', html, fileSizeConverter(imageSize));
             html = replaceBlock('tags', html, (urlOptions[1] !== 'undefined' ?
-                                               '<a class="tag" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' : ''));
+                                               '<a class="tag" href="wiki/index"><i class="fas fa-times"></i></a><a class="tag" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' : ''));
+            html = replaceBlock('tagcloud', html, loadTagCloud(tagCloudFiles));
             html = replaceBlock('content', html, list);
 
             preparePageForDisplay(res, html, pageTitle);
@@ -137,7 +153,7 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 
         //load wiki entry
         loadWikiEntryAsync(urlOptions[1], function (wikiErr, wikiEntry) {
-            var pageTitle = 'Entry Not Found';
+            let pageTitle = 'Entry Not Found';
             if (wikiErr && wikiErr.code === 'ENOENT') {
                 //fill in data
                 html = replaceBlock('title', html, pageTitle, true); //TODO find customizable way to do this
@@ -155,7 +171,7 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
                 const tags = wikiEntry.match(/tags: (.*)/);
                 if (tags) {
                     const tagArray = tags[1].replace(/,\s*/g, ',').split(',');
-                    for (var i = 0, j = tagArray.length; i < j; i++) {
+                    for (let i = 0, j = tagArray.length; i < j; i++) {
                         if (tagArray[i] === '') continue;
                         tagArray[i] = tagArray[i].toLowerCase();
                         tagArray[i] = '<a class="tag" href="wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
@@ -184,10 +200,10 @@ router.register('\/wiki\/edit\/(.+)', function (req, res, urlOptions) {
 
         //load wiki entry
         loadWikiEntryAsync(urlOptions[1], function (wikiErr, wikiEntry) {
-            var pageTitle = "Entry Not Found";
+            let pageTitle = "Entry Not Found";
             if (wikiErr && wikiErr.code === 'ENOENT') {
                 //fill in data
-                loadTemplateAsync('view', function (errView, htmlView) {
+                loadTemplateAsync('view', function (errView) {
                     if (errView) throw errView;
 
                     html = replaceBlock('title', html, pageTitle, true); //TODO find customizable way to do this
@@ -250,7 +266,7 @@ router.register('/wiki/settings', function (req, res) {
 router.register('\/wiki\/save\/(.+?)\/(.+?)\/(.*?)\/(.*?)\/((?:.|\s)+)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
 
-    for (var i = 1; i <= 5; i++) {
+    for (let i = 1; i <= 5; i++) {
         urlOptions[i] = decodeURIComponent(urlOptions[i]);
     }
 
@@ -343,7 +359,7 @@ router.register('\/wiki\/download\/(.+)\/(.+)\/([0-9]{1,3})', function (req, res
         if (err || image === undefined) {
             res.write('error');
         } else {
-            var quality = parseInt(urlOptions[3]);
+            let quality = parseInt(urlOptions[3]);
             if (quality > 100) quality = 100;
             if (quality < 10) quality = 10;
             image.resize(image.bitmap.width, image.bitmap.height).quality(quality).write('public/wiki/img/' + decodeURIComponent(urlOptions[2]) + '.jpg');

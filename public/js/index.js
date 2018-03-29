@@ -1,5 +1,31 @@
+function slideDown(elem) {
+    elem.style.maxHeight = '1000px';
+    // We're using a timer to set opacity = 0 because setting max-height = 0 doesn't (completely) hide the element.
+    elem.style.opacity   = '1';
+}
+
+function slideUp(elem) {
+    elem.style.maxHeight = '0';
+    once( 1, function () {
+        elem.style.opacity = '0';
+    });
+}
+
+function once (seconds, callback) {
+    let counter = 0;
+    const time = window.setInterval(function () {
+        counter++;
+        if (counter >= seconds) {
+            callback();
+            window.clearInterval(time);
+        }
+    }, 400);
+}
+
 document.addEventListener('DOMContentLoaded', function () {
     const deleteButtons = $('.delete');
+    const tagsContainer = $1('#tag-cloud-container');
+    const tagsHeader = $1('#tag-cloud-header');
     deleteButtons.forEach(function (deleteButton) {
         addEvent(deleteButton, 'click', function (e) {
             e.preventDefault();
@@ -16,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     const entries = $('.index:not(.size) .row');
-    var currentlyActive = -1;
+    let currentlyActive = -1;
     addEvent(document, 'keydown', function (e) {
         if (e.keyCode >= 37 && e.keyCode <= 40) {
             if (currentlyActive === -1) {
@@ -37,6 +63,17 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (e.keyCode === 13) { //enter
             location.href = $1('.row.active div a').href;
+        }
+    });
+    addEvent(tagsHeader, 'click', function() {
+        if(tagsContainer.classList.contains('opened')) {
+            tagsContainer.classList.remove('opened');
+            tagsHeader.classList.remove('opened');
+            slideUp(tagsContainer);
+        } else {
+            tagsContainer.classList.add('opened');
+            tagsHeader.classList.add('opened');
+            slideDown(tagsContainer);
         }
     });
 });
