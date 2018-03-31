@@ -490,6 +490,9 @@ document.addEventListener('DOMContentLoaded', function () {
             //get rid of links, ids and alternative texts (they are not important for the display of elements and they get in the way of cursor placement)
             translatedText = translatedText.replace(/\s(href|alt|id)=".*?"/g, '');
 
+            //prepare line breaks
+            translatedText = translatedText.replace(/<br\/>/g, '<br>');
+
             //prepare prism
             translatedText = translatedText.replace(/<pre><code class="lang-(.+)">/g, '<pre class=" language-$1"><code class=" language-$1">');
 
@@ -1115,5 +1118,7 @@ document.addEventListener('DOMContentLoaded', function () {
             imageQuality.appendChild(option);
         }
         imageQuality.value = '60';
+
+        content.focus();
     }
 );
