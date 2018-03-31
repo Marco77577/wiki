@@ -89,7 +89,7 @@ const loadTagCloud = function (files) {
             if (!tags.includes(tag)) tags.push(tag);
         });
     });
-    return tags.map(tag => '<a class="tag" href="wiki/index/' + tag + '">' + tag + '</a>').join('');
+    return tags.map(tag => '<a class="tag" href="wiki/index/' + tag + '">' + tag + '</a>').join(' ');
 };
 
 const loadIndex = function (req, res, urlOptions) {

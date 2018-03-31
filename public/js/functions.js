@@ -11,7 +11,7 @@ function addEvent(el, type, handler) {
 }
 
 function getAjax(url, success) {
-    var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+    const xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
     xhr.open('GET', url);
     xhr.onreadystatechange = function () {
         if (xhr.readyState > 3 && xhr.status === 200) {
