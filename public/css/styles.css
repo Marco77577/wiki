@@ -563,6 +563,8 @@ header {
   .content ul li, .content ol li {
     margin-bottom: 5px;
     line-height: 150%; }
+    .content ul li p, .content ol li p {
+      font-size: 1em; }
 .content img {
   position: relative;
   max-width: 100%;
