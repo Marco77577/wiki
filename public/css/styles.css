@@ -583,6 +583,13 @@ header {
     z-index: 1;
     max-width: 80vw;
     cursor: zoom-out; }
+.content .iframe-wrapper {
+  text-align: center;
+  background-color: #000; }
+  .content .iframe-wrapper iframe {
+    max-width: 100%;
+    width: 560px;
+    height: 315px; }
 .content span#cursor {
   position: relative; }
   .content span#cursor:before {

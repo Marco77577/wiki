@@ -110,4 +110,20 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    $('a[href*="https://www.youtube.com"]').forEach(video => {
+        const id = video.href.match(/https:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9\-]+)/);
+        const div = document.createElement('div');
+        div.classList.add('iframe-wrapper');
+
+        const iframe = document.createElement('iframe');
+        iframe.src = 'https://www.youtube.com/embed/' + id[1] + '?rel=0';
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allowfullscreen', 'true');
+        iframe.setAttribute('allow', 'autoplay; encrypted-media;');
+        div.appendChild(iframe);
+        if(video.parentNode === undefined) return;
+        video.parentNode.insertBefore(div, video);
+        video.parentNode.removeChild(video);
+    });
 });
