@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     addEvent(document, 'keydown', function(e) {
-        if(e.ctrlKey && e.keyCode === 70) {
+        if(e.ctrlKey && e.keyCode === 70) { // Ctrl + F
             e.preventDefault();
             search.focus();
         }

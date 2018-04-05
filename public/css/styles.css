@@ -634,6 +634,8 @@ header {
     animation-name: cursor;
     animation-duration: 1.5s;
     animation-iteration-count: infinite; }
+.content span.search-highlight {
+  background-color: yellow; }
 @keyframes cursor {
   0% {
     border-color: #0366d6; }

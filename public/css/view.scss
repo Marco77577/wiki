@@ -208,18 +208,23 @@
 		}
 	}
 
-	span#cursor {
-		position: relative;
-		&:before {
-			content: '';
-			position: absolute;
-			display: inline-block;
-			width: 0;
-			height: 1.3em;
-			border-right: 2px solid #0366d6;
-			animation-name: cursor;
-			animation-duration: 1.5s;
-			animation-iteration-count: infinite;
+	span {
+		&#cursor {
+			position: relative;
+			&:before {
+				content: '';
+				position: absolute;
+				display: inline-block;
+				width: 0;
+				height: 1.3em;
+				border-right: 2px solid #0366d6;
+				animation-name: cursor;
+				animation-duration: 1.5s;
+				animation-iteration-count: infinite;
+			}
+		}
+		&.search-highlight {
+			background-color: yellow;
 		}
 	}
 
