@@ -368,6 +368,38 @@ header {
   @media screen and (max-width: 48em) {
     #editor {
       position: static; } }
+  #editor nav {
+    position: absolute;
+    left: -50px;
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column; }
+    #editor nav a {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background-color: #f1f8ff;
+      color: #0366d6;
+      box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+      margin-bottom: 10px; }
+      #editor nav a:hover {
+        background-color: #dfecff; }
+      #editor nav a:before {
+        font-family: 'Font Awesome 5 Free', sans-serif;
+        font-weight: 900;
+        font-size: 2.5em;
+        position: absolute;
+        left: calc(50px / 2 - 20px);
+        top: calc(50px / 2 - 12.5px);
+        width: 40px;
+        height: 40px;
+        text-align: center; }
+      #editor nav a.select-all:before {
+        content: '\f249'; }
+      #editor nav a.view:before {
+        content: '\f06e'; }
 
 .insertion-wrapper {
   display: none;

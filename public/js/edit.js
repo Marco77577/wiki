@@ -407,6 +407,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const deleteButton = $1('#delete-button');
         const viewButton = $1('#view-button');
         const buttonWrapper = $1('#button-wrapper');
+        const selectAllButton = $1('.select-all');
 
         //link wizard fields
         const linkWindow = $1('#link-window');
@@ -1021,6 +1022,11 @@ document.addEventListener('DOMContentLoaded', function () {
         addEvent(youtubeCancelButton, 'click', function (e) {
             e.preventDefault();
             cancelYoutubeWindow();
+        });
+        addEvent(selectAllButton, 'click', function(e) {
+            e.preventDefault();
+            content.setSelectionRange(0, content.innerHTML.length);
+            content.focus();
         });
 
         addEvent(relatedSearch, 'input', function () {
