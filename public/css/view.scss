@@ -13,6 +13,13 @@
 		&:hover {
 			background-color: $tagHoverBackgroundColor;
 		}
+		&.publish {
+			background-color: #fff8f1;
+			color: #d66603;;
+			&:hover {
+				background-color: #ffecdf;
+			}
+		}
 	}
 }
 

@@ -98,7 +98,7 @@
 		&.error, &.delete:hover {
 			background-color: $errorColor;
 		}
-		&.view:hover, &.print:hover, &.update:hover, &.download:hover {
+		&.view:hover, &.print:hover, &.update:hover, &.download:hover, &.publish:hover {
 			background-color: #4a81e4;
 		}
 		&:before {
@@ -116,10 +116,13 @@
 		&.update:before {
 			content: '\f0ad';
 		}
+		&.publish:before {
+			content: '\f0ac';
+		}
 		&.download:before {
 			content: '\f019';
 		}
-		&.save.saving:before, &.update.saving:before {
+		&.save.saving:before, &.update.saving:before, &.publish.saving.before {
 			content: '\f2f1';
 		}
 		&.download.downloading:before, &.delete.deleting:before {
@@ -137,7 +140,7 @@
 		&.view:before {
 			content: '\f06e';
 		}
-		&.save.error:before, &.delete.error:before, &.editbutton.error:before, &.view.error:before, &.print.error:before, &.update.error:before, &.download.error:before {
+		&.save.error:before, &.delete.error:before, &.editbutton.error:before, &.view.error:before, &.print.error:before, &.update.error:before, &.download.error:before, &.publish.error:before {
 			content: '\f071';
 		}
 	}
