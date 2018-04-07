@@ -736,7 +736,7 @@ document.addEventListener('DOMContentLoaded', function () {
             youtubeUrl.classList.remove('error');
 
             const text = '[![' + youtubeText.value;
-            const link = '](http://img.youtube.com/vi/' + youtubeUrl.value.match(/\?v=([a-zA-Z0-9\-]+)/)[1] + '/0.jpg)](' + youtubeUrl.value + ')';
+            const link = '](http://img.youtube.com/vi/' + youtubeUrl.value.match(/\?v=([a-zA-Z0-9\-_]+)/)[1] + '/0.jpg)](' + youtubeUrl.value + ')';
             const calculatedSecondPartStart = parseInt(youtubeSelectionStart.value) + text.length;
             const calculatedEnd = calculatedSecondPartStart + link.length;
             content.value = content.value.slice(0, parseInt(youtubeSelectionStart.value)) + text + content.value.slice(parseInt(youtubeSelectionEnd.value));

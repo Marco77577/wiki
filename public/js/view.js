@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         $('a[href*="https://www.youtube.com"]').forEach(video => {
-            const id = video.href.match(/https:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9\-]+)/);
+            const id = video.href.match(/https:\/\/(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9\-_]+)/);
             const div = document.createElement('div');
             div.classList.add('iframe-wrapper');
 
