@@ -1025,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         addEvent(selectAllButton, 'click', function(e) {
             e.preventDefault();
-            content.setSelectionRange(0, content.innerHTML.length);
+            content.setSelectionRange(0, content.value.length);
             content.focus();
         });
 
