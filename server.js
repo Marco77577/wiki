@@ -53,8 +53,13 @@ const doesSearchTermMatch = function (needle, haystack) {
     haystack = haystack.toLowerCase();
     const title = haystack.match(/title: (.+)(?:\r\n|\r|\n)/)[1];
     const tags = haystack.match(/tags: (.*)(?:\r\n|\r|\n)/)[1];
-    if (needle.match(/^all:(.+)/) !== null) {
-        return haystack.indexOf(needle.match(/^all:(.+)/)[1]) !== -1;
+    let c;
+    if ((c = needle.match(/^all:(.+)/)) !== null) {
+        return haystack.indexOf(c[1]) !== -1;
+    } else if ((c = needle.match(/^title:(.+)/)) !== null) {
+        return title.indexOf(c[1]) !== -1;
+    } else if ((c = needle.match(/^tags:(.+)/)) !== null) {
+        return tags.indexOf(c[1]) !== -1;
     } else {
         return title.indexOf(needle) !== -1 || tags.indexOf(needle) !== -1;
     }
