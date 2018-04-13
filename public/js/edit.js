@@ -406,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const saveButton = $1('#save-button');
         const deleteButton = $1('#delete-button');
         const viewButton = $1('#view-button');
+        const viewMaterialButton = $1('#view-material-button');
         const buttonWrapper = $1('#button-wrapper');
         const selectAllButton = $1('.select-all');
 
@@ -564,6 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (result === 'success') {
                 latestSaveSlug = slug.value;
                 viewButton.href = '/wiki/view/' + latestSaveSlug;
+                viewMaterialButton.href = '/wiki/view/' + latestSaveSlug;
                 saveButton.classList.remove('error');
                 setDirty(false);
             } else {

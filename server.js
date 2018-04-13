@@ -262,7 +262,7 @@ router.register('/wiki/new', function (req, res) {
 
         const pageTitle = 'New';
         html = replaceBlock('title', html, '');
-        html = replaceBlock('slug', html, '');
+        html = replaceBlock('slug', html, '', true);
         html = replaceBlock('tags', html, '');
         html = replaceBlock('content', html, '');
 
