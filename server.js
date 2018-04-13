@@ -47,6 +47,19 @@ const preparePageForDisplay = function (res, html, pageTitle) {
     res.end();
 };
 
+const doesSearchTermMatch = function (needle, haystack) {
+    if (needle.length <= 0) return true;
+    needle = needle.toLowerCase();
+    haystack = haystack.toLowerCase();
+    const title = haystack.match(/title: (.+)(?:\r\n|\r|\n)/)[1];
+    const tags = haystack.match(/tags: (.*)(?:\r\n|\r|\n)/)[1];
+    if (needle.match(/^all:(.+)/) !== null) {
+        return haystack.indexOf(needle.match(/^all:(.+)/)[1]) !== -1;
+    } else {
+        return title.indexOf(needle) !== -1 || tags.indexOf(needle) !== -1;
+    }
+};
+
 const getEntryList = function (search, callback) {
     fs.readdir('./public/wiki', function (err, files) {
         if (err) throw err;
@@ -56,7 +69,7 @@ const getEntryList = function (search, callback) {
             if (files[i].split('.').pop() !== 'md') continue;
             try {
                 const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
-                if (search !== '' && file.match(/title: (.+)(?:\r\n|\r|\n)/)[1].toLowerCase().indexOf(search.toLowerCase()) === -1 && file.match(/tags: (.*)(?:\r\n|\r|\n)/)[1].toLowerCase().indexOf(search.toLowerCase()) === -1) continue;
+                if (!doesSearchTermMatch(search, file)) continue;
                 list.push({
                     title: file.match(/title: (.+)(?:\r\n|\r|\n)/)[1],
                     tags: file.match(/tags: (.*)(?:\r\n|\r|\n)/)[1],
@@ -122,7 +135,7 @@ const loadIndex = function (req, res, urlOptions) {
                 try {
                     const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
                     urlOptions[1] = decodeURIComponent(urlOptions[1]);
-                    if (urlOptions[1] !== 'undefined' && !(file.toLowerCase().indexOf(urlOptions[1]) !== -1 || file.toLowerCase().match(new RegExp(urlOptions[1])))) continue;
+                    if (urlOptions[1] !== 'undefined' && !doesSearchTermMatch(urlOptions[1], file)) continue;
                     tagCloudFiles.push(files[i]);
                     const stats = fs.statSync('./public/wiki/' + files[i]);
                     fileSize += stats.size;
