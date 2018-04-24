@@ -326,6 +326,15 @@ router.register('\/wiki\/save\/(.+?)\/(.+?)\/(.*?)\/(.*?)\/((?:.|\s)+)', functio
                 res.write('Error: Could not delete old file.')
             } else {
                 save();
+
+                //fix links to old slug
+                getEntryList('all:wiki/view/' + urlOptions[3], function (entries) {
+                    entries.forEach(entry => {
+                        let content = fs.readFileSync('./public/wiki/' + entry.slug + '.md', 'utf8');
+                        content = content.replace(new RegExp('wiki/view/' + urlOptions[3], 'g'), 'wiki/view/' + urlOptions[2]);
+                        fs.writeFileSync('./public/wiki/' + entry.slug + '.md', content, 'utf8');
+                    });
+                });
             }
         });
     }
