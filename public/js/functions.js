@@ -35,8 +35,9 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     addEvent(document, 'keydown', function(e) {
-        if(e.ctrlKey && e.keyCode === 70) { // Ctrl + F
+        if(e.ctrlKey && e.shiftKey && e.keyCode === 70) { // Ctrl + Shift + F
             e.preventDefault();
+            search.setSelectionRange(0, search.value.length);
             search.focus();
         }
     });
