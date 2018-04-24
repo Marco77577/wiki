@@ -19,13 +19,19 @@
 		}
 		input {
 			padding-left: 68px;
-			&#slug + label {
+			& + label {
 				display: none;
 				position: absolute;
-				top: 0;
+				top: 1px;
 				left: auto;
 				right: 8px;
 				color: $errorColor;
+				border: 0;
+				width: auto;
+				height: 32px;
+			}
+			&:focus + label {
+				background-color: #fff;
 			}
 		}
 	}
@@ -59,9 +65,9 @@
 		}
 		&.error {
 			border-color: $errorColor;
-		}
-		&#slug.error + label {
-			display: block;
+			& + label {
+				display: block;
+			}
 		}
 	}
 	select {

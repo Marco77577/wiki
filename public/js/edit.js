@@ -575,6 +575,7 @@ document.addEventListener('DOMContentLoaded', function () {
             saveButton.classList.remove('saving');
         };
         const attemptSaving = function () {
+            saveButton.classList.remove('error');
             if (title !== document.activeElement && slug !== document.activeElement && title.value.length > 0 && slug.value.length > 0 && content.value.length > 0 && title.value !== '{% block title %}' && slug.value !== '{% block slug %}' && tags.value !== '{% block tags %}' && content.value !== '{% block content %}') {
                 saveButton.classList.add('saving');
                 if (slug.value !== latestSaveSlug) {
@@ -586,6 +587,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     save(saveCallback);
                 }
+            } else {
+                saveButton.classList.add('error');
             }
         };
         const setDirty = function (d) {
@@ -593,9 +596,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (dirty) {
                 saveButton.innerText = 'Save Changes!';
                 saveButton.classList.remove('success');
+                window.onbeforeunload = () => true;
             } else {
                 saveButton.innerText = 'Saved';
                 saveButton.classList.add('success');
+                window.onbeforeunload = null;
             }
         };
         const openLinkWindow = function () {
@@ -774,11 +779,6 @@ document.addEventListener('DOMContentLoaded', function () {
             cancelRelatedWindow();
         };
 
-        window.addEventListener('beforeunload', function () {
-            if (dirty) attemptSaving();
-            return !dirty;
-        });
-
         update();
 
         addEvent(title, 'input', function () {
@@ -792,6 +792,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         slug.classList.add('error');
                     }
                 });
+            }
+            if(title.value.length <= 0) {
+                title.classList.add('error');
+            } else {
+                title.classList.remove('error');
             }
         });
         addEvent(slug, 'input', function () {
