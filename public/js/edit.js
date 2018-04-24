@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 shiftKey: true,
                 endPositionNoSelection: 0,
                 endPositionWithSelection: 0,
-                displayButton: true,
+                displayButton: false,
             },
             {
                 name: 'tab',
@@ -374,7 +374,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 displayButton: false,
                 customCommand: function () {
                     const positions = getTextSelection(content);
-                    console.log(positions);
                     if (positions.start > 0) {
                         if (positions.start === positions.end) { //remove tab before start position
                             if (content.value.slice(positions.start - 1, positions.start) === '\t') {
@@ -461,6 +460,17 @@ document.addEventListener('DOMContentLoaded', function () {
         let relatedSearchEntries = $('#related-search-wrapper .row');
         let relatedSearchCurrentlyActive = -1;
 
+        //Color wizard fields
+        const colorWindow = $1('#color-window');
+        const customColor = $1('#custom-color');
+        const colorSelectionStart = $1('#color-selection-start');
+        const colorSelectionEnd = $1('#color-selection-end');
+        const colorFinishButton = $1('#color-finish-button');
+        const colorCancelButton = $1('#color-cancel-button');
+        const colorButton = $1('#color');
+        const colorButtons = $('.button.color');
+        let colorCurrentlyActive = -1;
+
         const update = function () {
             preview.innerHTML = marked(content.value);
             preview.innerHTML = preview.innerHTML.replace(/\s(href|alt|id)=".*?"/g, '');
@@ -533,7 +543,7 @@ document.addEventListener('DOMContentLoaded', function () {
             preview.innerHTML = preview.innerHTML.slice(0, cursorPosition) + cursorHtml + preview.innerHTML.slice(cursorPosition);
 
             const cursor = $1('#cursor', preview);
-            if(isOffScreen(cursor)) debounce(scrollIt(cursor), 200);
+            if (isOffScreen(cursor)) debounce(scrollIt(cursor), 200);
         };
         const checkSlug = function (callback) {
             getAjax('http://localhost:' + PORT + '/wiki/checkslug/' + slug.value, function (result) {
@@ -779,6 +789,44 @@ document.addEventListener('DOMContentLoaded', function () {
             cancelRelatedWindow();
         };
 
+        const openColorWindow = function () {
+            const positions = getTextSelection(content);
+            colorSelectionStart.value = positions.start;
+            colorSelectionEnd.value = positions.end;
+            colorWindow.classList.add('visible');
+            customColor.setSelectionRange(0, customColor.value.length);
+            customColor.focus();
+        };
+        const cancelColorWindow = function () {
+            colorWindow.classList.remove('visible');
+            colorSelectionStart.value = '';
+            colorSelectionEnd.value = '';
+            content.focus();
+        };
+        const finishColorWizard = function () {
+            colorFinishButton.classList.remove('error');
+            if (!customColor.value.match(/#([a-zA-Z0-9]{3}|[a-zA-Z0-9]{4}|[a-zA-Z0-9]{6}|[a-zA-Z0-9]{8})$/g)) {
+                colorFinishButton.classList.add('error');
+                return;
+            }
+            const firstPart = '<span style="color: ' + customColor.value + '">';
+            const secondPart = '</span>';
+            const calculatedSecondPartStart = parseInt(colorSelectionEnd.value) + firstPart.length;
+            content.value = content.value.slice(0, parseInt(colorSelectionStart.value)) + firstPart + content.value.slice(parseInt(colorSelectionStart.value));
+            content.value = content.value.slice(0, calculatedSecondPartStart) + secondPart + content.value.slice(calculatedSecondPartStart);
+            content.setSelectionRange(parseInt(colorSelectionStart.value) + firstPart.length, parseInt(colorSelectionEnd.value) + firstPart.length);
+            content.focus();
+            update();
+            cancelColorWindow();
+        };
+        const updateColorButtons = function () {
+            colorButtons.forEach(button => button.classList.remove('active'));
+            colorButtons[colorCurrentlyActive].classList.add('active');
+            customColor.value = colorButtons[colorCurrentlyActive].getAttribute('data-hex');
+            customColor.setSelectionRange(0, customColor.value.length);
+            customColor.focus();
+        };
+
         update();
 
         addEvent(title, 'input', function () {
@@ -793,7 +841,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 });
             }
-            if(title.value.length <= 0) {
+            if (title.value.length <= 0) {
                 title.classList.add('error');
             } else {
                 title.classList.remove('error');
@@ -834,11 +882,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 if (e.shiftKey && e.keyCode === 80) { //Shift + P
                     e.preventDefault();
-                    openImageWindow();
+                    openColorWindow();
                 }
                 if (e.shiftKey && e.keyCode === 89) { //Shift + Y
                     e.preventDefault();
                     openYoutubeWindow();
+                }
+                if (e.shiftKey && e.keyCode === 73) { //Shift + I
+                    e.preventDefault();
+                    openImageWindow();
                 }
                 if (e.keyCode === 82) { //R
                     e.preventDefault();
@@ -864,6 +916,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 cancelImageWindow();
                 cancelYoutubeWindow();
                 cancelRelatedWindow();
+                cancelColorWindow();
             }
             if (linkWindow.classList.contains('visible') && e.keyCode === 13) { //enter
                 e.preventDefault();
@@ -882,6 +935,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 const activatedSearchResult = $1('#related-search-wrapper .row.active');
                 if (activatedSearchResult != null) {
                     finishRelatedWizard(activatedSearchResult);
+                }
+            }
+            if (colorWindow.classList.contains('visible')) {
+                switch (e.keyCode) {
+                    case 13: //enter
+                        e.preventDefault();
+                        finishColorWizard();
+                        break;
+                    case 40: //down
+                        e.preventDefault();
+                        if (++colorCurrentlyActive >= colorButtons.length) colorCurrentlyActive = 0;
+                        updateColorButtons();
+                        break;
+                    case 38: //up
+                        e.preventDefault();
+                        if (--colorCurrentlyActive < 0) colorCurrentlyActive = colorButtons.length - 1;
+                        updateColorButtons();
+                        break;
                 }
             }
         });
@@ -1030,12 +1101,11 @@ document.addEventListener('DOMContentLoaded', function () {
             e.preventDefault();
             cancelYoutubeWindow();
         });
-        addEvent(selectAllButton, 'click', function(e) {
+        addEvent(selectAllButton, 'click', function (e) {
             e.preventDefault();
             content.setSelectionRange(0, content.value.length);
             content.focus();
         });
-
         addEvent(relatedSearch, 'input', function () {
             getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent(relatedSearch.value), function (result) {
                 relatedSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
@@ -1092,6 +1162,19 @@ document.addEventListener('DOMContentLoaded', function () {
         addEvent(relatedCancelButton, 'click', function (e) {
             e.preventDefault();
             cancelRelatedWindow();
+        });
+        addEvent(colorButton, 'click', openColorWindow);
+        addEvent(colorFinishButton, 'click', function (e) {
+            e.preventDefault();
+            finishColorWizard();
+        });
+        addEvent(colorCancelButton, 'click', function (e) {
+            e.preventDefault();
+            cancelColorWindow();
+        });
+        addEvent(customColor, 'input', function () {
+            colorCurrentlyActive = -1;
+            colorButtons.forEach(button => button.classList.remove('active'));
         });
 
         addEvent(displayActivator, 'mouseover', function () {
