@@ -49,6 +49,12 @@ document.addEventListener('DOMContentLoaded', function () {
             prepareView();
         }
     };
+    const showClipBoardToast = function () {
+        $1('.toast').classList.add('visible');
+        setTimeout(function () {
+            $1('.toast').classList.remove('visible');
+        }, 1000);
+    };
     const prepareView = function () {
         let counter = 0;
         $('pre').forEach(function (element) {
@@ -60,10 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const i = counter++;
             addEvent(clickToCopy, 'click', function () {
                 copyTextToClipboard(codeArray[i]);
-                $1('.toast').classList.add('visible');
-                setTimeout(function () {
-                    $1('.toast').classList.remove('visible');
-                }, 1000);
+                showClipBoardToast();
             });
 
             element.appendChild(clickToCopy);
@@ -119,6 +122,13 @@ document.addEventListener('DOMContentLoaded', function () {
             if (video.parentNode === undefined) return;
             video.parentNode.insertBefore(div, video);
             video.parentNode.removeChild(video);
+        });
+
+        $('code').forEach(code => {
+            addEvent(code, 'click', function () {
+                copyTextToClipboard(code.innerText);
+                showClipBoardToast();
+            });
         });
     };
 
