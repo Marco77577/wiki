@@ -60,9 +60,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 row.classList.remove('active');
             });
             entries[currentlyActive].classList.add('active');
+            scrollIt($1('.row.active div a'));
         }
         if (e.keyCode === 13) { //enter
             location.href = $1('.row.active div a').href;
+        }
+        if(e.keyCode === 69) { //E
+            location.href = $1('.row.active div.option-wrapper a.edit').href;
         }
     });
     addEvent(tagsHeader, 'click', function() {
