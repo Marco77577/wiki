@@ -310,6 +310,39 @@ document.addEventListener('DOMContentLoaded', function () {
                         update();
                     }
                 }
+            },
+            {
+                name: 'duplicateLine',
+                text: 'Duplicate Line',
+                delimiterStart: '',
+                delimiterEnd: '',
+                keyCode: 68,
+                ctrlKey: true,
+                shiftKey: false,
+                endPositionNoSelection: 0,
+                endPositionWithSelection: 0,
+                displayButton: false,
+                customCommand: function () {
+                    const positions = getTextSelection(content);
+                    if (positions.start > 0) {
+                        if (positions.start === positions.end) { //copy entire line
+                            let start = positions.start - 1, end = positions.end;
+                            const text = content.value;
+                            while (text[start] !== '\n' && start > 0) start--;
+                            while (text[end] !== '\n' && end < text.length) end++;
+                            const selectedContent = content.value.slice(start, end);
+                            content.value = content.value.slice(0, end) + (start === 0 ? '\n' :
+                                                                           '') + selectedContent + content.value.slice(end);
+                            content.setSelectionRange(positions.start + end - start, positions.start + end - start);
+                        } else { //copy content
+                            const selectedContent = content.value.slice(positions.start, positions.end);
+                            content.value = content.value.slice(0, positions.end) + selectedContent + content.value.slice(positions.end);
+                            content.setSelectionRange(positions.start, positions.end);
+                        }
+                        content.focus();
+                        update();
+                    }
+                }
             }
         ];
         let dirty = false;
