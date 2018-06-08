@@ -29,6 +29,19 @@ html, body {
 
 $navHeight: 50px;
 header {
+	&.fixed {
+		position: fixed;
+		top: 0; left: 0; right: 0;
+		z-index: 3;
+		@include prefix(transition, top 0.1s);
+		&.hide {
+			top: -$navHeight;
+		}
+		& + .header-margin {
+			width: 100%;
+			height: $navHeight;
+		}
+	}
 	background-color: #292d32;
 	font-size: 1.6em;
 	nav {

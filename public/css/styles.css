@@ -65,6 +65,22 @@ html, body {
 header {
   background-color: #292d32;
   font-size: 1.6em; }
+  header.fixed {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 3;
+    transition: top 0.1s;
+    -webkit-transition: top 0.1s;
+    -moz-transition: top 0.1s;
+    -o-transition: top 0.1s;
+    -ms-transition: top 0.1s; }
+    header.fixed.hide {
+      top: -50px; }
+    header.fixed + .header-margin {
+      width: 100%;
+      height: 50px; }
   header nav {
     height: 50px;
     overflow: hidden; }

@@ -80,4 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
             slideDown(tagsContainer);
         }
     });
+
+    $1('header').classList.add('fixed');
 });

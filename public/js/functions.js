@@ -107,18 +107,28 @@ function getAjax(url, success) {
 document.addEventListener('DOMContentLoaded', function () {
     const searchForm = $1('#search-form');
     const search = $1('#search');
+    const header = $1('header');
+    const scrollObject = {x: 0, y: 0};
 
     addEvent(searchForm, 'submit', function (e) {
         e.preventDefault();
         if (search.value.length === 0) return;
         location.href = 'http://localhost:' + PORT + '/wiki/index/' + search.value;
     });
-
-    addEvent(document, 'keydown', function(e) {
-        if(e.ctrlKey && e.shiftKey && e.keyCode === 70) { // Ctrl + Shift + F
+    addEvent(document, 'keydown', function (e) {
+        if (e.ctrlKey && e.shiftKey && e.keyCode === 70) { // Ctrl + Shift + F
             e.preventDefault();
             search.setSelectionRange(0, search.value.length);
             search.focus();
         }
+    });
+    addEvent(window, 'scroll', function () {
+        if(scrollObject.y < window.pageYOffset)
+            header.classList.add('hide');
+        else
+            header.classList.remove('hide');
+
+        scrollObject.x = window.pageXOffset;
+        scrollObject.y = window.pageYOffset;
     });
 });

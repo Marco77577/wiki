@@ -130,6 +130,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 showClipBoardToast();
             });
         });
+
+        $1('header').classList.add('fixed');
     };
 
     addEvent(deleteButton, 'click', function (e) {
