@@ -37,6 +37,9 @@
 			background-color: #f6f8fa;
 			div:first-of-type .option-wrapper {
 				display: block;
+				@include responsive(lg, down) {
+					display: none;
+				}
 			}
 		}
 		&:first-of-type {
