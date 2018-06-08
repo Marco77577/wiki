@@ -647,7 +647,7 @@ header {
   width: auto;
   left: 0;
   float: left;
-  margin-right: 15px;
+  margin-right: 25px;
   margin-bottom: 15px;
   cursor: zoom-in;
   transition: max-width 0.5s, left 0.5s;
