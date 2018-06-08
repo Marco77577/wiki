@@ -9,10 +9,8 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-12">
-				<h1 class="entry-title">{% block title %}</h1>
-				<div class="tags">
-					{% block tags %}
-				</div>
+				<h1 class="entry-title">404 ─ Entry Not Found</h1>
+				<div class="tags"></div>
 			</div>
 		</div>
 	</div>
@@ -21,14 +19,10 @@
 	<div class="row">
 		<div class="col-12 col-md-8">
 			<div class="content">
-				{% block content %}
 			</div>
 		</div>
 		<div class="col-12 col-md-4 edit">
-			<a class="button editbutton" href="wiki/edit/{% block slug %}" title="E" data-slug="{% block slug %}">Edit</a>
-			<a class="button delete" href="#">Delete</a>
-			<a class="button print" onclick="window.print()" title="P">Print</a>
-			{% block filesize %}
+			<a class="button editbutton" href="wiki/edit/{% block slug %}" title="E">Create This Entry</a>
 		</div>
 	</div>
 </div>

@@ -7,7 +7,7 @@ const childProcess = require('child_process');
 const jimp = require('jimp');
 
 const loadTemplateSync = function (name) {
-    return fs.readFileSync('./public/' + name + '.html');
+    return fs.readFileSync('./public/' + name + '.html', 'utf8');
 };
 
 const loadTemplateAsync = function (name, callback) {
@@ -187,12 +187,11 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 
         //load wiki entry
         loadWikiEntryAsync(urlOptions[1], function (wikiErr, wikiEntry) {
-            let pageTitle = 'Entry Not Found';
+            let pageTitle = '404 ─ Entry Not Found';
             if (wikiErr && wikiErr.code === 'ENOENT') {
-                //fill in data
-                html = replaceBlock('title', html, pageTitle, true); //TODO find customizable way to do this
-                html = replaceBlock('tags', html, '');
-                html = replaceBlock('content', html, '');
+                html = loadTemplateSync('404');
+                html = replaceBlock('slug', html, urlOptions[1], true);
+                preparePageForDisplay(res, html, pageTitle);
             } else {
                 //extract title and tags
                 const title = wikiEntry.match(/^title: (.+)/);
@@ -217,14 +216,14 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
                 }
 
                 //fill in data
+                const stats = fs.statSync('./public/wiki/' + urlOptions[1] + '.md');
+                html = replaceBlock('filesize', html, '<p>File size: ' + fileSizeConverter(stats.size) + '</p>');
                 html = replaceBlock('content', html, marked(wikiEntry));
+
+                html = replaceBlock('slug', html, urlOptions[1], true);
+                html = replaceBlock('filesize', html, '');
+                preparePageForDisplay(res, html, pageTitle);
             }
-
-            html = replaceBlock('slug', html, urlOptions[1], true);
-
-            const stats = fs.statSync('./public/wiki/' + urlOptions[1] + '.md');
-            html = replaceBlock('filesize', html, '<p>File size: ' + fileSizeConverter(stats.size) + '</p>');
-            preparePageForDisplay(res, html, pageTitle);
         });
     });
 });

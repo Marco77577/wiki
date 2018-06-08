@@ -24,6 +24,7 @@ function copyTextToClipboard(text) {
 
 document.addEventListener('DOMContentLoaded', function () {
     const codeArray = [];
+    const editButton = $1('.editbutton');
     const deleteButton = $1('.delete');
     const content = $1('.content');
     const originalText = content.innerHTML;
@@ -31,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteEntry = function () {
         const confirm = window.confirm('Are you sure you want to delete this entry?');
         if (!confirm) return;
-        getAjax('http://localhost:' + PORT + '/wiki/delete/' + deleteButton.getAttribute('data-slug'), function (result) {
+        getAjax('http://localhost:' + PORT + '/wiki/delete/' + editButton.getAttribute('data-slug'), function (result) {
             if (result === 'success') {
                 location.href = 'http://localhost:' + PORT + '/wiki/index';
             } else {
@@ -139,10 +140,6 @@ document.addEventListener('DOMContentLoaded', function () {
         $1('header').classList.add('fixed');
     };
 
-    addEvent(deleteButton, 'click', function (e) {
-        e.preventDefault();
-        deleteEntry();
-    });
     addEvent(document, 'keydown', function (e) {
         if (searchField === document.activeElement && e.keyCode !== 27) return;
         switch (e.keyCode) {
@@ -154,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 deleteEntry();
                 break;
             case 69: //(E)dit
-                location.href = 'http://localhost:' + PORT + '/wiki/edit/' + deleteButton.getAttribute('data-slug');
+                location.href = 'http://localhost:' + PORT + '/wiki/edit/' + editButton.getAttribute('data-slug');
                 break;
             case 80: //(P)rint
                 window.print();
@@ -163,6 +160,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     addEvent(searchField, 'input', function () {
         highlightText();
+    });
+    addEvent(deleteButton, 'click', function (e) {
+        e.preventDefault();
+        deleteEntry();
     });
 
     prepareView();
