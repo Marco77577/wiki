@@ -60,6 +60,8 @@ document.addEventListener('DOMContentLoaded', function () {
         $('pre').forEach(function (element) {
             element.classList.add('line-numbers');
 
+            const div = document.createElement('div');
+            div.classList.add('code-container');
             const clickToCopy = document.createElement('span');
             clickToCopy.classList.add('clipboard');
             clickToCopy.innerText = 'Copy to Clipboard';
@@ -69,7 +71,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 showClipBoardToast();
             });
 
-            element.appendChild(clickToCopy);
+            element.parentNode.insertBefore(div, element);
+            element.parentNode.removeChild(element);
+            div.appendChild(element);
+            div.appendChild(clickToCopy);
         });
 
         $('pre code').forEach(function (element) {

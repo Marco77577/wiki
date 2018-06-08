@@ -103,12 +103,26 @@
 		}
 	}
 
-	pre {
+	.code-container {
 		position: relative;
-		font-size: 14px;
 		&:hover .clipboard {
 			display: inline-block;
 		}
+		.clipboard {
+			display: none;
+			position: absolute;
+			top: 14px;
+			right: 10px;
+			cursor: pointer;
+			background-color: #fff;
+			border-radius: 3px;
+			padding: 3px 10px;
+			font-size: 1.4em;
+		}
+	}
+
+	pre {
+		font-size: 14px;
 		&.line-numbers {
 			.line-number {
 				display: inline-block;
@@ -123,16 +137,6 @@
 		}
 		.line-number {
 			display: none;
-		}
-		.clipboard {
-			display: none;
-			position: absolute;
-			top: 14px;
-			right: 10px;
-			cursor: pointer;
-			background-color: #fff;
-			border-radius: 3px;
-			padding: 0 10px;
 		}
 	}
 

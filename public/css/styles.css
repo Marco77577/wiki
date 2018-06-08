@@ -569,11 +569,22 @@ header {
       font-size: 0.75em; }
     .content a.related:hover {
       text-decoration: none; }
-.content pre {
-  position: relative;
-  font-size: 14px; }
-  .content pre:hover .clipboard {
+.content .code-container {
+  position: relative; }
+  .content .code-container:hover .clipboard {
     display: inline-block; }
+  .content .code-container .clipboard {
+    display: none;
+    position: absolute;
+    top: 14px;
+    right: 10px;
+    cursor: pointer;
+    background-color: #fff;
+    border-radius: 3px;
+    padding: 3px 10px;
+    font-size: 1.4em; }
+.content pre {
+  font-size: 14px; }
   .content pre.line-numbers .line-number {
     display: inline-block;
     width: 30px;
@@ -589,15 +600,6 @@ header {
     -ms-user-select: none; }
   .content pre .line-number {
     display: none; }
-  .content pre .clipboard {
-    display: none;
-    position: absolute;
-    top: 14px;
-    right: 10px;
-    cursor: pointer;
-    background-color: #fff;
-    border-radius: 3px;
-    padding: 0 10px; }
 .content code:not([class^=' lang']) {
   padding: 3px 5px;
   background-color: rgba(0, 0, 0, 0.05);
