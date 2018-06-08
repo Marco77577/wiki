@@ -3,7 +3,7 @@
 /* 992    laptop */
 /* 1200   desktop */
 /* $point: xs, sm, md, lg, or xl */
-/* $first: mobile, or desktop   depending on what you are developing first */
+/* $first: up, down */
 @media screen and (max-width: 0rem) {
   .hidden-xs-down {
     display: none; } }
@@ -169,6 +169,9 @@ header {
       background-color: #f6f8fa; }
       .index .row:hover div:first-of-type .option-wrapper, .index .row.active div:first-of-type .option-wrapper {
         display: block; }
+        @media screen and (max-width: 62em) {
+          .index .row:hover div:first-of-type .option-wrapper, .index .row.active div:first-of-type .option-wrapper {
+            display: none; } }
     .index .row:first-of-type {
       background-color: #f2f7ff;
       border-color: #c8e1ff;

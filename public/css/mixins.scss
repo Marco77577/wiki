@@ -5,9 +5,9 @@ $breakpoint-lg: 62em; /* 992    laptop */
 $breakpoint-xl: 75em; /* 1200   desktop */
 
 /* $point: xs, sm, md, lg, or xl */
-/* $first: mobile, or desktop   depending on what you are developing first */
-@mixin responsive($point, $first: desktop) {
-	@if $first == mobile {
+/* $first: up, down */
+@mixin responsive($point, $first: down) {
+	@if $first == up {
 		@if $point == xl {
 			@media screen and (min-width: $breakpoint-xl) {
 				@content;
@@ -29,7 +29,7 @@ $breakpoint-xl: 75em; /* 1200   desktop */
 				@content;
 			}
 		}
-	} @else if $first == desktop {
+	} @else if $first == down {
 		@if $point == xl {
 			@media screen and (max-width: $breakpoint-xl) {
 				@content;
@@ -75,7 +75,7 @@ $hide: xs sm md lg xl;
 		}
 	}
 	.hidden-#{$point}-up {
-		@include responsive($point, mobile) {
+		@include responsive($point, up) {
 			display: none;
 		}
 	}
