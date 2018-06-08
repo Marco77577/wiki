@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteButtons = $('.delete');
     const tagsContainer = $1('#tag-cloud-container');
     const tagsHeader = $1('#tag-cloud-header');
+    const search = $1('#search');
     deleteButtons.forEach(function (deleteButton) {
         addEvent(deleteButton, 'click', function (e) {
             e.preventDefault();
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (e.keyCode === 13) { //enter
             location.href = $1('.row.active div a').href;
         }
-        if(e.keyCode === 69) { //E
+        if(e.keyCode === 69 && search !== document.activeElement) { //E
             location.href = $1('.row.active div.option-wrapper a.edit').href;
         }
     });
