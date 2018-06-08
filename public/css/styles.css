@@ -61,7 +61,10 @@ html, body {
   @page :first {
     margin: 0 0 2cm; }
   .container {
-    max-width: 90%; } }
+    max-width: 90%; }
+
+  .header-margin {
+    display: none; } }
 header {
   background-color: #292d32;
   font-size: 1.6em; }
