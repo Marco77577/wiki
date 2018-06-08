@@ -1143,6 +1143,10 @@ document.addEventListener('DOMContentLoaded', function () {
             content.focus();
         });
 
+        addEvent(window, 'resize', function() {
+            content.style.height = 'calc(100% - ' + (buttonWrapper.offsetHeight + 50) + 'px)';
+        });
+
         md.filter(fct => fct.displayButton).forEach(function (fct) {
             const span = document.createElement('span');
             span.classList.add('icon');
