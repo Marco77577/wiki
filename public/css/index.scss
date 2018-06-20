@@ -30,8 +30,41 @@
 		border-top: 0;
 		cursor: pointer;
 		overflow: hidden;
+		@include prefix(transition, (height 1s, padding-top 1s, padding-bottom 1s, border-top 1s, border-bottom 1s, bottom 1s, opacity 1s));
+		&.deleted {
+			height: 0;
+			padding-top: 0;
+			padding-bottom: 0;
+			border-top: 0;
+			border-bottom: 0;
+		}
 		&.index-row {
+			position: relative;
+			bottom: 0;
 			margin: 0;
+			background-color: #fff;
+			opacity: 1;
+			@include prefix(user-select, none);
+			&.entering {
+				bottom: 150px;
+				opacity: 0;
+			}
+			strong.hide {
+				display: none;
+			}
+			.delete-all {
+				display: none;
+				&.show {
+					display: inline-block;
+				}
+				&:before {
+					font-family: 'Font Awesome 5 Free', sans-serif;
+					font-weight: 900;
+					margin-right: 5px;
+					display: inline-block;
+					content: '\f1f8';
+				}
+			}
 		}
 		&:hover, &.active {
 			background-color: #f6f8fa;

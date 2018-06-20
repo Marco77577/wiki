@@ -6,6 +6,17 @@ const marked = require('marked');
 const childProcess = require('child_process');
 const jimp = require('jimp');
 
+String.prototype.hashCode = function () {
+    let hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+        chr = this.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0; // Convert to 32bit integer
+    }
+    return '_' + Math.abs(hash);
+};
+
 const loadTemplateSync = function (name) {
     return fs.readFileSync('./public/' + name + '.html', 'utf8');
 };
@@ -28,7 +39,7 @@ const replaceBlock = function (blockName, container, substitute, global) {
 };
 
 const prepareUrls = function (container) {
-    return container.replace(/(href|src)="(?!http|mailto:|tel:)(.+?)"/g, '$1="http://localhost:' + config.PORT + '/$2"');
+    return container.replace(/(href|src)="(?!http|mailto:|tel:|file:)(.+?)"/g, '$1="http://localhost:' + config.PORT + '/$2"');
 };
 
 const loadEnvVarTemplate = function () {
@@ -97,6 +108,15 @@ const fileSizeConverter = function (size) {
     return size.toFixed(2) + ' ' + ['Bytes', 'KB', 'MB', 'GB', 'TB'][counter];
 };
 
+const timeToString = function (time) {
+    return (time.getDate() < 10 ? '0' : '') + time.getDate() + '.' + (time.getMonth() + 1 < 10 ? '0' :
+                                                                      '') + (time.getMonth() + 1) + '.' + time.getFullYear() + ', ' + (time.getHours() < 10 ?
+                                                                                                                                       '0' :
+                                                                                                                                       '') + time.getHours() + ':' + (time.getMinutes() < 10 ?
+                                                                                                                                                                      '0' :
+                                                                                                                                                                      '') + time.getMinutes();
+};
+
 const loadTagCloud = function (files) {
     const tags = [];
     files.forEach(file => {
@@ -118,8 +138,8 @@ const emptyDirectory = function (path) {
     });
 };
 
-const createDirectory = function () {
-    fs.mkdir('./public/publish', err => {
+const createDirectory = function (path) {
+    fs.mkdir(path, err => {
     });
 };
 
@@ -144,15 +164,7 @@ const loadIndex = function (req, res, urlOptions) {
                     tagCloudFiles.push(files[i]);
                     const stats = fs.statSync('./public/wiki/' + files[i]);
                     fileSize += stats.size;
-                    list += '<div class="row index-row"><div class="col-12 col-md-8"><a href="wiki/view/' + files[i].replace('.md', '') + '">' + file.replace(/title: (.+)(?:.|\s)*/, '$1') + '</a><div class="option-wrapper"><a href="wiki/edit/' + files[i].replace('.md', '') + '" class="edit">Edit</a><a href="#" class="delete" data-slug="' + files[i].replace('.md', '') + '">Delete</a></div></div><div class="col-12 col-md-2">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2" onclick="location.href=\'/wiki/view/' + files[i].replace('.md', '') + '\'">' + (stats.mtime.getDate() < 10 ?
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  '0' :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  '') + stats.mtime.getDate() + '.' + (stats.mtime.getMonth() + 1 < 10 ?
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       '0' :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       '') + (stats.mtime.getMonth() + 1) + '.' + stats.mtime.getFullYear() + ', ' + (stats.mtime.getHours() < 10 ?
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      '0' :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      '') + stats.mtime.getHours() + ':' + (stats.mtime.getMinutes() < 10 ?
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            '0' :
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            '') + stats.mtime.getMinutes() + '</div></div>';
+                    list += '<div class="row index-row"><div class="col-12 col-md-8"><a href="wiki/view/' + files[i].replace('.md', '') + '">' + file.replace(/title: (.+)(?:.|\s)*/, '$1') + '</a><div class="option-wrapper"><a href="wiki/edit/' + files[i].replace('.md', '') + '" class="edit">Edit</a><a href="#" class="delete" data-slug="' + files[i].replace('.md', '') + '">Delete</a></div></div><div class="col-12 col-md-2">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2" onclick="location.href=\'/wiki/view/' + files[i].replace('.md', '') + '\'">' + timeToString(stats.mtime) + '</div></div>';
                 } catch (ex) {
                     //ignore
                 }
@@ -180,6 +192,28 @@ router.register('/wiki/index', loadIndex);
 router.register('/wiki/home', loadIndex);
 router.register('/wiki', loadIndex);
 router.register('/', loadIndex);
+
+router.register('/wiki/files', function (req, res, urlOptions) {
+    loadTemplateAsync('files', function (err, html) {
+        if (err) throw err;
+
+        let totalFileSize = 0;
+        let content = '';
+
+        const files = fs.readdirSync('./public/wiki/files');
+        for (let i = 0, j = files.length; i < j; i++) {
+            const stats = fs.statSync('./public/wiki/files/' + files[i]);
+            totalFileSize += stats.size;
+            content += '<div class="row index-row file-row" id="' + files[i].hashCode() + '"><div class="col-12 col-md-8"><a href="wiki/files/' + files[i] + '" target="_blank">' + files[i] + '</a><div class="option-wrapper"><a class="delete" data-filename="' + files[i] + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>';
+        }
+
+        html = replaceBlock('content', html, content);
+        html = replaceBlock('totalfilesize', html, fileSizeConverter(totalFileSize));
+        html = replaceBlock('totalfilesizeinbytes', html, totalFileSize);
+
+        preparePageForDisplay(res, html, "Files");
+    });
+});
 
 router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
     loadTemplateAsync('view', function (err, html) {
@@ -412,9 +446,72 @@ router.register('\/wiki\/download\/(.+)\/(.+)\/([0-9]{1,3})', function (req, res
     });
 });
 
+const fileChunks = [];
+
+router.register('\/wiki\/uploadChunk\/(.+)\/([a-zA-Z0-9\-_]+)\/([0-9]+)', function (req, res, urlOptions) {
+    urlOptions[1] = decodeURIComponent(urlOptions[1]);
+
+    //url decode base64 string
+    urlOptions[2] = urlOptions[2].replace(/-/g, '+').replace(/_/g, '/');
+
+    //check if first chunk
+    if (!(urlOptions[1] in fileChunks)) {
+        fileChunks[urlOptions[1]] = {chunks: []};
+    }
+    fileChunks[urlOptions[1]]['chunks'][urlOptions[3]] = urlOptions[2];
+
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    res.write('success:' + urlOptions[3]);
+    res.end();
+
+});
+
+router.register('\/wiki\/upload\/(.+)', function (req, res, urlOptions) {
+    let counter = 1;
+    urlOptions[1] = decodeURIComponent(urlOptions[1]);
+    //guarantee file does not yet exist
+    createDirectory('./public/wiki/files');
+    let fileName = urlOptions[1];
+    while (fs.existsSync('./public/wiki/files/' + fileName)) {
+        fileName = urlOptions[1].substr(0, urlOptions[1].lastIndexOf('.')) + '(' + (counter++) + ')' + urlOptions[1].substr(urlOptions[1].lastIndexOf('.'));
+    }
+
+    //get file
+    let fileContentBase64 = '';
+    for (let i = 0, j = fileChunks[urlOptions[1]]['chunks'].length; i < j; i++) {
+        fileContentBase64 += fileChunks[urlOptions[1]]['chunks'][i];
+    }
+    fileChunks[urlOptions[1]] = {chunks: []};
+
+    //upload file
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    fs.writeFile('./public/wiki/files/' + fileName, fileContentBase64, 'base64', function (err) {
+        if (err) {
+            res.write('error');
+        }
+        else {
+            const stats = fs.statSync('./public/wiki/files/' + fileName);
+            res.write('<div class="row index-row file-row entering" id="' + fileName.hashCode() + '"><div class="col-12 col-md-8"><a href="file:///' + __dirname + '/public/wiki/files/' + fileName + '" target="_blank">' + fileName + '</a><div class="option-wrapper"><a class="delete" data-filename="' + fileName + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + fileName.hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>');
+        }
+        res.end();
+    });
+});
+
 router.register('\/wiki\/deleteImage\/(.+)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
     fs.unlink('./public/wiki/img/' + urlOptions[1] + '.jpg', function (err) {
+        if (err) {
+            res.write('error');
+        } else {
+            res.write('success');
+        }
+        res.end();
+    });
+});
+
+router.register('\/wiki\/deleteFile\/(.+)', function (req, res, urlOptions) {
+    res.writeHead(200, {'Content-Type': 'text/plain'});
+    fs.unlink('./public/wiki/files/' + decodeURIComponent(urlOptions[1]), function (err) {
         if (err) {
             res.write('error');
         } else {

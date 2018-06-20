@@ -87,7 +87,14 @@ function $1(selector, context) {
 }
 
 function addEvent(el, type, handler) {
-    if (el.attachEvent) el.attachEvent('on' + type, handler); else el.addEventListener(type, handler);
+    const addEvent = function(eventName) {
+        if (el.attachEvent) el.attachEvent('on' + eventName, handler); else el.addEventListener(eventName, handler);
+    };
+    if(type.constructor === Array) {
+        type.forEach(t => addEvent(t))
+    } else {
+        addEvent(type);
+    }
 }
 
 function getAjax(url, success) {

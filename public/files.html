@@ -1,0 +1,64 @@
+<html>
+<head>
+	{% block head %}
+	<script src="js/files.js"></script>
+</head>
+<body>
+{% block header %}
+<form id="uploadForm">
+	<div class="title">
+		<div class="container">
+			<div class="row">
+				<div class="col-12 drop-area">
+					<div class="border-area">
+						<h1 class="entry-title"><span class="icon">Choose a file</span> <span>or drag it here.</span></h1>
+						<div id="progress"></div>
+						<div id="overallProgress"></div>
+						<input type="file" name="files" id="files" multiple/>
+						<input type="hidden" id="MAX_FILE_SIZE" name="MAX_FILE_SIZE" value="300000" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
+<div class="container">
+	<div class="row">
+		<div class="col-12">
+			<div class="index content">
+				<div class="row index-row">
+					<div class="col-12 col-md-8" id="options-pane">
+						<strong>Title</strong>
+						<a href="#" class="delete-all">Delete All</a>
+					</div>
+					<div class="col-12 col-md-2">
+						<strong>File Size</strong>
+					</div>
+					<div class="col-12 col-md-2">
+						<strong>Created</strong>
+					</div>
+				</div>
+				{% block content %}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-12">
+			<div class="index size content">
+				<div class="row index-row">
+					<div class="col-12 col-md-8">
+						<strong>Total File Size</strong>
+					</div>
+					<div class="col-12 col-md-2">
+						<strong id="total-file-size" data-totalfilesize="{% block totalfilesizeinbytes %}">{% block totalfilesize %}</strong>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="toast" id="delete-toast">
+	<span>File(s) deleted.</span>
+</div>
+</body>
+</html>

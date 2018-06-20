@@ -1,5 +1,6 @@
 node_modules
 public/wiki/*.md
+public/wiki/files
 public/wiki/img/*.jpg
 public/wiki/img/*.jpeg
 public/wiki/img/*.png

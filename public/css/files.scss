@@ -1,0 +1,106 @@
+#uploadForm {
+	$overallProgressRadius: 15px;
+	$uploadBorderWidth: 3px;
+	.title {
+		height: 200px;
+		.drop-area {
+			cursor: pointer;
+			&.hover {
+				.border-area {
+					background-color: #fff;
+					h1 span.icon:before {
+						animation: dragover;
+						animation-iteration-count: infinite;
+						animation-duration: 1s;
+						animation-timing-function: linear;
+					}
+				}
+			}
+			&.uploading .border-area h1 span.icon:before {
+				content: '\f251';
+				animation: hourglass;
+				animation-iteration-count: infinite;
+				animation-duration: 1s;
+				animation-timing-function: linear;
+				@keyframes hourglass {
+					0% {content: '\f251';}
+					33% {content: '\f252';}
+					66% {content: '\f253';}
+				}
+			}
+
+			.border-area {
+				position: relative;
+				display: flex;
+				align-items: center;
+				width: 100%;
+				height: 100%;
+				border: $uploadBorderWidth dashed $titleBorderColor;
+				pointer-events: none;
+				@include responsive(sm, down) {
+					margin: 0 20px;
+					width: calc(100% - 40px);
+				}
+				h1 {
+					width: 100%;
+					text-align: center;
+					span.icon {
+						position: relative;
+						&:before {
+							font-family: 'Font Awesome 5 Free', sans-serif;
+							font-weight: 900;
+							font-size: 2em;
+							content: '\f019';
+							position: absolute;
+							top: -10px;
+							left: -60px;
+							@include responsive(sm, down) {
+								display: none;
+							}
+						}
+						@keyframes dragover {
+							0% {top: -20px;}
+							50% {top: 0;}
+							100% {top: 0;}
+						}
+					}
+					span:not([class='icon']) {
+						font-weight: normal;
+					}
+				}
+				input {
+					display: none;
+				}
+				#progress {
+					position: absolute;
+					left: -$uploadBorderWidth;
+					bottom: -$uploadBorderWidth;
+					height: $uploadBorderWidth;
+					background-color: #0366d6;
+					@for $i from 1 through 100 {
+						&._#{$i} {
+							width: calc(#{$i} * 1% + 2 * #{$uploadBorderWidth});
+						}
+					}
+				}
+				#overallProgress {
+					display: none;
+					position: absolute;
+					left: -$overallProgressRadius;
+					bottom: -$overallProgressRadius;
+					background-color: #0366d6;
+					color: #fff;
+					border-radius: 50%;
+					width: calc(2 * #{$overallProgressRadius});
+					height: calc(2 * #{$overallProgressRadius});
+					line-height: calc(2 * #{$overallProgressRadius});
+					text-align: center;
+					font-size: 1.4em;
+					&.show {
+						display: block;
+					}
+				}
+			}
+		}
+	}
+}

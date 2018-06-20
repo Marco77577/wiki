@@ -102,6 +102,7 @@ header {
 }
 
 $titleBackgroundColor: #fafbfc;
+$titleBorderColor: #e1e4e8;
 $inputBorderColor: #d1d5da;
 $errorColor: #ef525b;
 $tagBackgroundColor: #f1f8ff;
@@ -112,10 +113,11 @@ $headerBackgroundColor: #2e3035;
 
 .title {
 	background-color: $titleBackgroundColor;
-	border-bottom: 1px solid #e1e4e8;
+	border-bottom: 1px solid $titleBorderColor;
 	padding: 20px 0;
 }
 
 @import "index";
 @import "edit";
 @import "view";
+@import "files";

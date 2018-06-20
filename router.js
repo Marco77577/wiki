@@ -1,7 +1,7 @@
-var handlerFactory = require('./handler');
-var fs = require('fs');
-var parser = require('url');
-var handlers = [];
+const handlerFactory = require('./handler');
+const fs = require('fs');
+const parser = require('url');
+let handlers = [];
 
 exports.clear = function () {
     handlers = [];
@@ -13,8 +13,8 @@ exports.register = function (url, method) {
 
 exports.route = function (req) {
     const url = parser.parse(req.url, true);
-    var handler = {method: null, urlOptions: []};
-    for (var i = 0, j = handlers.length; i < j; i++) {
+    const handler = {method: null, urlOptions: []};
+    for (let i = 0, j = handlers.length; i < j; i++) {
         // console.log(url.pathname);
         // console.log(handlers[i].url);
         const regexMatch = url.pathname.match(new RegExp('^' + handlers[i].url + '$'));
@@ -32,11 +32,32 @@ exports.route = function (req) {
 
 exports.missing = function (req) {
     // Try to read the file locally, this is a security hole, yo /../../etc/passwd
-    var url = parser.parse(req.url, true);
-    var path = __dirname + "/public" + url.pathname.replace(/\.\.\//g, '');
+    const url = parser.parse(req.url, true);
+    const path = __dirname + "/public" + decodeURIComponent(url.pathname.replace(/\.\.\//g, ''));
     try {
         data = fs.readFileSync(path);
-        const mimeAddition = path.split('.').pop() === 'css' ? 'text/css' : (path.split('.').pop() === 'jpg' ? 'image' : 'text/html');
+
+        let mimeAddition;
+        const fileType = path.split('.').pop();
+        switch(fileType) {
+            case 'css':
+                mimeAddition = 'text/css';
+                break;
+            case 'jpg':
+                mimeAddition = 'image';
+                break;
+            case 'pdf':
+                mimeAddition = 'application/pdf';
+                break;
+            case 'doc':
+            case 'docx':
+                mimeAddition = 'application/msword';
+                break;
+            default:
+                mimeAddition = 'text/html';
+                break;
+        }
+
         mime = req.headers.accepts || mimeAddition;
         return handlerFactory.createHandler(function (req, res) {
             res.writeHead(200, {'Content-Type': mime});
