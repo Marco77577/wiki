@@ -26,48 +26,185 @@ document.addEventListener('DOMContentLoaded', function () {
     const deleteButtons = $('.delete');
     const tagsContainer = $1('#tag-cloud-container');
     const tagsHeader = $1('#tag-cloud-header');
+    const toastDelete = $1('#delete-toast');
+    const entrySize = $1('#entry-size');
     const search = $1('#search');
+    const optionsPaneTitle = $1('#options-pane strong');
+    const optionsPaneDelete = $1('#options-pane a');
+
+    const getTotalFileSize = function () {
+        //todo update total and image file size as well
+        let node = $('.entry-row')[0];
+        let i;
+        for (i = parseInt($1('#_filesize' + node.id).getAttribute('data-size')); node = node.nextElementSibling; i += parseInt($1('#_filesize' + node.id).getAttribute('data-size'))) ;
+        return i;
+    };
+    const select = function (e) {
+        e.stopPropagation();
+        if (e.shiftKey) { //select all files in between
+            //remove selection
+            const entryRows = $('.entry-row');
+            entryRows.forEach(fr => fr.classList.remove('active'));
+
+            //select in between: attempt direction down
+            const start = selectedLast === null ? content.children[1] : selectedLast;
+            let current = start;
+            do {
+                current.classList.add('active');
+            } while ((current = current.nextElementSibling) !== null && current.previousElementSibling !== this);
+
+            if (!this.classList.contains('active')) { //select in between: attempt direction down
+                entryRows.forEach(fr => fr.classList.remove('active'));
+
+                let current = start;
+                do {
+                    current.classList.add('active');
+                } while ((current = current.previousElementSibling) !== null && current.nextElementSibling !== this);
+            }
+            selectedLast = this;
+        } else {
+            //toggle selected
+            if (!this.classList.contains('active')) {
+                this.classList.add('active');
+                selectedLast = this;
+            } else {
+                this.classList.remove('active');
+            }
+        }
+
+        //show options for multiple selected files
+        updateOptionsPane();
+    };
+    const updateOptionsPane = function () {
+        const selectedFiles = $('.entry-row.active');
+        optionsPaneDelete.innerText = 'Delete ' + selectedFiles.length + ' Files';
+        if (selectedFiles.length > 1) {
+            optionsPaneTitle.classList.add('hide');
+            optionsPaneDelete.classList.add('show');
+        } else {
+            optionsPaneTitle.classList.remove('hide');
+            optionsPaneDelete.classList.remove('show');
+        }
+    };
+    const deleteEntry = function(slug) {
+        getAjax('http://localhost:' + PORT + '/wiki/delete/' + slug, function (result) {
+            if(result === 'error') {
+                console.log('Could not delete entry.');
+                return;
+            }
+
+            //reset user interface
+            const row = $1('#' + slug.hashCode());
+
+            //hide file
+            row.classList.add('deleted');
+
+            //show toast
+            toastDelete.classList.add('visible');
+
+            setTimeout(function () {
+                //hide toast and remove entry from user interface
+                toastDelete.classList.remove('visible');
+                row.parentNode.removeChild(row);
+                updateOptionsPane();
+
+                //update total file size
+                entrySize.innerText = fileSizeConverter(getTotalFileSize());
+            }, 2000);
+        });
+    };
+    const applyFilter = function() {
+        $('.entry-row').forEach(entryRow => {
+            entryRow.classList.remove('deleted');
+            if ($1('a', entryRow).innerText.match(new RegExp(this.value, 'i')) === null) {
+                entryRow.classList.add('deleted');
+            }
+        });
+    };
+
+    //entry delete functionality
     deleteButtons.forEach(function (deleteButton) {
         addEvent(deleteButton, 'click', function (e) {
             e.preventDefault();
+
             const confirm = window.confirm('Are you sure you want to delete this entry?');
             if (!confirm) return;
-            getAjax('http://localhost:' + PORT + '/wiki/delete/' + deleteButton.getAttribute('data-slug'), function (result) {
-                if (result === 'success') {
-                    location.href = 'http://localhost:' + PORT + '/wiki/index';
-                } else {
-                    this.classList.add('error');
-                }
-            });
+
+            deleteEntry(deleteButton.getAttribute('data-slug'));
         });
     });
+    addEvent(optionsPaneDelete, 'click', function (e) {
+        e.preventDefault();
 
-    const entries = $('.index:not(.size) .row');
-    let currentlyActive = -1;
+        const confirm = window.confirm('Are you sure you want to delete these entries?');
+        if (!confirm) return;
+
+        $('.entry-row.active .delete').forEach(entry => deleteEntry(entry.getAttribute('data-slug')));
+    });
+
+    //select functionality
+    let selectedLast = null;
+    $('.entry-row').forEach(entryRow => {
+        addEvent(entryRow, 'click', select);
+    });
+    addEvent(document, 'click', function () {
+        $('.entry-row').forEach(fileRow => fileRow.classList.remove('active'));
+        updateOptionsPane();
+    });
+
+    //navigation functionality
     addEvent(document, 'keydown', function (e) {
-        if (e.keyCode >= 37 && e.keyCode <= 40) {
-            if (e.keyCode === 39 || e.keyCode === 40) { //right/down arrow
-                if (++currentlyActive >= entries.length || currentlyActive <= 0) {
-                    currentlyActive = 1;
+        const indexRows = $('.index-row');
+
+        switch (e.keyCode) {
+            case 13: // enter
+                if(selectedLast === null) return;
+                $1('a', selectedLast).click();
+                break;
+            case 27: // escape
+                search.value = '';
+                applyFilter();
+                break;
+            case 37: // arrow left
+            case 38: // arrow up
+                if (selectedLast === null) selectedLast = indexRows[2];
+                indexRows.forEach(fileRow => fileRow.classList.remove('active'));
+
+                if (selectedLast.previousElementSibling !== indexRows[1] && selectedLast.previousElementSibling !== null) {
+                    selectedLast = selectedLast.previousElementSibling;
+                } else {
+                    selectedLast = indexRows[indexRows.length - 4];
                 }
-            } else if (e.keyCode === 37 || e.keyCode === 38) { //left/up arrow
-                if (--currentlyActive <= 0) {
-                    currentlyActive = entries.length - 1;
+                selectedLast.classList.add('active');
+                break;
+            case 39: // arrow right
+            case 40: // arrow down
+                if (selectedLast === null) selectedLast = indexRows[1];
+                indexRows.forEach(fileRow => fileRow.classList.remove('active'));
+
+                if (selectedLast.nextElementSibling !== null) {
+                    selectedLast = selectedLast.nextElementSibling;
+                } else {
+                    selectedLast = indexRows[2];
                 }
-            }
-            entries.forEach(function (row) {
-                row.classList.remove('active');
-            });
-            entries[currentlyActive].classList.add('active');
-            scrollIt($1('.row.active div a'));
-        }
-        if (e.keyCode === 13) { //enter
-            location.href = $1('.row.active div a').href;
-        }
-        if (e.keyCode === 69 && search !== document.activeElement) { //E
-            location.href = $1('.row.active div.option-wrapper a.edit').href;
+                selectedLast.classList.add('active');
+                break;
+            case 68: // (d)elete
+                if(document.activeElement === search || selectedLast === null) return;
+
+                const confirm = window.confirm('Are you sure you want to delete these entries?');
+                if (!confirm) return;
+
+                $('.entry-row.active .delete').forEach(entry => deleteEntry(entry.getAttribute('data-slug')));
+                break;
+            case 69: // (e)edit
+                if(document.activeElement === search || selectedLast === null) return;
+                $1('a.edit', selectedLast).click();
+                break;
         }
     });
+
+    //tag cloud functionality
     addEvent(tagsHeader, 'click', function () {
         if (tagsContainer.classList.contains('opened')) {
             tagsContainer.classList.remove('opened');
@@ -79,6 +216,9 @@ document.addEventListener('DOMContentLoaded', function () {
             slideDown(tagsContainer);
         }
     });
+
+    //filter functionality
+    addEvent(search, 'input', applyFilter);
 
     $1('header').classList.add('fixed');
 });

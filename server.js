@@ -148,7 +148,7 @@ const loadIndex = function (req, res, urlOptions) {
         if (err) throw err;
         fs.readdir('./public/wiki', function (err2, files) {
             if (err2) throw err2;
-            let imageSize = 0, fileSize = 0;
+            let imageSize = 0, entrySize = 0;
             const images = fs.readdirSync('./public/wiki/img');
             for (let i = 0, j = images.length; i < j; i++) {
                 imageSize += fs.statSync('./public/wiki/img/' + images[i]).size;
@@ -163,8 +163,8 @@ const loadIndex = function (req, res, urlOptions) {
                     if (urlOptions[1] !== 'undefined' && !doesSearchTermMatch(urlOptions[1], file)) continue;
                     tagCloudFiles.push(files[i]);
                     const stats = fs.statSync('./public/wiki/' + files[i]);
-                    fileSize += stats.size;
-                    list += '<div class="row index-row"><div class="col-12 col-md-8"><a href="wiki/view/' + files[i].replace('.md', '') + '">' + file.replace(/title: (.+)(?:.|\s)*/, '$1') + '</a><div class="option-wrapper"><a href="wiki/edit/' + files[i].replace('.md', '') + '" class="edit">Edit</a><a href="#" class="delete" data-slug="' + files[i].replace('.md', '') + '">Delete</a></div></div><div class="col-12 col-md-2">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2" onclick="location.href=\'/wiki/view/' + files[i].replace('.md', '') + '\'">' + timeToString(stats.mtime) + '</div></div>';
+                    entrySize += stats.size;
+                    list += '<div class="row index-row entry-row" id="' + files[i].replace('.md', '').hashCode() + '"><div class="col-12 col-md-8"><a href="wiki/view/' + files[i].replace('.md', '') + '">' + file.replace(/title: (.+)(?:.|\s)*/, '$1') + '</a><div class="option-wrapper"><a href="wiki/edit/' + files[i].replace('.md', '') + '" class="edit">Edit</a><a href="#" class="delete" data-slug="' + files[i].replace('.md', '') + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].replace('.md', '').hashCode() + '" data-size="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2" onclick="location.href=\'/wiki/view/' + files[i].replace('.md', '') + '\'">' + timeToString(stats.mtime) + '</div></div>';
                 } catch (ex) {
                     //ignore
                 }
@@ -172,9 +172,12 @@ const loadIndex = function (req, res, urlOptions) {
 
             const pageTitle = (urlOptions[1] !== 'undefined' ? 'Search' : 'Index');
             html = replaceBlock('title', html, pageTitle);
-            html = replaceBlock('totalfilesize', html, fileSizeConverter(fileSize + imageSize));
-            html = replaceBlock('filesize', html, fileSizeConverter(fileSize));
+            html = replaceBlock('totalsize', html, fileSizeConverter(entrySize + imageSize));
+            html = replaceBlock('totalsizeinbytes', html, entrySize + imageSize);
+            html = replaceBlock('entrysize', html, fileSizeConverter(entrySize));
+            html = replaceBlock('entrysizeinbytes', html, entrySize);
             html = replaceBlock('imagesize', html, fileSizeConverter(imageSize));
+            html = replaceBlock('imagesizeinbytes', html, imageSize);
             html = replaceBlock('tags', html, (urlOptions[1] !== 'undefined' ?
                                                '<a class="tag" href="wiki/index"><i class="fas fa-times"></i></a><a class="tag' + (urlOptions[1] === 'publish' ?
                                                                                                                                    ' publish' :

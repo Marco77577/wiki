@@ -1,23 +1,3 @@
-String.prototype.hashCode = function () {
-    let hash = 0, i, chr;
-    if (this.length === 0) return hash;
-    for (i = 0; i < this.length; i++) {
-        chr = this.charCodeAt(i);
-        hash = ((hash << 5) - hash) + chr;
-        hash |= 0; // Convert to 32bit integer
-    }
-    return '_' + Math.abs(hash);
-};
-
-function fileSizeConverter(size) {
-    let counter = 0;
-    while (size > 1024) {
-        size /= 1024;
-        counter++;
-    }
-    return size.toFixed(2) + ' ' + ['Bytes', 'KB', 'MB', 'GB', 'TB'][counter];
-}
-
 addEventListener('DOMContentLoaded', function () {
     const dropArea = $1('.drop-area');
     const overallProgress = $1('#overallProgress');
@@ -114,7 +94,10 @@ addEventListener('DOMContentLoaded', function () {
     };
     const deleteFile = function (fileName) {
         getAjax('http://localhost:' + PORT + '/wiki/deleteFile/' + encodeURIComponent(fileName), function (result) {
-            if (result === 'error') console.log('Could not delete file.');
+            if (result === 'error') {
+                console.log('Could not delete file.');
+                return;
+            }
 
             //reset user interface
             const row = $1('#' + fileName.hashCode());
@@ -197,6 +180,14 @@ addEventListener('DOMContentLoaded', function () {
         for (i = parseInt($1('#_filesize' + node.id).getAttribute('data-filesize')); node = node.nextElementSibling; i += parseInt($1('#_filesize' + node.id).getAttribute('data-filesize'))) ;
         return i;
     };
+    const applyFilter = function () {
+        $('.file-row').forEach(fileRow => {
+            fileRow.classList.remove('deleted');
+            if ($1('.delete', fileRow).getAttribute('data-filename').match(new RegExp(this.value, 'i')) === null) {
+                fileRow.classList.add('deleted');
+            }
+        });
+    };
 
     //file upload functionality
     addEvent(dropArea, ['drag', 'dragstart', 'dragend', 'dragover', 'dragenter', 'dragleave', 'drop'], function (e) {
@@ -278,24 +269,19 @@ addEventListener('DOMContentLoaded', function () {
     });
 
     //filter functionality
-    addEvent(search, 'input', function () {
-        $('.file-row').forEach(fileRow => {
-            fileRow.classList.remove('deleted');
-            if ($1('.delete', fileRow).getAttribute('data-filename').match(new RegExp(this.value, 'i')) === null) {
-                fileRow.classList.add('deleted');
-            }
-        });
-    });
+    addEvent(search, 'input', applyFilter);
 
     //navigation functionality
     addEvent(document, 'keydown', function (e) {
-        console.log(e.keyCode);
-
         const indexRows = $('.index-row');
 
         switch (e.keyCode) {
             case 13: // enter
                 $1('.file-row.active a').click();
+                break;
+            case 27: // escape
+                search.value = '';
+                applyFilter();
                 break;
             case 37: // arrow left
             case 38: // arrow up
@@ -322,6 +308,7 @@ addEventListener('DOMContentLoaded', function () {
                 selectedLast.classList.add('active');
                 break;
             case 68: // (d)elete
+                if (document.activeElement === search) return;
                 const confirm = window.confirm('Are you sure you want to delete these files?');
                 if (!confirm) return;
 
