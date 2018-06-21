@@ -329,14 +329,6 @@ header {
     @media print {
       .edit a.button {
         display: none; } }
-    .edit a.button.color.red.active, .edit a.button.color.red:hover {
-      background-color: red; }
-    .edit a.button.color.yellow.active, .edit a.button.color.yellow:hover {
-      background-color: yellow; }
-    .edit a.button.color.green.active, .edit a.button.color.green:hover {
-      background-color: green; }
-    .edit a.button.color.blue.active, .edit a.button.color.blue:hover {
-      background-color: blue; }
     .edit a.button.save:hover, .edit a.button.editbutton:hover, .edit a.button.success {
       background-color: #63bb7d; }
     .edit a.button.error, .edit a.button.delete:hover {
@@ -391,20 +383,22 @@ header {
         font-family: 'Font Awesome 5 Free', sans-serif;
         font-weight: 900;
         margin-right: 5px; }
-    .edit #button-wrapper span#related:before {
+    .edit #button-wrapper span#related-wizard-button:before {
       content: '\f35d'; }
-    .edit #button-wrapper span#youtube:before {
+    .edit #button-wrapper span#youtube-wizard-button:before {
       font-family: "Font Awesome 5 Brands", sans-serif;
       content: '\f167'; }
-    .edit #button-wrapper span#image:before {
+    .edit #button-wrapper span#image-wizard-button:before {
       content: '\f03e'; }
-    .edit #button-wrapper span#color:before {
+    .edit #button-wrapper span#color-wizard-button:before {
       content: '\f1fc'; }
+    .edit #button-wrapper span#file-wizard-button:before {
+      content: '\f0c6'; }
     .edit #button-wrapper span#bold:before {
       content: '\f032'; }
     .edit #button-wrapper span#italic:before {
       content: '\f033'; }
-    .edit #button-wrapper span#link:before, .edit #button-wrapper span#link-button:before {
+    .edit #button-wrapper span#link:before, .edit #button-wrapper span#link-wizard-button:before {
       content: '\f0c1'; }
     .edit #button-wrapper span#strikethrough:before {
       content: '\f0cc'; }
@@ -623,7 +617,7 @@ header {
     background-color: #fff;
     border-radius: 3px;
     padding: 3px 10px;
-    font-size: 14; }
+    font-size: 14px; }
 .content pre {
   font-size: 14px; }
   .content pre.line-numbers .line-number {

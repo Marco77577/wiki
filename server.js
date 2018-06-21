@@ -99,6 +99,20 @@ const getEntryList = function (search, callback) {
     });
 };
 
+const getFileList = function (search, callback) {
+    createDirectory('./public/wiki/files');
+    fs.readdir('./public/wiki/files', function (err, files) {
+        if (err) throw err;
+        search = decodeURIComponent(search);
+        const list = [];
+        for (let i = 0, j = files.length; i < j; i++) {
+            if (files[i].match(new RegExp(search, 'i')) === null) continue;
+            list.push(files[i]);
+        }
+        callback(list);
+    });
+};
+
 const fileSizeConverter = function (size) {
     let counter = 0;
     while (size > 1024) {
@@ -203,18 +217,19 @@ router.register('/wiki/files', function (req, res, urlOptions) {
         let totalFileSize = 0;
         let content = '';
 
-        const files = fs.readdirSync('./public/wiki/files');
-        for (let i = 0, j = files.length; i < j; i++) {
-            const stats = fs.statSync('./public/wiki/files/' + files[i]);
-            totalFileSize += stats.size;
-            content += '<div class="row index-row file-row" id="' + files[i].hashCode() + '"><div class="col-12 col-md-8"><a href="wiki/files/' + files[i] + '" target="_blank">' + files[i] + '</a><div class="option-wrapper"><a class="delete" data-filename="' + files[i] + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>';
-        }
+        getFileList('', function (files) {
+            for (let i = 0, j = files.length; i < j; i++) {
+                const stats = fs.statSync('./public/wiki/files/' + files[i]);
+                totalFileSize += stats.size;
+                content += '<div class="row index-row file-row" id="' + files[i].hashCode() + '"><div class="col-12 col-md-8"><a href="wiki/files/' + files[i] + '" target="_blank">' + files[i] + '</a><div class="option-wrapper"><a class="delete" data-filename="' + files[i] + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>';
+            }
 
-        html = replaceBlock('content', html, content);
-        html = replaceBlock('totalfilesize', html, fileSizeConverter(totalFileSize));
-        html = replaceBlock('totalfilesizeinbytes', html, totalFileSize);
+            html = replaceBlock('content', html, content);
+            html = replaceBlock('totalfilesize', html, fileSizeConverter(totalFileSize));
+            html = replaceBlock('totalfilesizeinbytes', html, totalFileSize);
 
-        preparePageForDisplay(res, html, "Files");
+            preparePageForDisplay(res, html, "Files");
+        });
     });
 });
 
@@ -458,6 +473,14 @@ router.register('\/wiki\/checkslug\/(.+)', function (req, res, urlOptions) {
 router.register('\/wiki\/entries\/(.*)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/json'});
     getEntryList(urlOptions[1], function (list) {
+        res.write(JSON.stringify(list));
+        res.end();
+    });
+});
+
+router.register('\/wiki\/filelist\/?(.*)', function (req, res, urlOptions) {
+    res.writeHead(200, {'Content-Type': 'text/json'});
+    getFileList(urlOptions[1], function (list) {
         res.write(JSON.stringify(list));
         res.end();
     });

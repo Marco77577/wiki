@@ -1,3 +1,34 @@
+function expandHtml(container, recipe) {
+    recipe.forEach(element => {
+        //create element
+        const el = document.createElement(element.element);
+
+        //construct element content
+        if (element.content !== null && element.content.constructor === Array) {
+            expandHtml(el, element.content);
+        } else if (element.content !== null) {
+            el.textContent = element.content;
+        }
+
+        //set attributes
+        if (element.properties !== undefined) {
+            element.properties.forEach(property => {
+                el.setAttribute(property.propertyName, property.value);
+            });
+        }
+
+        //add events
+        if (element.events !== undefined) {
+            element.events.forEach(event => {
+                addEvent(el, event.eventName, event.action);
+            });
+        }
+
+        //append element to container
+        container.append(el);
+    });
+}
+
 function getTextSelection(el) {
     let start = 0, end = 0, normalizedValue, range,
         textInputRange, len, endRange;
@@ -345,6 +376,967 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
         ];
+        const wizardObject = {
+            start: 0,
+            end: 0,
+            selected: null,
+            functions:
+                {
+                    validateNotEmpty: function (field) {
+                        if (field.value.length <= 0) {
+                            field.classList.add('error');
+                            field.focus();
+                            return false;
+                        }
+                        field.classList.remove('error');
+                        return true;
+                    },
+                    validateSpecial: function (field, fct) {
+                        if (!fct()) {
+                            field.classList.add('error');
+                            field.focus();
+                            return false;
+                        }
+                        field.classList.remove('error');
+                        return true;
+                    },
+                    arrowNavigation: function (wrapper, e) {
+                        if (wrapper.childNodes.length <= 1) return;
+                        switch (e.keyCode) {
+                            case 38: //up
+                                e.preventDefault();
+                                wrapper.childNodes.forEach(row => row.classList.remove('active'));
+
+                                if (wizardObject.selected === null) wizardObject.selected = wrapper.childNodes[1];
+                                if (wizardObject.selected.previousElementSibling !== wrapper.childNodes[0] && wizardObject.selected.previousElementSibling !== null) {
+                                    wizardObject.selected = wizardObject.selected.previousElementSibling;
+                                } else {
+                                    wizardObject.selected = wrapper.childNodes[wrapper.childNodes.length - 1];
+                                }
+                                wizardObject.selected.classList.add('active');
+                                break;
+                            case 40: //down
+                                e.preventDefault();
+                                wrapper.childNodes.forEach(row => row.classList.remove('active'));
+
+                                if (wizardObject.selected === null) wizardObject.selected = wrapper.childNodes[0];
+                                if (wizardObject.selected.nextElementSibling !== null) {
+                                    wizardObject.selected = wizardObject.selected.nextElementSibling;
+                                } else {
+                                    wizardObject.selected = wrapper.childNodes[1];
+                                }
+                                wizardObject.selected.classList.add('active');
+                                break;
+                        }
+                    },
+                    openWizard: function (wizardWindow, wizard) {
+                        const positions = getTextSelection(content);
+                        wizardObject.start = positions.start;
+                        wizardObject.end = positions.end;
+
+                        //open wizard
+                        wizardWindow.classList.add('visible');
+
+                        //initialize wizard
+                        if (wizard.initialize !== null) {
+                            wizard.initialize();
+                        }
+
+                        //focus default field
+                        $1('#' + wizard.autoFocus).focus();
+                    },
+                    closeWizard: function (wizardWindow, wizard) {
+                        //close wizard
+                        wizardWindow.classList.remove('visible');
+                        content.focus();
+
+                        //update preview
+                        update();
+
+                        //reset fields
+                        wizardObject.start = 0;
+                        wizardObject.end = 0;
+                        wizardObject.selected = null;
+                        $('input', wizardWindow).forEach(input => {
+                            input.value = '';
+                        });
+
+                        //destroy wizard
+                        if (wizard.destroy !== null) {
+                            wizard.destroy();
+                        }
+                    },
+                    applyWizard: function (wizardWindow, wizard) {
+                        if (wizard.apply()) {
+                            content.setSelectionRange(wizardObject.start, wizardObject.end);
+                            wizardObject.functions.closeWizard(wizardWindow, wizard);
+                        }
+                    }
+                },
+            wizards: [
+                {
+                    id: 'related-wizard',
+                    name: 'Related',
+                    keyCode: 82,
+                    ctrlKey: true,
+                    shiftKey: false,
+                    displayButton: true,
+                    autoFocus: 'related-search',
+                    initialize: null,
+                    destroy: function () {
+                        $1('#related-search-wrapper').innerHTML = '';
+                    },
+                    apply: function () {
+                        if (wizardObject.selected === null) return false;
+
+                        //apply wizard
+                        const text = '<a class="related" href="wiki/view/' + wizardObject.selected.getAttribute('data-slug') + '">' + wizardObject.selected.getAttribute('data-title') + '</a>';
+                        const calculatedEnd = wizardObject.start + text.length;
+                        content.value = content.value.slice(0, wizardObject.start) + text + content.value.slice(wizardObject.start);
+
+                        //define content selection
+                        wizardObject.start = wizardObject.end = calculatedEnd;
+                        return true;
+                    },
+                    content: [
+                        {
+                            element: 'label',
+                            content: 'Related Entry:',
+                            properties: [
+                                {propertyName: 'for', value: 'related-search'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'related-search'},
+                                {propertyName: 'placeholder', value: 'Search ...'}
+                            ],
+                            events: [
+                                {
+                                    eventName: 'input',
+                                    action: function () {
+                                        getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent($1('#related-search').value), function (result) {
+                                            //define user interface handles
+                                            const relatedSearchWrapper = $1('#related-search-wrapper');
+
+                                            //fill wrapper
+                                            relatedSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
+                                            result = JSON.parse(result);
+                                            for (let i = 0, j = result.length; i < j; i++) {
+                                                const entry = result[i];
+                                                const row = document.createElement('div');
+                                                row.classList.add('row');
+                                                row.setAttribute('data-title', entry.title);
+                                                row.setAttribute('data-slug', entry.slug);
+                                                relatedSearchWrapper.appendChild(row);
+
+                                                const col = document.createElement('div');
+                                                col.classList.add('col-12');
+                                                row.appendChild(col);
+
+                                                const a = document.createElement('a');
+                                                a.innerText = entry.title;
+                                                col.appendChild(a);
+
+                                                addEvent(a, 'click', function (e) {
+                                                    e.preventDefault();
+                                                    wizardObject.selected = row;
+                                                    wizardObject.functions.applyWizard($1('#related-wizard-window'), wizardObject.wizards.filter(wizard => wizard.id === 'related-wizard')[0]);
+                                                });
+                                            }
+                                        });
+                                    }
+                                },
+                                {
+                                    eventName: 'keydown',
+                                    action: function (e) {
+                                        wizardObject.functions.arrowNavigation($1('#related-search-wrapper'), e);
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            element: 'div',
+                            content: null,
+                            properties: [
+                                {propertyName: 'id', value: 'related-search-wrapper'},
+                                {propertyName: 'class', value: 'index search-wrapper'}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: 'youtube-wizard',
+                    name: 'YouTube Video',
+                    keyCode: 89,
+                    ctrlKey: true,
+                    shiftKey: true,
+                    displayButton: true,
+                    autoFocus: 'youtube-alt-text',
+                    initialize: function () {
+                        $1('#youtube-alt-text').value = content.value.slice(wizardObject.start, wizardObject.end);
+                    },
+                    destroy: null,
+                    apply: function () {
+                        //define user interface handles
+                        const youtubeText = $1('#youtube-alt-text');
+                        const youtubeUrl = $1('#youtube-url');
+
+                        //validate input
+                        if (!wizardObject.functions.validateNotEmpty(youtubeText)) return false;
+                        if (!wizardObject.functions.validateNotEmpty(youtubeUrl) || !wizardObject.functions.validateSpecial(youtubeUrl, () => youtubeUrl.value.match(/\?v=([a-zA-Z0-9\-_]+)/) !== null)) return false;
+
+                        //apply wizard
+                        const text = '[![' + youtubeText.value;
+                        const link = '](http://img.youtube.com/vi/' + youtubeUrl.value.match(/\?v=([a-zA-Z0-9\-_]+)/)[1] + '/0.jpg)](' + youtubeUrl.value + ')';
+                        const calculatedSecondPartStart = wizardObject.start + text.length;
+                        const calculatedEnd = calculatedSecondPartStart + link.length;
+                        content.value = content.value.slice(0, wizardObject.start) + text + content.value.slice(wizardObject.end);
+                        content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
+
+                        //define content selection
+                        wizardObject.start = wizardObject.start = calculatedEnd;
+                        return true;
+                    },
+                    content: [
+                        {
+                            element: 'label',
+                            content: 'Alternative Text*:',
+                            properties: [
+                                {propertyName: 'for', value: 'youtube-alt-text'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'youtube-alt-text'},
+                                {propertyName: 'placeholder', value: 'Youtube Video Title'}
+                            ]
+                        },
+                        {
+                            element: 'label',
+                            content: 'Video URL*:',
+                            properties: [
+                                {propertyName: 'for', value: 'youtube-url'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'youtube-url'},
+                                {propertyName: 'placeholder', value: 'https://www.youtube.com/watch?v=yr6cp7cppCc'}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: 'image-wizard',
+                    name: 'Image',
+                    keyCode: 73,
+                    ctrlKey: true,
+                    shiftKey: true,
+                    displayButton: true,
+                    autoFocus: 'image-alt-text',
+                    initialize: function () {
+                        $1('#image-alt-text').value = content.value.slice(wizardObject.start, wizardObject.end);
+                        $1('#image-timestamp').value = Date.now();
+
+                        const imageQuality = $1('#image-quality');
+                        for (let i = 1; i <= 10; i++) {
+                            const option = document.createElement('option');
+                            option.text = i * 10 + '%';
+                            option.value = '' + i * 10;
+                            imageQuality.appendChild(option);
+                        }
+                        imageQuality.value = '60';
+                    },
+                    destroy: function () {
+                        $1('#image-container').innerHTML = '';
+                        $1('#image-download-button').classList.remove('error', 'downloading');
+                        $1('#image-delete-button').classList.remove('error', 'deleting');
+                    },
+                    apply: function () {
+                        //define user interface handles
+                        const imageText = $1('#image-alt-text');
+                        const imageUrl = $1('#image-url');
+
+                        //validate input
+                        if (!wizardObject.functions.validateNotEmpty(imageText)) return false;
+                        if (!wizardObject.functions.validateNotEmpty(imageUrl)) return false;
+
+                        //apply wizard
+                        const text = '[![' + imageText.value;
+                        const link = '](' + imageUrl.value + ')](' + imageUrl.value + ')';
+                        const calculatedSecondPartStart = wizardObject.start + text.length;
+                        const calculatedEnd = calculatedSecondPartStart + link.length;
+                        content.value = content.value.slice(0, wizardObject.start) + text + content.value.slice(wizardObject.end);
+                        content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
+
+                        //define content selection
+                        wizardObject.start = wizardObject.end = calculatedEnd;
+                        return true;
+                    },
+                    content: [
+                        {
+                            element: 'label',
+                            content: 'Alternative Text*:',
+                            properties: [
+                                {propertyName: 'for', value: 'image-alt-text'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'image-alt-text'},
+                                {propertyName: 'placeholder', value: 'Google Logo'}
+                            ]
+                        },
+                        {
+                            element: 'label',
+                            content: 'Image URL*:',
+                            properties: [
+                                {propertyName: 'for', value: 'image-url'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'image-url'},
+                                {propertyName: 'placeholder', value: 'https://google.com/image.jpg'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'hidden'},
+                                {propertyName: 'id', value: 'image-timestamp'}
+                            ]
+                        },
+                        {
+                            element: 'div',
+                            content: [
+                                {
+                                    element: 'div',
+                                    content: [
+                                        {
+                                            element: 'label',
+                                            content: 'Quality:',
+                                            properties: [
+                                                {propertyName: 'for', value: 'image-quality'},
+                                                {propertyName: 'class', value: 'hidden'},
+                                            ]
+                                        },
+                                        {
+                                            element: 'select',
+                                            content: null,
+                                            properties: [
+                                                {propertyName: 'id', value: 'image-quality'},
+                                                {propertyName: 'dir', value: 'rtl'},
+                                                {propertyName: 'title', value: 'Compression Quality'},
+                                            ]
+                                        }
+                                    ],
+                                    properties: [
+                                        {propertyName: 'class', value: 'col-4'},
+                                    ]
+                                },
+                                {
+                                    element: 'div',
+                                    content: [
+                                        {
+                                            element: 'a',
+                                            content: 'Save Image Locally',
+                                            properties: [
+                                                {propertyName: 'id', value: 'image-download-button'},
+                                                {propertyName: 'class', value: 'button download'},
+                                            ],
+                                            events: [
+                                                {
+                                                    eventName: 'click',
+                                                    action: function (e) {
+                                                        e.preventDefault();
+                                                        //define user interface handles
+                                                        const imageUrl = $1('#image-url');
+                                                        const imageDownloadButton = $1('#image-download-button');
+                                                        const imageDeleteButton = $1('#image-delete-button');
+                                                        const imageTimestamp = $1('#image-timestamp');
+                                                        const imageContainer = $1('#image-container');
+                                                        const imageQuality = $1('#image-quality');
+
+                                                        //validate input
+                                                        if (imageUrl.value.length <= 0 || imageUrl.value.match(/https?/i) === null) {
+                                                            imageUrl.classList.add('error');
+                                                            return;
+                                                        }
+
+                                                        //reset user interface
+                                                        imageUrl.classList.remove('error');
+                                                        imageDownloadButton.classList.remove('error');
+                                                        imageDownloadButton.classList.add('downloading');
+                                                        imageDownloadButton.innerText = "Downloading";
+                                                        imageContainer.innerHTML = '';
+                                                        imageDeleteButton.classList.remove('visible');
+
+                                                        //download image
+                                                        getAjax('http://localhost:' + PORT + '/wiki/download/' + encodeURIComponent(imageUrl.value) + '/' + imageTimestamp.value + '/' + imageQuality.value, function (result) {
+                                                            //update user interface
+                                                            imageDownloadButton.classList.remove('downloading');
+                                                            imageDownloadButton.innerText = "Save Image Locally";
+                                                            if (result === 'error') {
+                                                                imageDownloadButton.classList.add('error');
+                                                                return;
+                                                            }
+                                                            imageDownloadButton.classList.remove('error');
+
+                                                            //create image preview
+                                                            const imagePath = '/wiki/img/' + imageTimestamp.value + '.jpg';
+                                                            const a = document.createElement('a');
+                                                            a.target = '_blank';
+                                                            a.href = imagePath;
+                                                            imageContainer.appendChild(a);
+
+                                                            const img = document.createElement('img');
+                                                            img.src = imagePath;
+                                                            a.appendChild(img);
+
+                                                            imageUrl.value = imagePath;
+                                                            imageDeleteButton.classList.add('visible');
+                                                        });
+                                                    }
+                                                }
+                                            ]
+                                        }
+                                    ],
+                                    properties: [
+                                        {propertyName: 'class', value: 'col-8'},
+                                    ]
+                                }
+                            ],
+                            properties: [
+                                {propertyName: 'class', value: 'row'}
+                            ]
+                        },
+                        {
+                            element: 'div',
+                            content: null,
+                            properties: [
+                                {propertyName: 'id', value: 'image-container'}
+                            ]
+                        },
+                        {
+                            element: 'a',
+                            content: 'Delete Image',
+                            properties: [
+                                {propertyName: 'id', value: 'image-delete-button'},
+                                {propertyName: 'class', value: 'button delete'}
+                            ],
+                            events: [
+                                {
+                                    eventName: 'click',
+                                    action: function (e) {
+                                        e.preventDefault();
+
+                                        //define user interface handles
+                                        const imageDeleteButton = $1('#image-delete-button');
+                                        const imageTimestamp = $1('#image-timestamp');
+                                        const imageContainer = $1('#image-container');
+                                        const imageUrl = $1('#image-url');
+
+                                        //update user interface
+                                        imageDeleteButton.classList.add('deleting');
+
+                                        //delete image
+                                        getAjax('http://localhost:' + PORT + '/wiki/deleteImage/' + imageTimestamp.value, function (result) {
+                                            //update user interface
+                                            imageDeleteButton.classList.remove('deleting');
+                                            if (result === 'error') {
+                                                imageDeleteButton.classList.add('error');
+                                            } else {
+                                                imageContainer.innerHTML = '';
+                                                imageUrl.value = '';
+                                                imageUrl.focus();
+                                                imageDeleteButton.classList.remove('visible');
+                                                imageDeleteButton.classList.remove('error');
+                                            }
+                                        });
+                                    }
+                                }
+                            ]
+                        },
+                    ]
+                },
+                {
+                    id: 'link-wizard',
+                    name: 'Link',
+                    keyCode: 65,
+                    ctrlKey: true,
+                    shiftKey: true,
+                    displayButton: true,
+                    autoFocus: 'link-text',
+                    initialize: function () {
+                        $1('#link-text').value = content.value.slice(wizardObject.start, wizardObject.end);
+                    },
+                    destroy: function () {
+                        $1('#link-search-wrapper').innerHTML = '';
+                    },
+                    apply: function () {
+                        //define user interface handles
+                        let text;
+                        let link;
+                        const linkText = $1('#link-text');
+                        const linkUrl = $1('#link-url');
+
+                        //validate and prepare input
+                        if (wizardObject.selected !== null) {
+                            text = '[' + (linkText.value.length <= 0 ? wizardObject.selected.getAttribute('data-title') : linkText.value);
+                            link = '](wiki/view/' + wizardObject.selected.getAttribute('data-slug') + ')';
+                        } else {
+                            if (!wizardObject.functions.validateNotEmpty(linkText)) return false;
+                            if (!wizardObject.functions.validateNotEmpty(linkUrl)) return false;
+
+                            text = '[' + linkText.value;
+                            link = '](' + linkUrl.value + ')';
+                        }
+
+                        //apply wizard
+                        const calculatedSecondPartStart = wizardObject.start + text.length;
+                        const calculatedEnd = calculatedSecondPartStart + link.length;
+                        content.value = content.value.slice(0, wizardObject.start) + text + content.value.slice(wizardObject.end);
+                        content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
+
+                        //define content selection
+                        wizardObject.start = wizardObject.end = calculatedEnd;
+                        return true;
+                    },
+                    content: [
+                        {
+                            element: 'label',
+                            content: 'Text*:',
+                            properties: [
+                                {propertyName: 'for', value: 'link-text'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'link-text'},
+                                {propertyName: 'placeholder', value: 'Google'}
+                            ]
+                        },
+                        {
+                            element: 'label',
+                            content: 'URL*:',
+                            properties: [
+                                {propertyName: 'for', value: 'link-url'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'link-url'},
+                                {propertyName: 'placeholder', value: 'https://google.com'}
+                            ]
+                        },
+                        {
+                            element: 'label',
+                            content: 'Link an entry:',
+                            properties: [
+                                {propertyName: 'for', value: 'link-search'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'link-search'},
+                                {propertyName: 'placeholder', value: 'Search ...'}
+                            ],
+                            events: [
+                                {
+                                    eventName: 'input',
+                                    action: function () {
+                                        getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent($1('#link-search').value), function (result) {
+                                            //define user interface handles
+                                            const linkSearchWrapper = $1('#link-search-wrapper');
+
+                                            //fill wrapper
+                                            linkSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
+                                            result = JSON.parse(result);
+                                            for (let i = 0, j = result.length; i < j; i++) {
+                                                const entry = result[i];
+                                                const row = document.createElement('div');
+                                                row.classList.add('row');
+                                                row.setAttribute('data-title', entry.title);
+                                                row.setAttribute('data-slug', entry.slug);
+                                                linkSearchWrapper.appendChild(row);
+
+                                                const col = document.createElement('div');
+                                                col.classList.add('col-12');
+                                                row.appendChild(col);
+
+                                                const a = document.createElement('a');
+                                                a.innerText = entry.title;
+                                                col.appendChild(a);
+
+                                                addEvent(a, 'click', e => {
+                                                    e.preventDefault();
+                                                    wizardObject.selected = row;
+                                                    wizardObject.functions.applyWizard($1('#link-wizard-window'), wizardObject.wizards.filter(wizard => wizard.id === 'link-wizard')[0]);
+                                                });
+                                            }
+                                        });
+                                    }
+                                },
+                                {
+                                    eventName: 'keydown',
+                                    action: function (e) {
+                                        wizardObject.functions.arrowNavigation($1('#link-search-wrapper'), e);
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            element: 'div',
+                            content: null,
+                            properties: [
+                                {propertyName: 'id', value: 'link-search-wrapper'},
+                                {propertyName: 'class', value: 'index search-wrapper'}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: 'color-wizard',
+                    name: 'Color',
+                    keyCode: 80,
+                    ctrlKey: true,
+                    shiftKey: true,
+                    displayButton: true,
+                    autoFocus: 'color-custom',
+                    initialize: function () {
+                        //define user interface handles
+                        const customColor = $1('#color-custom');
+
+                        customColor.value = '#FF0000';
+                        customColor.setSelectionRange(0, customColor.value.length);
+                    },
+                    destroy: function () {
+                        $1('#color-search-wrapper').childNodes.forEach(color => color.classList.remove('active'));
+                    },
+                    apply: function () {
+                        //define user interface handles
+                        const customColor = $1('#color-custom');
+
+                        //validate input
+                        if (wizardObject.selected === null && !wizardObject.functions.validateSpecial(customColor, () => customColor.value.match(/#([a-zA-Z0-9]{3}|[a-zA-Z0-9]{4}|[a-zA-Z0-9]{6}|[a-zA-Z0-9]{8})$/) !== null)) return false;
+
+                        //apply wizard
+                        const firstPart = '<span style="color: ' + (wizardObject.selected !== null ?
+                                                                    wizardObject.selected.getAttribute('data-color') :
+                                                                    customColor.value) + '">';
+                        const secondPart = '</span>';
+                        const calculatedSecondPartStart = wizardObject.end + firstPart.length;
+                        content.value = content.value.slice(0, wizardObject.start) + firstPart + content.value.slice(wizardObject.start);
+                        content.value = content.value.slice(0, calculatedSecondPartStart) + secondPart + content.value.slice(calculatedSecondPartStart);
+
+                        //define content selection
+                        wizardObject.start += firstPart.length;
+                        wizardObject.end += firstPart.length;
+                        return true;
+                    },
+                    content: [
+                        {
+                            element: 'label',
+                            content: 'Custom Color:',
+                            properties: [
+                                {propertyName: 'for', value: 'color-custom'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'color-custom'},
+                                {propertyName: 'placeholder', value: '#000000'},
+                                {propertyName: 'value', value: '#FF0000'}
+                            ],
+                            events: [
+                                {
+                                    eventName: 'keydown',
+                                    action: function (e) {
+                                        wizardObject.functions.arrowNavigation($1('#color-search-wrapper'), e);
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            element: 'div',
+                            content: [
+                                {
+                                    element: 'div',
+                                    content: [
+                                        {
+                                            element: 'div',
+                                            content: [
+                                                {
+                                                    element: 'strong',
+                                                    content: 'Fast Access Colors'
+                                                }
+                                            ],
+                                            properties: [
+                                                {propertyName: 'class', value: 'col-12'}
+                                            ]
+                                        }
+                                    ],
+                                    properties: [
+                                        {propertyName: 'class', value: 'row'}
+                                    ]
+                                },
+                                {
+                                    element: 'div',
+                                    content: [
+                                        {
+                                            element: 'div',
+                                            content: [
+                                                {
+                                                    element: 'a',
+                                                    content: 'Red',
+                                                    events: [
+                                                        {
+                                                            eventName: 'click',
+                                                            action: function () {
+                                                                wizardObject.selected = $1('#color-red');
+                                                                wizardObject.functions.applyWizard($1('#color-wizard-window'), wizardObject.wizards.filter(wizard => wizard.id === 'color-wizard')[0]);
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            properties: [
+                                                {propertyName: 'class', value: 'col-12'}
+                                            ]
+                                        }
+                                    ],
+                                    properties: [
+                                        {propertyName: 'id', value: 'color-red'},
+                                        {propertyName: 'class', value: 'row'},
+                                        {propertyName: 'data-color', value: '#FF0000'}
+                                    ]
+                                },
+                                {
+                                    element: 'div',
+                                    content: [
+                                        {
+                                            element: 'div',
+                                            content: [
+                                                {
+                                                    element: 'a',
+                                                    content: 'Yellow',
+                                                    events: [
+                                                        {
+                                                            eventName: 'click',
+                                                            action: function () {
+                                                                wizardObject.selected = $1('#color-yellow');
+                                                                wizardObject.functions.applyWizard($1('#color-wizard-window'), wizardObject.wizards.filter(wizard => wizard.id === 'color-wizard')[0]);
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            properties: [
+                                                {propertyName: 'class', value: 'col-12'}
+                                            ]
+                                        }
+                                    ],
+                                    properties: [
+                                        {propertyName: 'id', value: 'color-yellow'},
+                                        {propertyName: 'class', value: 'row'},
+                                        {propertyName: 'data-color', value: '#FFFF00'}
+                                    ]
+                                },
+                                {
+                                    element: 'div',
+                                    content: [
+                                        {
+                                            element: 'div',
+                                            content: [
+                                                {
+                                                    element: 'a',
+                                                    content: 'Green',
+                                                    events: [
+                                                        {
+                                                            eventName: 'click',
+                                                            action: function () {
+                                                                wizardObject.selected = $1('#color-green');
+                                                                wizardObject.functions.applyWizard($1('#color-wizard-window'), wizardObject.wizards.filter(wizard => wizard.id === 'color-wizard')[0]);
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            properties: [
+                                                {propertyName: 'class', value: 'col-12'}
+                                            ]
+                                        }
+                                    ],
+                                    properties: [
+                                        {propertyName: 'id', value: 'color-green'},
+                                        {propertyName: 'class', value: 'row'},
+                                        {propertyName: 'data-color', value: '#00FF00'}
+                                    ]
+                                },
+                                {
+                                    element: 'div',
+                                    content: [
+                                        {
+                                            element: 'div',
+                                            content: [
+                                                {
+                                                    element: 'a',
+                                                    content: 'Blue',
+                                                    events: [
+                                                        {
+                                                            eventName: 'click',
+                                                            action: function () {
+                                                                wizardObject.selected = $1('#color-blue');
+                                                                wizardObject.functions.applyWizard($1('#color-wizard-window'), wizardObject.wizards.filter(wizard => wizard.id === 'color-wizard')[0]);
+                                                            }
+                                                        }
+                                                    ]
+                                                }
+                                            ],
+                                            properties: [
+                                                {propertyName: 'class', value: 'col-12'}
+                                            ]
+                                        }
+                                    ],
+                                    properties: [
+                                        {propertyName: 'id', value: 'color-blue'},
+                                        {propertyName: 'class', value: 'row'},
+                                        {propertyName: 'data-color', value: '#0000FF'}
+                                    ]
+                                }
+                            ],
+                            properties: [
+                                {propertyName: 'id', value: 'color-search-wrapper'},
+                                {propertyName: 'class', value: 'index search-wrapper'}
+                            ]
+                        }
+                    ]
+                },
+                {
+                    id: 'file-wizard',
+                    name: 'File',
+                    keyCode: 71,
+                    ctrlKey: true,
+                    shiftKey: false,
+                    displayButton: true,
+                    autoFocus: 'file-search',
+                    initialize: null,
+                    destroy: function () {
+                        $1('#file-search-wrapper').innerHTML = '';
+                    },
+                    apply: function () {
+                        //validate input
+                        if (wizardObject.selected === null) return false;
+
+                        //apply wizard
+                        const link = '<a href="wiki/files/' + wizardObject.selected.getAttribute('data-filename') + '" target="_blank">' + wizardObject.selected.getAttribute('data-filename') + '</a>';
+                        const calculatedEnd = wizardObject.start + link.length;
+                        content.value = content.value.slice(0, wizardObject.start) + link + content.value.slice(wizardObject.start);
+
+                        //define content selection
+                        wizardObject.start = wizardObject.end = calculatedEnd;
+                        return true;
+                    },
+                    content: [
+                        {
+                            element: 'label',
+                            content: 'Attach a file:',
+                            properties: [
+                                {propertyName: 'for', value: 'file-search'}
+                            ]
+                        },
+                        {
+                            element: 'input',
+                            content: null,
+                            properties: [
+                                {propertyName: 'type', value: 'text'},
+                                {propertyName: 'id', value: 'file-search'},
+                                {propertyName: 'placeholder', value: 'Search ...'}
+                            ],
+                            events: [
+                                {
+                                    eventName: 'input',
+                                    action: function () {
+                                        getAjax('http://localhost:' + PORT + '/wiki/filelist/' + encodeURIComponent($1('#file-search').value), function (files) {
+                                            //define user interface handles
+                                            const fileSearchWrapper = $1('#file-search-wrapper');
+
+                                            fileSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>File Name</strong></div></div>';
+                                            files = JSON.parse(files);
+                                            for (let i = 0, j = files.length; i < j; i++) {
+                                                const row = document.createElement('div');
+                                                row.classList.add('row');
+                                                row.setAttribute('data-filename', files[i]);
+                                                fileSearchWrapper.appendChild(row);
+
+                                                const col = document.createElement('div');
+                                                col.classList.add('col-12');
+                                                row.appendChild(col);
+
+                                                const a = document.createElement('a');
+                                                a.innerText = files[i];
+                                                col.appendChild(a);
+
+                                                addEvent(a, 'click', e => {
+                                                    e.preventDefault();
+                                                    wizardObject.selected = row;
+                                                    wizardObject.functions.applyWizard($1('#file-wizard-window'), wizardObject.wizards.filter(wizard => wizard.id === 'file-wizard')[0]);
+                                                });
+                                            }
+                                        });
+                                    }
+                                },
+                                {
+                                    eventName: 'keydown',
+                                    action: function (e) {
+                                        wizardObject.functions.arrowNavigation($1('#file-search-wrapper'), e);
+                                    }
+                                }
+                            ]
+                        },
+                        {
+                            element: 'div',
+                            content: null,
+                            properties: [
+                                {propertyName: 'id', value: 'file-search-wrapper'},
+                                {propertyName: 'class', value: 'index search-wrapper'}
+                            ]
+                        }
+                    ]
+                }
+            ]
+        };
+
         let dirty = false;
         const editor = $1('#editor');
         const displayActivator = $1('#display-activator');
@@ -360,69 +1352,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const viewButton = $1('#view-button');
         const viewMaterialButton = $1('#view-material-button');
         const buttonWrapper = $1('#button-wrapper');
-        const selectAllButton = $1('.select-all');
-
-        //link wizard fields
-        const linkWindow = $1('#link-window');
-        const linkSearchWrapper = $1('#link-search-wrapper');
-        const linkText = $1('#link-text');
-        const linkUrl = $1('#link-url');
-        const linkSearch = $1('#link-search');
-        const linkButton = $1('#link-button');
-        const linkSelectionStart = $1('#link-selection-start');
-        const linkSelectionEnd = $1('#link-selection-end');
-        const linkFinishButton = $1('#link-finish-button');
-        const linkCancelButton = $1('#link-cancel-button');
-        let linkSearchEntries = $('#link-search-wrapper .row');
-        let linkSearchCurrentlyActive = -1;
-
-        //image wizard fields
-        const imageWindow = $1('#image-window');
-        const imageText = $1('#image-text');
-        const imageUrl = $1('#image-url');
-        const imageSelectionStart = $1('#image-selection-start');
-        const imageSelectionEnd = $1('#image-selection-end');
-        const imageTimestamp = $1('#image-timestamp');
-        const imageQuality = $1('#image-quality');
-        const imageContainer = $1('#image-container');
-        const imageFinishButton = $1('#image-finish-button');
-        const imageCancelButton = $1('#image-cancel-button');
-        const imageDownloadButton = $1('#image-download-button');
-        const imageDeleteButton = $1('#image-delete-button');
-        const imageButton = $1('#image');
-
-        //Youtube wizard fields
-        const youtubeWindow = $1('#youtube-window');
-        const youtubeText = $1('#youtube-text');
-        const youtubeUrl = $1('#youtube-url');
-        const youtubeSelectionStart = $1('#youtube-selection-start');
-        const youtubeSelectionEnd = $1('#youtube-selection-end');
-        const youtubeFinishButton = $1('#youtube-finish-button');
-        const youtubeCancelButton = $1('#youtube-cancel-button');
-        const youtubeButton = $1('#youtube');
-
-        //related wizard fields
-        const relatedWindow = $1('#related-window');
-        const relatedSearchWrapper = $1('#related-search-wrapper');
-        const relatedSearch = $1('#related-search');
-        const relatedButton = $1('#related');
-        const relatedSelectionStart = $1('#related-selection-start');
-        const relatedSelectionEnd = $1('#related-selection-end');
-        const relatedFinishButton = $1('#related-finish-button');
-        const relatedCancelButton = $1('#related-cancel-button');
-        let relatedSearchEntries = $('#related-search-wrapper .row');
-        let relatedSearchCurrentlyActive = -1;
-
-        //Color wizard fields
-        const colorWindow = $1('#color-window');
-        const customColor = $1('#custom-color');
-        const colorSelectionStart = $1('#color-selection-start');
-        const colorSelectionEnd = $1('#color-selection-end');
-        const colorFinishButton = $1('#color-finish-button');
-        const colorCancelButton = $1('#color-cancel-button');
-        const colorButton = $1('#color');
-        const colorButtons = $('.button.color');
-        let colorCurrentlyActive = -1;
 
         const update = function () {
             preview.innerHTML = marked(content.value);
@@ -566,221 +1495,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.onbeforeunload = null;
             }
         };
-        const openLinkWindow = function () {
-            const positions = getTextSelection(content);
-            linkSelectionStart.value = positions.start;
-            linkSelectionEnd.value = positions.end;
-            linkText.value = content.value.slice(positions.start, positions.end);
-            linkWindow.classList.add('visible');
-            linkText.focus();
-            linkSearchCurrentlyActive = -1;
-        };
-        const cancelLinkWindow = function () {
-            linkWindow.classList.remove('visible');
-            linkText.value = '';
-            linkUrl.value = 'http://';
-            linkSearch.value = '';
-            linkSelectionStart.value = '';
-            linkSelectionEnd.value = '';
-            linkSearchWrapper.innerHTML = '';
-            content.focus();
-        };
-        const finishLinkWizardWithSearchResult = function (entry) {
-            const text = linkText.value.length > 0 ? linkText.value : entry.getAttribute('data-title');
-            const link = '](wiki/view/' + entry.getAttribute('data-slug') + ')';
-            const calculatedSecondPartStart = parseInt(linkSelectionStart.value) + text.length + 1;
-            const calculatedEnd = calculatedSecondPartStart + link.length;
-            content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + '[' + text + content.value.slice(parseInt(linkSelectionEnd.value));
-            content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
-            content.setSelectionRange(calculatedEnd, calculatedEnd);
-            content.focus();
-            update();
-            cancelLinkWindow();
-        };
-        const finishLinkWizard = function () {
-            const activatedSearchResult = $1('#link-search-wrapper .row.active');
-            if (activatedSearchResult != null) {
-                finishLinkWizardWithSearchResult(activatedSearchResult);
-                return;
-            }
-            if (linkText.value.length <= 0) {
-                linkText.classList.add('error');
-                linkText.focus();
-                return;
-            }
-            linkText.classList.remove('error');
-            if (linkUrl.value.length <= 0 || linkUrl.value === 'http://') {
-                linkUrl.classList.add('error');
-                linkUrl.focus();
-                return;
-            }
-            linkUrl.classList.remove('error');
-
-            const text = '[' + linkText.value;
-            const link = '](' + linkUrl.value + ')';
-            const calculatedSecondPartStart = parseInt(linkSelectionStart.value) + text.length;
-            const calculatedEnd = calculatedSecondPartStart + link.length;
-            content.value = content.value.slice(0, parseInt(linkSelectionStart.value)) + text + content.value.slice(parseInt(linkSelectionEnd.value));
-            content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
-            content.setSelectionRange(calculatedEnd, calculatedEnd);
-            content.focus();
-            update();
-            cancelLinkWindow();
-        };
-        const openImageWindow = function () {
-            const positions = getTextSelection(content);
-            imageTimestamp.value = Date.now();
-            imageSelectionStart.value = positions.start;
-            imageSelectionEnd.value = positions.end;
-            imageText.value = content.value.slice(positions.start, positions.end);
-            imageWindow.classList.add('visible');
-            imageText.focus();
-        };
-        const cancelImageWindow = function () {
-            imageWindow.classList.remove('visible');
-            imageText.value = '';
-            imageUrl.value = 'http://';
-            imageSelectionStart.value = '';
-            imageSelectionEnd.value = '';
-            imageTimestamp.value = '';
-            imageContainer.innerHTML = '';
-            imageDownloadButton.classList.remove('error');
-            imageDownloadButton.classList.remove('downloading');
-            imageDeleteButton.classList.remove('deleting');
-            imageDeleteButton.classList.remove('error');
-            content.focus();
-        };
-        const finishImageWizard = function () {
-            if (imageText.value.length <= 0) {
-                imageText.classList.add('error');
-                imageText.focus();
-                return;
-            }
-            imageText.classList.remove('error');
-            if (imageUrl.value.length <= 0 || imageUrl.value === 'http://') {
-                imageUrl.classList.add('error');
-                imageUrl.focus();
-                return;
-            }
-            imageUrl.classList.remove('error');
-
-            const text = '[![' + imageText.value;
-            const link = '](' + imageUrl.value + ')](' + imageUrl.value + ')';
-            const calculatedSecondPartStart = parseInt(imageSelectionStart.value) + text.length;
-            const calculatedEnd = calculatedSecondPartStart + link.length;
-            content.value = content.value.slice(0, parseInt(imageSelectionStart.value)) + text + content.value.slice(parseInt(imageSelectionEnd.value));
-            content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
-            content.setSelectionRange(calculatedEnd, calculatedEnd);
-            content.focus();
-            update();
-            cancelImageWindow();
-        };
-        const openYoutubeWindow = function () {
-            const positions = getTextSelection(content);
-            youtubeSelectionStart.value = positions.start;
-            youtubeSelectionEnd.value = positions.end;
-            youtubeText.value = content.value.slice(positions.start, positions.end);
-            youtubeWindow.classList.add('visible');
-            youtubeText.focus();
-        };
-        const cancelYoutubeWindow = function () {
-            youtubeWindow.classList.remove('visible');
-            youtubeText.value = '';
-            youtubeUrl.value = '';
-            youtubeSelectionStart.value = '';
-            youtubeSelectionEnd.value = '';
-            content.focus();
-        };
-        const finishYoutubeWizard = function () {
-            if (youtubeText.value.length <= 0) {
-                youtubeText.classList.add('error');
-                youtubeText.focus();
-                return;
-            }
-            youtubeText.classList.remove('error');
-            if (youtubeUrl.value.length <= 0 || youtubeUrl.value === 'http://') {
-                youtubeUrl.classList.add('error');
-                youtubeUrl.focus();
-                return;
-            }
-            youtubeUrl.classList.remove('error');
-
-            const text = '[![' + youtubeText.value;
-            const link = '](http://img.youtube.com/vi/' + youtubeUrl.value.match(/\?v=([a-zA-Z0-9\-_]+)/)[1] + '/0.jpg)](' + youtubeUrl.value + ')';
-            const calculatedSecondPartStart = parseInt(youtubeSelectionStart.value) + text.length;
-            const calculatedEnd = calculatedSecondPartStart + link.length;
-            content.value = content.value.slice(0, parseInt(youtubeSelectionStart.value)) + text + content.value.slice(parseInt(youtubeSelectionEnd.value));
-            content.value = content.value.slice(0, calculatedSecondPartStart) + link + content.value.slice(calculatedSecondPartStart);
-            content.setSelectionRange(calculatedEnd, calculatedEnd);
-            content.focus();
-            update();
-            cancelYoutubeWindow();
-        };
-        const openRelatedWindow = function () {
-            const positions = getTextSelection(content);
-            relatedSelectionStart.value = positions.start;
-            relatedSelectionEnd.value = positions.end;
-            relatedWindow.classList.add('visible');
-            relatedSearch.focus();
-            relatedSearchCurrentlyActive = 1;
-        };
-        const cancelRelatedWindow = function () {
-            relatedWindow.classList.remove('visible');
-            relatedSearch.value = '';
-            relatedSelectionStart.value = '';
-            relatedSelectionEnd.value = '';
-            relatedSearchWrapper.innerHTML = '';
-            content.focus();
-        };
-        const finishRelatedWizard = function (entry) {
-            const text = '<a class="related" href="wiki/view/' + entry.getAttribute('data-slug') + '">' + entry.getAttribute('data-title') + '</a>';
-            const calculatedEnd = parseInt(relatedSelectionStart.value) + text.length;
-            content.value = content.value.slice(0, parseInt(relatedSelectionStart.value)) + text + content.value.slice(parseInt(relatedSelectionStart.value));
-            content.setSelectionRange(calculatedEnd, calculatedEnd);
-            content.focus();
-            update();
-            cancelRelatedWindow();
-        };
-
-        const openColorWindow = function () {
-            const positions = getTextSelection(content);
-            colorSelectionStart.value = positions.start;
-            colorSelectionEnd.value = positions.end;
-            colorWindow.classList.add('visible');
-            customColor.setSelectionRange(0, customColor.value.length);
-            customColor.focus();
-        };
-        const cancelColorWindow = function () {
-            colorWindow.classList.remove('visible');
-            colorSelectionStart.value = '';
-            colorSelectionEnd.value = '';
-            content.focus();
-        };
-        const finishColorWizard = function () {
-            colorFinishButton.classList.remove('error');
-            if (!customColor.value.match(/#([a-zA-Z0-9]{3}|[a-zA-Z0-9]{4}|[a-zA-Z0-9]{6}|[a-zA-Z0-9]{8})$/g)) {
-                colorFinishButton.classList.add('error');
-                return;
-            }
-            const firstPart = '<span style="color: ' + customColor.value + '">';
-            const secondPart = '</span>';
-            const calculatedSecondPartStart = parseInt(colorSelectionEnd.value) + firstPart.length;
-            content.value = content.value.slice(0, parseInt(colorSelectionStart.value)) + firstPart + content.value.slice(parseInt(colorSelectionStart.value));
-            content.value = content.value.slice(0, calculatedSecondPartStart) + secondPart + content.value.slice(calculatedSecondPartStart);
-            content.setSelectionRange(parseInt(colorSelectionStart.value) + firstPart.length, parseInt(colorSelectionEnd.value) + firstPart.length);
-            content.focus();
-            update();
-            cancelColorWindow();
-        };
-        const updateColorButtons = function () {
-            colorButtons.forEach(button => button.classList.remove('active'));
-            colorButtons[colorCurrentlyActive].classList.add('active');
-            customColor.value = colorButtons[colorCurrentlyActive].getAttribute('data-hex');
-            customColor.setSelectionRange(0, customColor.value.length);
-            customColor.focus();
-        };
-
-        update();
 
         addEvent(title, 'input', function () {
             setDirty(true);
@@ -829,26 +1543,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         applyStyle(fct);
                     }
                 });
-                if (e.shiftKey && e.keyCode === 65) { //Shift + A
-                    e.preventDefault();
-                    openLinkWindow();
-                }
-                if (e.shiftKey && e.keyCode === 80) { //Shift + P
-                    e.preventDefault();
-                    openColorWindow();
-                }
-                if (e.shiftKey && e.keyCode === 89) { //Shift + Y
-                    e.preventDefault();
-                    openYoutubeWindow();
-                }
-                if (e.shiftKey && e.keyCode === 73) { //Shift + I
-                    e.preventDefault();
-                    openImageWindow();
-                }
-                if (e.keyCode === 82) { //R
-                    e.preventDefault();
-                    openRelatedWindow();
-                }
             }
         });
         addEvent(content, 'keyup', function (e) {
@@ -862,51 +1556,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (e.keyCode === 83 && e.ctrlKey) {
                 e.preventDefault();
                 attemptSaving();
-            }
-            if (e.keyCode === 27) { //esc
-                e.preventDefault();
-                cancelLinkWindow();
-                cancelImageWindow();
-                cancelYoutubeWindow();
-                cancelRelatedWindow();
-                cancelColorWindow();
-            }
-            if (linkWindow.classList.contains('visible') && e.keyCode === 13) { //enter
-                e.preventDefault();
-                finishLinkWizard();
-            }
-            if (imageWindow.classList.contains('visible') && e.keyCode === 13) { //enter
-                e.preventDefault();
-                finishImageWizard();
-            }
-            if (youtubeWindow.classList.contains('visible') && e.keyCode === 13) { //enter
-                e.preventDefault();
-                finishYoutubeWizard();
-            }
-            if (relatedWindow.classList.contains('visible') && e.keyCode === 13) { //enter
-                e.preventDefault();
-                const activatedSearchResult = $1('#related-search-wrapper .row.active');
-                if (activatedSearchResult != null) {
-                    finishRelatedWizard(activatedSearchResult);
-                }
-            }
-            if (colorWindow.classList.contains('visible')) {
-                switch (e.keyCode) {
-                    case 13: //enter
-                        e.preventDefault();
-                        finishColorWizard();
-                        break;
-                    case 40: //down
-                        e.preventDefault();
-                        if (++colorCurrentlyActive >= colorButtons.length) colorCurrentlyActive = 0;
-                        updateColorButtons();
-                        break;
-                    case 38: //up
-                        e.preventDefault();
-                        if (--colorCurrentlyActive < 0) colorCurrentlyActive = colorButtons.length - 1;
-                        updateColorButtons();
-                        break;
-                }
             }
         });
         addEvent(document, 'scroll', function () {
@@ -933,202 +1582,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         });
-        addEvent(linkSearch, 'input', function () {
-            getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent(linkSearch.value), function (result) {
-                linkSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
-                result = JSON.parse(result);
-                for (let i = 0, j = result.length; i < j; i++) {
-                    const entry = result[i];
-                    const row = document.createElement('div');
-                    row.classList.add('row');
-                    row.setAttribute('data-title', entry.title);
-                    row.setAttribute('data-slug', entry.slug);
-                    linkSearchWrapper.appendChild(row);
-
-                    const col = document.createElement('div');
-                    col.classList.add('col-12');
-                    row.appendChild(col);
-
-                    const a = document.createElement('a');
-                    a.innerText = entry.title;
-                    col.appendChild(a);
-
-                    addEvent(a, 'click', e => {
-                        e.preventDefault();
-                        finishLinkWizardWithSearchResult(row);
-                    });
-                }
-                linkSearchEntries = $('#link-search-wrapper .row');
-            });
-        });
-        addEvent(linkButton, 'click', openLinkWindow);
-        addEvent(linkFinishButton, 'click', e => {
-            e.preventDefault();
-            finishLinkWizard();
-        });
-        addEvent(linkCancelButton, 'click', e => {
-            e.preventDefault();
-            cancelLinkWindow();
-        });
-        addEvent(linkSearch, 'keydown', e => {
-            if (e.keyCode >= 37 && e.keyCode <= 40) {
-                if (linkSearchCurrentlyActive === -1) {
-                    linkSearchCurrentlyActive = 1;
-                } else if (e.keyCode === 39 || e.keyCode === 40) { //right/down arrow
-                    if (++linkSearchCurrentlyActive >= linkSearchEntries.length) {
-                        linkSearchCurrentlyActive = 1;
-                    }
-                } else if (e.keyCode === 37 || e.keyCode === 38) { //left/up arrow
-                    if (--linkSearchCurrentlyActive <= 0) {
-                        linkSearchCurrentlyActive = linkSearchEntries.length - 1;
-                    }
-                }
-                linkSearchEntries.forEach(row => row.classList.remove('active'));
-                linkSearchEntries[linkSearchCurrentlyActive].classList.add('active');
-                e.preventDefault();
-            }
-        });
-        addEvent(imageButton, 'click', openImageWindow);
-        addEvent(imageFinishButton, 'click', function (e) {
-            e.preventDefault();
-            finishImageWizard();
-        });
-        addEvent(imageCancelButton, 'click', function (e) {
-            e.preventDefault();
-            cancelImageWindow();
-        });
-        addEvent(imageDownloadButton, 'click', function (e) {
-            e.preventDefault();
-            if (imageUrl.value.length <= 0 || imageUrl.value === 'http://') {
-                imageUrl.classList.add('error');
-                return;
-            }
-            imageUrl.classList.remove('error');
-            imageDownloadButton.classList.remove('error');
-            imageDownloadButton.classList.add('downloading');
-            imageDownloadButton.innerText = "Downloading";
-            imageContainer.innerHTML = '';
-            imageDeleteButton.classList.remove('visible');
-            getAjax('http://localhost:' + PORT + '/wiki/download/' + encodeURIComponent(imageUrl.value) + '/' + imageTimestamp.value + '/' + imageQuality.value, function (result) {
-                imageDownloadButton.classList.remove('downloading');
-                imageDownloadButton.innerText = "Save Image Locally";
-                if (result === 'error') {
-                    imageDownloadButton.classList.add('error');
-                    return;
-                }
-                imageDownloadButton.classList.remove('error');
-                const imagePath = 'http://localhost:' + PORT + '/wiki/img/' + imageTimestamp.value + '.jpg';
-                const a = document.createElement('a');
-                a.target = '_blank';
-                a.href = imagePath;
-                imageContainer.appendChild(a);
-
-                const img = document.createElement('img');
-                img.src = imagePath;
-                a.appendChild(img);
-
-                imageUrl.value = imagePath;
-                imageDeleteButton.classList.add('visible');
-            });
-        });
-        addEvent(imageDeleteButton, 'click', function (e) {
-            e.preventDefault();
-            imageDeleteButton.classList.add('deleting');
-            getAjax('http://localhost:' + PORT + '/wiki/deleteImage/' + imageTimestamp.value, function (result) {
-                imageDeleteButton.classList.remove('deleting');
-                if (result === 'error') {
-                    imageDeleteButton.classList.add('error');
-                } else {
-                    imageContainer.innerHTML = '';
-                    imageDeleteButton.classList.remove('visible');
-                    imageDeleteButton.classList.remove('error');
-                }
-            });
-        });
-        addEvent(youtubeButton, 'click', openYoutubeWindow);
-        addEvent(youtubeFinishButton, 'click', function (e) {
-            e.preventDefault();
-            finishYoutubeWizard();
-        });
-        addEvent(youtubeCancelButton, 'click', function (e) {
-            e.preventDefault();
-            cancelYoutubeWindow();
-        });
-        addEvent(selectAllButton, 'click', function (e) {
-            e.preventDefault();
-            content.setSelectionRange(0, content.value.length);
-            content.focus();
-        });
-        addEvent(relatedSearch, 'input', function () {
-            getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent(relatedSearch.value), function (result) {
-                relatedSearchWrapper.innerHTML = '<div class="row"><div class="col-12"><strong>Title</strong></div></div>';
-                result = JSON.parse(result);
-                for (let i = 0, j = result.length; i < j; i++) {
-                    const entry = result[i];
-                    const row = document.createElement('div');
-                    row.classList.add('row');
-                    row.setAttribute('data-title', entry.title);
-                    row.setAttribute('data-slug', entry.slug);
-                    relatedSearchWrapper.appendChild(row);
-
-                    const col = document.createElement('div');
-                    col.classList.add('col-12');
-                    row.appendChild(col);
-
-                    const a = document.createElement('a');
-                    a.innerText = entry.title;
-                    col.appendChild(a);
-
-                    addEvent(a, 'click', function (e) {
-                        e.preventDefault();
-                        finishRelatedWizard(row);
-                    });
-                }
-                relatedSearchEntries = $('#related-search-wrapper .row');
-            });
-        });
-        addEvent(relatedSearch, 'keydown', function (e) {
-            if (e.keyCode >= 37 && e.keyCode <= 40) {
-                if (relatedSearchCurrentlyActive === -1) {
-                    relatedSearchCurrentlyActive = 1;
-                } else if (e.keyCode === 39 || e.keyCode === 40) { //right/down arrow
-                    if (++relatedSearchCurrentlyActive >= relatedSearchEntries.length) {
-                        relatedSearchCurrentlyActive = 1;
-                    }
-                } else if (e.keyCode === 37 || e.keyCode === 38) { //left/up arrow
-                    if (--relatedSearchCurrentlyActive <= 0) {
-                        relatedSearchCurrentlyActive = relatedSearchEntries.length - 1;
-                    }
-                }
-                relatedSearchEntries.forEach(row => row.classList.remove('active'));
-                relatedSearchEntries[relatedSearchCurrentlyActive].classList.add('active');
-                e.preventDefault();
-            }
-        });
-        addEvent(relatedButton, 'click', openRelatedWindow);
-        addEvent(relatedFinishButton, 'click', function (e) {
-            e.preventDefault();
-            const activatedSearchResult = $1('#related-search-wrapper .row.active');
-            if (activatedSearchResult == null) return;
-            finishRelatedWizard(activatedSearchResult);
-        });
-        addEvent(relatedCancelButton, 'click', function (e) {
-            e.preventDefault();
-            cancelRelatedWindow();
-        });
-        addEvent(colorButton, 'click', openColorWindow);
-        addEvent(colorFinishButton, 'click', function (e) {
-            e.preventDefault();
-            finishColorWizard();
-        });
-        addEvent(colorCancelButton, 'click', function (e) {
-            e.preventDefault();
-            cancelColorWindow();
-        });
-        addEvent(customColor, 'input', function () {
-            colorCurrentlyActive = -1;
-            colorButtons.forEach(button => button.classList.remove('active'));
-        });
 
         addEvent(displayActivator, 'mouseover', function () {
             editor.style['z-index'] = '0';
@@ -1143,10 +1596,95 @@ document.addEventListener('DOMContentLoaded', function () {
             content.focus();
         });
 
-        addEvent(window, 'resize', function() {
+        addEvent(window, 'resize', function () {
             content.style.height = 'calc(100% - ' + (buttonWrapper.offsetHeight + 50) + 'px)';
         });
 
+        //add wizards to document
+        wizardObject['wizards'].filter(wizard => wizard.displayButton).forEach(function (wizard) {
+            //create wizard button
+            const span = document.createElement('span');
+            span.classList.add('icon');
+            span.setAttribute('id', wizard.id + '-button');
+            span.setAttribute('title', (wizard.ctrlKey ? 'Ctrl+' : '') + (wizard.shiftKey ? 'Shift+' :
+                                                                          '') + String.fromCharCode(wizard.keyCode));
+            span.textContent = wizard.name;
+            buttonWrapper.appendChild(span);
+
+            const divider = document.createElement('span');
+            divider.textContent = ' ';
+            buttonWrapper.appendChild(divider);
+
+            //create wizard window
+            const win = document.createElement('div');
+            win.classList.add('insertion-wrapper', 'edit');
+            win.id = wizard.id + '-window';
+
+            const container = document.createElement('div');
+            container.classList.add('container');
+            win.appendChild(container);
+
+            const row = document.createElement('div');
+            row.classList.add('row');
+            container.appendChild(row);
+
+            const col = document.createElement('div');
+            col.classList.add('col-12', 'col-md-8', 'offset-md-2', 'col-lg-4', 'offset-lg-4', 'field-container');
+            row.appendChild(col);
+
+            const title = document.createElement('h1');
+            title.textContent = wizard.name;
+            col.appendChild(title);
+
+            expandHtml(col, wizard.content);
+
+            const finishButton = document.createElement('a');
+            finishButton.classList.add('button', 'save', 'success');
+            finishButton.textContent = 'Finish';
+            finishButton.title = 'Enter';
+            col.appendChild(finishButton);
+
+            const cancelButton = document.createElement('a');
+            cancelButton.classList.add('button', 'delete');
+            cancelButton.textContent = 'Cancel';
+            cancelButton.title = 'Esc';
+            col.appendChild(cancelButton);
+
+            document.body.appendChild(win);
+
+            //open wizard functionality
+            addEvent(span, 'click', function () {
+                wizardObject.functions.openWizard(win, wizard);
+            });
+            addEvent(content, 'keydown', function (e) {
+                if (e.ctrlKey === wizard.ctrlKey && e.shiftKey === wizard.shiftKey && e.keyCode === wizard.keyCode) {
+                    e.preventDefault();
+                    wizardObject.functions.openWizard(win, wizard);
+                }
+            });
+
+            //wizard navigation functionality
+            addEvent(win, 'keydown', function (e) {
+                switch (e.keyCode) {
+                    case 13: //enter
+                        e.preventDefault();
+                        wizardObject.functions.applyWizard(win, wizard);
+                        break;
+                    case 27: //escape
+                        wizardObject.functions.closeWizard(win, wizard);
+                        break;
+                }
+            });
+            addEvent(finishButton, 'click', function () {
+                    wizardObject.functions.applyWizard(win, wizard);
+                }
+            );
+            addEvent(cancelButton, 'click', function () {
+                wizardObject.functions.closeWizard(win, wizard);
+            });
+        });
+
+        //add markdown shortcuts to document
         md.filter(fct => fct.displayButton).forEach(function (fct) {
             const span = document.createElement('span');
             span.classList.add('icon');
@@ -1162,16 +1700,13 @@ document.addEventListener('DOMContentLoaded', function () {
             addEvent(span, 'click', () => applyStyle(fct));
         });
 
+        //update content preview
+        update();
+
+        //save document regularly
         setInterval(attemptSaving, 2000);
 
-        for (let i = 1; i <= 10; i++) {
-            const option = document.createElement('option');
-            option.text = i * 10 + '%';
-            option.value = '' + i * 10;
-            imageQuality.appendChild(option);
-        }
-        imageQuality.value = '60';
-
+        //focus content field
         content.focus();
     }
 );

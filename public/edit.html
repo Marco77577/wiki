@@ -39,13 +39,7 @@
 		<div class="row">
 			<div class="col-12 col-md-6">
 				<div class="edit">
-					<div id="button-wrapper">
-						<span class="icon" id="related" title="Ctrl+R">Related</span>
-						<span class="icon" id="youtube" title="Ctrl+Shift+Y">YouTube Video</span>
-						<span class="icon" id="image" title="Ctrl+Shift+I">Image</span>
-						<span class="icon" id="link-button" title="Ctrl+Shift+A">Link</span>
-						<span class="icon" id="color" title="Ctrl+Shift+P">Color</span>
-					</div>
+					<div id="button-wrapper"></div>
 					<nav>
 						<a class="select-all" href="#" title="Select All"></a>
 						<a class="view" href="wiki/view/{% block slug %}" title="View" id="view-material-button"></a>
@@ -64,102 +58,6 @@
 		<div class="col-12 col-md-6">
 			<div class="content" id="preview">
 				{% block content %}
-			</div>
-		</div>
-	</div>
-</div>
-<div class="insertion-wrapper edit" id="link-window">
-	<div class="container">
-		<div class="row">
-			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
-				<label for="link-text">Text*:</label>
-				<input type="text" id="link-text" placeholder="Google"/>
-				<label for="link-url">Link URL*:</label>
-				<input type="text" id="link-url" placeholder="https://google.com" value="http://"/>
-				<label for="link-search">Link Entry:</label>
-				<input type="text" id="link-search" placeholder="Search ..."/>
-				<input type="hidden" id="link-selection-start"/>
-				<input type="hidden" id="link-selection-end"/>
-				<div id="link-search-wrapper" class="index search-wrapper"></div>
-				<a class="button save success" id="link-finish-button" title="Enter">Finish</a>
-				<a class="button delete" id="link-cancel-button" title="Esc">Cancel</a>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="insertion-wrapper edit" id="image-window">
-	<div class="container">
-		<div class="row">
-			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
-				<label for="image-text">Alt Text*:</label>
-				<input type="text" id="image-text" placeholder="Google Logo" />
-				<label for="image-url">Image URL*:</label>
-				<input type="text" id="image-url" placeholder="https://google.com/image.jpg" value="http://"/>
-				<input type="hidden" id="image-selection-start"/>
-				<input type="hidden" id="image-selection-end"/>
-				<input type="hidden" id="image-timestamp"/>
-				<div class="row">
-					<div class="col-4">
-						<label for="image-quality" class="hidden">Quality:</label>
-						<select id="image-quality" dir="rtl" title="Compression Quality"></select>
-					</div>
-					<div class="col-8">
-						<a class="button download" id="image-download-button">Save Image Locally</a>
-					</div>
-				</div>
-				<div id="image-container"></div>
-				<a class="button delete" id="image-delete-button">Delete Image</a>
-				<a class="button save success" id="image-finish-button" title="Enter">Finish</a>
-				<a class="button delete" id="image-cancel-button" title="Esc">Cancel</a>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="insertion-wrapper edit" id="youtube-window">
-	<div class="container">
-		<div class="row">
-			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
-				<label for="youtube-text">Alt Text*:</label>
-				<input type="text" id="youtube-text" placeholder="Youtube Video Title" />
-				<label for="image-url">Video URL*:</label>
-				<input type="text" id="youtube-url" placeholder="https://www.youtube.com/watch?v=yr6cp7cppCc"/>
-				<input type="hidden" id="youtube-selection-start"/>
-				<input type="hidden" id="youtube-selection-end"/>
-				<a class="button save success" id="youtube-finish-button" title="Enter">Finish</a>
-				<a class="button delete" id="youtube-cancel-button" title="Esc">Cancel</a>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="insertion-wrapper edit" id="related-window">
-	<div class="container">
-		<div class="row">
-			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
-				<label for="related-search">Related Entry:</label>
-				<input type="text" id="related-search" placeholder="Search ..."/>
-				<input type="hidden" id="related-selection-start"/>
-				<input type="hidden" id="related-selection-end"/>
-				<div id="related-search-wrapper" class="index search-wrapper"></div>
-				<a class="button save success" id="related-finish-button" title="Enter">Finish</a>
-				<a class="button delete" id="related-cancel-button" title="Esc">Cancel</a>
-			</div>
-		</div>
-	</div>
-</div>
-<div class="insertion-wrapper edit" id="color-window">
-	<div class="container">
-		<div class="row">
-			<div class="col-12 col-md-8 offset-md-2 col-lg-4 offset-lg-4 field-container">
-				<a class="button color red active" title="Red" data-hex="#FF0000">Red</a>
-				<a class="button color yellow" title="Yellow" data-hex="#FFFF00">Yellow</a>
-				<a class="button color green" title="Green" data-hex="#00FF00">Green</a>
-				<a class="button color blue" title="Blue" data-hex="#0000FF">Blue</a>
-				<label for="custom-color">Custom Color:</label>
-				<input type="text" id="custom-color" placeholder="#000000" value="#FF0000"/>
-				<input type="hidden" id="color-selection-start"/>
-				<input type="hidden" id="color-selection-end"/>
-				<a class="button save success" id="color-finish-button" title="Enter">Finish</a>
-				<a class="button delete" id="color-cancel-button" title="Esc">Cancel</a>
 			</div>
 		</div>
 	</div>

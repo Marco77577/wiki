@@ -98,20 +98,6 @@
 		@include print {
 			display: none;
 		}
-		&.color {
-			&.red.active, &.red:hover {
-				background-color: red;
-			}
-			&.yellow.active, &.yellow:hover {
-				background-color: yellow;
-			}
-			&.green.active, &.green:hover {
-				background-color: green;
-			}
-			&.blue.active, &.blue:hover {
-				background-color: blue;
-			}
-		}
 		&.save:hover, &.editbutton:hover, &.success {
 			background-color: #63bb7d;
 		}
@@ -187,18 +173,21 @@
 					margin-right: 5px;
 				}
 			}
-			&#related:before {
+			&#related-wizard-button:before {
 				content: '\f35d';
 			}
-			&#youtube:before {
+			&#youtube-wizard-button:before {
 				font-family: "Font Awesome 5 Brands", sans-serif;
 				content: '\f167';
 			}
-			&#image:before {
+			&#image-wizard-button:before {
 				content: '\f03e';
 			}
-			&#color:before {
+			&#color-wizard-button:before {
 				content: '\f1fc';
+			}
+			&#file-wizard-button:before {
+				content: '\f0c6';
 			}
 			&#bold:before {
 				content: '\f032';
@@ -206,7 +195,7 @@
 			&#italic:before {
 				content: '\f033';
 			}
-			&#link:before, &#link-button:before {
+			&#link:before, &#link-wizard-button:before {
 				content: '\f0c1';
 			}
 			&#strikethrough:before {
