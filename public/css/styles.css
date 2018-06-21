@@ -719,6 +719,23 @@ header {
     border-color: #0366d6; }
   100% {
     border-color: transparent; } }
+.attachments a {
+  display: block;
+  margin: 10px 0;
+  padding: 10px;
+  color: #24292e;
+  border: 1px solid #eaecef;
+  font-size: 1.6em;
+  border-radius: 3px;
+  text-decoration: none; }
+  .attachments a:hover {
+    color: #fff;
+    background-color: #0366d6;
+    border-color: #0366d6; }
+  .attachments a span {
+    display: block;
+    font-size: 0.75em; }
+
 #uploadForm .title {
   height: 200px; }
   #uploadForm .title .drop-area {

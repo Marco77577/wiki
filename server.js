@@ -267,6 +267,17 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
                     wikiEntry = wikiEntry.replace(/tags: (.*)/, '');
                 }
 
+                //extract attachments
+                const attachments = [];
+                const attachmentPattern = /<a href="wiki\/files\/.+?>(.+?)<\/a>/g;
+                let totalAttachmentSize = 0;
+                let match;
+                while ((match = attachmentPattern.exec(wikiEntry)) !== null) {
+                    const size = fs.statSync('./public/wiki/files/' + match[1]).size;
+                    totalAttachmentSize += size;
+                    attachments.push('<a href="wiki/files/' + match[1] + '" target="_blank">' + match[1] + ' <span>File size: ' + fileSizeConverter(size) + '</span></a>');
+                }
+
                 //fill in data
                 const stats = fs.statSync('./public/wiki/' + urlOptions[1] + '.md');
                 html = replaceBlock('filesize', html, '<p>File size: ' + fileSizeConverter(stats.size) + '</p>');
@@ -274,6 +285,9 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 
                 html = replaceBlock('slug', html, urlOptions[1], true);
                 html = replaceBlock('filesize', html, '');
+                html = replaceBlock('attachments', html, attachments.length > 0 ? '<div class="attachments"><h1>Attachments</h1>' + attachments.join('') + '</div>' : '');
+                html = replaceBlock('totalattachmentsize', html, attachments.length > 0 ? '<p>Total attachment size: ' + fileSizeConverter(totalAttachmentSize) + '</p>' : '');
+
                 preparePageForDisplay(res, html, pageTitle);
             }
         });

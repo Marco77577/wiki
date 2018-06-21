@@ -246,3 +246,25 @@
 		100% { border-color: transparent; }
 	}
 }
+
+.attachments {
+	a {
+		display: block;
+		margin: 10px 0;
+		padding: 10px;
+		color: #24292e;
+		border: 1px solid $headingBorderColor;
+		font-size: 1.6em;
+		border-radius: 3px;
+		text-decoration: none;
+		&:hover {
+			color: #fff;
+			background-color: $tagFontColor;
+			border-color: $tagFontColor;
+		}
+		span {
+			display: block;
+			font-size: 0.75em;
+		}
+	}
+}
