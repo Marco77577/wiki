@@ -140,7 +140,12 @@ document.addEventListener('DOMContentLoaded', function () {
     addEvent(searchForm, 'submit', function (e) {
         e.preventDefault();
         if (search.value.length === 0) return;
-        location.href = 'http://localhost:' + PORT + '/wiki/index/' + search.value;
+        let c;
+        if((c = /^files?:(.+)/.exec(search.value))) {
+            location.href = 'http://localhost:' + PORT + '/wiki/files/' + c[1];
+        } else {
+            location.href = 'http://localhost:' + PORT + '/wiki/index/' + search.value;
+        }
     });
     addEvent(document, 'keydown', function (e) {
         if (e.ctrlKey && e.shiftKey && e.keyCode === 70) { // Ctrl + Shift + F

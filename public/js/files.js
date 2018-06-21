@@ -183,7 +183,7 @@ addEventListener('DOMContentLoaded', function () {
     const applyFilter = function () {
         $('.file-row').forEach(fileRow => {
             fileRow.classList.remove('deleted');
-            if ($1('.delete', fileRow).getAttribute('data-filename').match(new RegExp(this.value, 'i')) === null) {
+            if ($1('.delete', fileRow).getAttribute('data-filename').match(new RegExp(search.value, 'i')) === null) {
                 fileRow.classList.add('deleted');
             }
         });
@@ -317,6 +317,6 @@ addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    //todo add a fileuploader/fileincluder to the edit screen
+    applyFilter();
     //todo add files to menu somehow
 });

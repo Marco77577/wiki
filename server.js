@@ -46,12 +46,13 @@ const loadEnvVarTemplate = function () {
     return '<script>const PORT = ' + config.PORT + '; const WIKI_NAME = \'' + config.WIKI_NAME + '\';</script>';
 };
 
-const preparePageForDisplay = function (res, html, pageTitle) {
+const preparePageForDisplay = function (res, html, pageTitle, defaultSearch = '') {
     html = replaceBlock('head', html, loadTemplateSync('head'));
     html = replaceBlock('title', html, pageTitle);
     html = replaceBlock('wikiname', html, config.WIKI_NAME, true);
     html = replaceBlock('envvars', html, loadEnvVarTemplate());
     html = replaceBlock('header', html, loadTemplateSync('header'));
+    html = replaceBlock('defaultsearch', html, defaultSearch);
     html = prepareUrls(html);
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write(html);
@@ -210,7 +211,7 @@ router.register('/wiki/home', loadIndex);
 router.register('/wiki', loadIndex);
 router.register('/', loadIndex);
 
-router.register('/wiki/files', function (req, res, urlOptions) {
+router.register('\/wiki\/files\/?(.*)', function (req, res, urlOptions) {
     loadTemplateAsync('files', function (err, html) {
         if (err) throw err;
 
@@ -228,7 +229,7 @@ router.register('/wiki/files', function (req, res, urlOptions) {
             html = replaceBlock('totalfilesize', html, fileSizeConverter(totalFileSize));
             html = replaceBlock('totalfilesizeinbytes', html, totalFileSize);
 
-            preparePageForDisplay(res, html, "Files");
+            preparePageForDisplay(res, html, 'Files', decodeURIComponent(urlOptions[1]));
         });
     });
 });
