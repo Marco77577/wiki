@@ -277,7 +277,7 @@ router.register('\/wiki\/edit\/(.+)', function (req, res, urlOptions) {
                 loadTemplateAsync('view', function (errView) {
                     if (errView) throw errView;
 
-                    html = replaceBlock('title', html, pageTitle, true); //TODO find customizable way to do this
+                    html = replaceBlock('title', html, pageTitle, true);
                     html = replaceBlock('slug', html, '');
                     html = replaceBlock('tags', html, '');
                     html = replaceBlock('content', html, '');
@@ -407,13 +407,43 @@ router.register('/wiki/update', function (req, res) {
 
 router.register('\/wiki\/delete\/(.+)', function (req, res, urlOptions) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
-    fs.unlink('./public/wiki/' + urlOptions[1] + '.md', function (err) {
+
+    //get content of entry and look for images
+    loadWikiEntryAsync(urlOptions[1], function (err, entry) {
         if (err) {
-            res.write('Error: Could not delete file.')
+            res.write('Error: Could not load file that needs to be deleted.');
         } else {
-            res.write('success');
+            //get local images
+            const images = [];
+            const pattern = /!\[.+?]\(https?:\/\/localhost:3000\/wiki\/img\/(\d+?)\.jpg\)/g;
+            let match;
+            while ((match = pattern.exec(entry)) !== null) {
+                images.push(match[1]);
+            }
+
+            //delete entry
+            fs.unlink('./public/wiki/' + urlOptions[1] + '.md', function (err) {
+                if (err) {
+                    res.write('Error: Could not delete file.');
+                } else {
+                    res.write('success');
+
+                    //check if image is used anywhere else
+                    images.forEach(image => {
+                        getEntryList('all:' + image + '.jpg', function (entries) {
+                            if (entries.length === 0) { //image not in use anymore, delete it
+                                fs.unlink('./public/wiki/img/' + image + '.jpg', function (err) {
+                                    if (err) {
+                                        console.log('Could not delete image ' + image + '.jpg.');
+                                    }
+                                });
+                            }
+                        });
+                    });
+                }
+                res.end();
+            });
         }
-        res.end();
     });
 });
 
