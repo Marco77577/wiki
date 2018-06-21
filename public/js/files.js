@@ -178,7 +178,11 @@ addEventListener('DOMContentLoaded', function () {
     const getTotalFileSize = function () {
         let node = $('.file-row')[0];
         let i;
-        for (i = parseInt($1('#_filesize' + node.id).getAttribute('data-filesize')); node = node.nextElementSibling; i += parseInt($1('#_filesize' + node.id).getAttribute('data-filesize'))) ;
+        try {
+            for (i = parseInt($1('#_filesize' + node.id).getAttribute('data-filesize')); node = node.nextElementSibling; i += parseInt($1('#_filesize' + node.id).getAttribute('data-filesize'))) ;
+        } catch (ex) {
+            //ignore
+        }
         return i;
     };
     const applyFilter = function () {
@@ -263,8 +267,8 @@ addEventListener('DOMContentLoaded', function () {
     let selectedLast = null;
     $('.file-row').forEach(fileRow => {
         addEvent(fileRow, 'click', select);
-        addEvent(fileRow, 'dblclick', function() {
-            if(fileRow.classList.contains('unused')) {
+        addEvent(fileRow, 'dblclick', function () {
+            if (fileRow.classList.contains('unused')) {
                 $('.file-row').forEach(fr => fr.classList.remove('active'));
                 $('.file-row.unused').forEach(fr => fr.classList.add('active'));
                 selectedLast = fileRow;
@@ -283,10 +287,11 @@ addEventListener('DOMContentLoaded', function () {
 
     //navigation functionality
     addEvent(document, 'keydown', function (e) {
-        const indexRows = $('.index-row');
+        const indexRows = $('.index-row:not(.deleted)');
 
         switch (e.keyCode) {
             case 13: // enter
+                if (document.activeElement === search) return;
                 $1('.file-row.active a').click();
                 break;
             case 27: // escape
@@ -295,27 +300,38 @@ addEventListener('DOMContentLoaded', function () {
                 break;
             case 37: // arrow left
             case 38: // arrow up
+                e.preventDefault();
                 if (selectedLast === null) selectedLast = indexRows[1];
                 indexRows.forEach(fileRow => fileRow.classList.remove('active'));
 
-                if (selectedLast.previousElementSibling !== indexRows[0] && selectedLast.previousElementSibling !== null) {
-                    selectedLast = selectedLast.previousElementSibling;
+                if (getPreviousSibling(selectedLast) !== indexRows[0] && getPreviousSibling(selectedLast) !== null) {
+                    selectedLast = getPreviousSibling(selectedLast);
                 } else {
                     selectedLast = indexRows[indexRows.length - 2];
                 }
                 selectedLast.classList.add('active');
+                scrollIt(selectedLast);
                 break;
             case 39: // arrow right
             case 40: // arrow down
+                e.preventDefault();
                 if (selectedLast === null) selectedLast = indexRows[0];
                 indexRows.forEach(fileRow => fileRow.classList.remove('active'));
 
-                if (selectedLast.nextElementSibling !== null) {
-                    selectedLast = selectedLast.nextElementSibling;
+                if (getNextSibling(selectedLast) !== null) {
+                    selectedLast = getNextSibling(selectedLast);
                 } else {
                     selectedLast = indexRows[1];
                 }
                 selectedLast.classList.add('active');
+                scrollIt(selectedLast);
+                break;
+            case 65: // (a)ll
+                if(e.ctrlKey) {
+                    e.preventDefault();
+                    indexRows.forEach(row => row.classList.add('active'));
+                    updateOptionsPane();
+                }
                 break;
             case 68: // (d)elete
                 if (document.activeElement === search) return;

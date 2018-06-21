@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //navigation functionality
     addEvent(document, 'keydown', function (e) {
-        const indexRows = $('.index-row');
+        const indexRows = $('.index-row:not(.deleted)');
 
         switch (e.keyCode) {
             case 13: // enter
@@ -175,24 +175,30 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (selectedLast === null) selectedLast = indexRows[2];
                 indexRows.forEach(fileRow => fileRow.classList.remove('active'));
 
-                if (selectedLast.previousElementSibling !== indexRows[1] && selectedLast.previousElementSibling !== null) {
-                    selectedLast = selectedLast.previousElementSibling;
+                if (getPreviousSibling(selectedLast) !== indexRows[1] && getPreviousSibling(selectedLast) !== null) {
+                    selectedLast = getPreviousSibling(selectedLast);
                 } else {
                     selectedLast = indexRows[indexRows.length - 4];
                 }
+
+                e.preventDefault();
                 selectedLast.classList.add('active');
+                scrollIt(selectedLast);
                 break;
             case 39: // arrow right
             case 40: // arrow down
                 if (selectedLast === null) selectedLast = indexRows[1];
                 indexRows.forEach(fileRow => fileRow.classList.remove('active'));
 
-                if (selectedLast.nextElementSibling !== null) {
-                    selectedLast = selectedLast.nextElementSibling;
+                if (getNextSibling(selectedLast) !== null) {
+                    selectedLast = getNextSibling(selectedLast);
                 } else {
                     selectedLast = indexRows[2];
                 }
+
+                e.preventDefault();
                 selectedLast.classList.add('active');
+                scrollIt(selectedLast);
                 break;
             case 68: // (d)elete
                 if (document.activeElement === search || selectedLast === null) return;

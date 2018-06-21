@@ -9,6 +9,16 @@ String.prototype.hashCode = function () {
     return '_' + Math.abs(hash);
 };
 
+function getNextSibling(row) {
+    while((row = row.nextElementSibling) !== null && row.classList.contains('deleted')) {}
+    return row;
+}
+
+function getPreviousSibling(row) {
+    while((row = row.previousElementSibling) !== null && row.classList.contains('deleted')) {}
+    return row;
+}
+
 function fileSizeConverter(size) {
     let counter = 0;
     while (size > 1024) {
