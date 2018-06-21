@@ -1259,7 +1259,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         if (wizardObject.selected === null) return false;
 
                         //apply wizard
-                        const link = '<a href="wiki/files/' + wizardObject.selected.getAttribute('data-filename') + '" target="_blank">' + wizardObject.selected.getAttribute('data-filename') + '</a>';
+                        const link = '<a href="/wiki/files/' + wizardObject.selected.getAttribute('data-filename') + '" target="_blank">' + wizardObject.selected.getAttribute('data-filename') + '</a>';
                         const calculatedEnd = wizardObject.start + link.length;
                         content.value = content.value.slice(0, wizardObject.start) + link + content.value.slice(wizardObject.start);
 

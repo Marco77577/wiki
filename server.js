@@ -39,7 +39,7 @@ const replaceBlock = function (blockName, container, substitute, global) {
 };
 
 const prepareUrls = function (container) {
-    return container.replace(/(href|src)="(?!http|mailto:|tel:|file:)(.+?)"/g, '$1="http://localhost:' + config.PORT + '/$2"');
+    return container.replace(/(href|src)="(?!http|mailto:|tel:|file:|\/wiki\/files)(.+?)"/g, '$1="http://localhost:' + config.PORT + '/$2"');
 };
 
 const loadEnvVarTemplate = function () {
@@ -299,7 +299,7 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 
                 //extract attachments
                 const attachments = [];
-                const attachmentPattern = /<a href="wiki\/files\/.+?>(.+?)<\/a>/g;
+                const attachmentPattern = /<a href="\/wiki\/files\/.+?>(.+?)<\/a>/g;
                 let totalAttachmentSize = 0;
                 let match;
                 while ((match = attachmentPattern.exec(wikiEntry)) !== null) {
