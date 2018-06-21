@@ -353,7 +353,18 @@ header {
     .edit a.button.save.saving:before, .edit a.button.update.saving:before, .edit a.button.publish.saving.before {
       content: '\f2f1'; }
     .edit a.button.download.downloading:before, .edit a.button.delete.deleting:before {
-      content: '\f252'; }
+      content: '\f251';
+      animation: hourglass;
+      animation-iteration-count: infinite;
+      animation-duration: 1s;
+      animation-timing-function: linear; }
+@keyframes hourglass {
+  0% {
+    content: '\f251'; }
+  33% {
+    content: '\f252'; }
+  66% {
+    content: '\f253'; } }
     .edit a.button.save.success:before {
       content: '\f00c'; }
     .edit a.button.delete:before {

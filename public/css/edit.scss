@@ -132,7 +132,16 @@
 			content: '\f2f1';
 		}
 		&.download.downloading:before, &.delete.deleting:before {
-			content: '\f252';
+			content: '\f251';
+			animation: hourglass;
+			animation-iteration-count: infinite;
+			animation-duration: 1s;
+			animation-timing-function: linear;
+			@keyframes hourglass {
+				0% {content: '\f251';}
+				33% {content: '\f252';}
+				66% {content: '\f253';}
+			}
 		}
 		&.save.success:before {
 			content: '\f00c';
