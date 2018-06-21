@@ -27,7 +27,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const tagsContainer = $1('#tag-cloud-container');
     const tagsHeader = $1('#tag-cloud-header');
     const toastDelete = $1('#delete-toast');
+    const totalSize = $1('#total-size');
     const entrySize = $1('#entry-size');
+    const imageSize = $1('#image-size');
     const search = $1('#search');
     const deleteSearchButton = $1('#delete-search');
     const optionsPaneTitle = $1('#options-pane strong');
@@ -87,9 +89,9 @@ document.addEventListener('DOMContentLoaded', function () {
             optionsPaneDelete.classList.remove('show');
         }
     };
-    const deleteEntry = function(slug) {
+    const deleteEntry = function (slug) {
         getAjax('http://localhost:' + PORT + '/wiki/delete/' + slug, function (result) {
-            if(result === 'error') {
+            if (result === 'error') {
                 console.log('Could not delete entry.');
                 return;
             }
@@ -109,12 +111,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 row.parentNode.removeChild(row);
                 updateOptionsPane();
 
-                //update total file size
+                //update file sizes
                 entrySize.innerText = fileSizeConverter(getTotalFileSize());
+                imageSize.innerText = fileSizeConverter(parseInt(result));
+                totalSize.innerText = fileSizeConverter(getTotalFileSize() + parseInt(result));
             }, 2000);
         });
     };
-    const applyFilter = function() {
+    const applyFilter = function () {
         $('.entry-row').forEach(entryRow => {
             entryRow.classList.remove('deleted');
             if ($1('a', entryRow).innerText.match(new RegExp(this.value, 'i')) === null) {
@@ -159,7 +163,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         switch (e.keyCode) {
             case 13: // enter
-                if(selectedLast === null) return;
+                if (selectedLast === null) return;
                 $1('a', selectedLast).click();
                 break;
             case 27: // escape
@@ -191,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 selectedLast.classList.add('active');
                 break;
             case 68: // (d)elete
-                if(document.activeElement === search || selectedLast === null) return;
+                if (document.activeElement === search || selectedLast === null) return;
 
                 const confirm = window.confirm('Are you sure you want to delete these entries?');
                 if (!confirm) return;
@@ -199,7 +203,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $('.entry-row.active .delete').forEach(entry => deleteEntry(entry.getAttribute('data-slug')));
                 break;
             case 69: // (e)edit
-                if(document.activeElement === search || selectedLast === null) return;
+                if (document.activeElement === search || selectedLast === null) return;
                 $1('a.edit', selectedLast).click();
                 break;
         }

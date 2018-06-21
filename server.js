@@ -478,7 +478,7 @@ router.register('\/wiki\/delete\/(.+)', function (req, res, urlOptions) {
         } else {
             //get local images
             const images = [];
-            const pattern = /!\[.+?]\(https?:\/\/localhost:3000\/wiki\/img\/(\d+?)\.jpg\)/g;
+            const pattern = /!\[.+?]\(\/wiki\/img\/(\d+?)\.jpg\)/g;
             let match;
             while ((match = pattern.exec(entry)) !== null) {
                 images.push(match[1]);
@@ -489,20 +489,22 @@ router.register('\/wiki\/delete\/(.+)', function (req, res, urlOptions) {
                 if (err) {
                     res.write('Error: Could not delete file.');
                 } else {
-                    res.write('success');
-
                     //check if image is used anywhere else
                     images.forEach(image => {
-                        getEntryList('all:' + image + '.jpg', function (entries) {
-                            if (entries.length === 0) { //image not in use anymore, delete it
-                                fs.unlink('./public/wiki/img/' + image + '.jpg', function (err) {
-                                    if (err) {
-                                        console.log('Could not delete image ' + image + '.jpg.');
-                                    }
-                                });
-                            }
-                        });
+                        const entries = getEntryListSync('all:' + image + '.jpg');
+                        if (entries.length === 0) { //image not in use anymore, delete it
+                            fs.unlinkSync('./public/wiki/img/' + image + '.jpg');
+                        }
                     });
+
+                    //calculate new total image size
+                    const imgDir = fs.readdirSync('./public/wiki/img');
+                    let totalImageSize = 0;
+                    imgDir.forEach(image => function () {
+                        totalImageSize += fs.statSync('./public/wiki/img/' + image).size;
+                    });
+
+                    res.write(totalImageSize.toString());
                 }
                 res.end();
             });
