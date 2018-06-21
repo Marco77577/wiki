@@ -9,6 +9,7 @@ addEventListener('DOMContentLoaded', function () {
     const optionsPaneDelete = $1('#options-pane a');
     const content = $1('.content');
     const search = $1('#search');
+    const deleteSearchButton = $1('#delete-search');
 
     const dragHoverStart = function () {
         dropArea.classList.add('hover');
@@ -265,7 +266,7 @@ addEventListener('DOMContentLoaded', function () {
         addEvent(fileRow, 'dblclick', function() {
             if(fileRow.classList.contains('unused')) {
                 $('.file-row').forEach(fr => fr.classList.remove('active'));
-                $('.file-row.unused').forEach(fr => fr.classList.add('active'))
+                $('.file-row.unused').forEach(fr => fr.classList.add('active'));
                 selectedLast = fileRow;
                 updateOptionsPane();
             }
@@ -278,6 +279,7 @@ addEventListener('DOMContentLoaded', function () {
 
     //filter functionality
     addEvent(search, 'input', applyFilter);
+    addEvent(deleteSearchButton, 'click', applyFilter);
 
     //navigation functionality
     addEvent(document, 'keydown', function (e) {

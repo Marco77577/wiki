@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const toastDelete = $1('#delete-toast');
     const entrySize = $1('#entry-size');
     const search = $1('#search');
+    const deleteSearchButton = $1('#delete-search');
     const optionsPaneTitle = $1('#options-pane strong');
     const optionsPaneDelete = $1('#options-pane a');
 
@@ -219,6 +220,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     //filter functionality
     addEvent(search, 'input', applyFilter);
+    addEvent(deleteSearchButton, 'click', applyFilter);
 
     $1('header').classList.add('fixed');
 });

@@ -119,6 +119,18 @@ header {
           outline: none; }
         header nav form input[type=submit] {
           display: none; }
+        header nav form input + span {
+          display: none;
+          position: absolute;
+          right: 25px; }
+          header nav form input + span.visible {
+            display: inline; }
+          header nav form input + span:before {
+            font-family: 'Font Awesome 5 Free', sans-serif;
+            font-weight: 900;
+            content: '\f00d';
+            color: #fff;
+            cursor: pointer; }
     header nav .flex {
       display: flex;
       align-items: center; }

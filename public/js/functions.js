@@ -107,10 +107,10 @@ function $1(selector, context) {
 }
 
 function addEvent(el, type, handler) {
-    const addEvent = function(eventName) {
+    const addEvent = function (eventName) {
         if (el.attachEvent) el.attachEvent('on' + eventName, handler); else el.addEventListener(eventName, handler);
     };
-    if(type.constructor === Array) {
+    if (type.constructor === Array) {
         type.forEach(t => addEvent(t))
     } else {
         addEvent(type);
@@ -134,6 +134,7 @@ function getAjax(url, success) {
 document.addEventListener('DOMContentLoaded', function () {
     const searchForm = $1('#search-form');
     const search = $1('#search');
+    const deleteSearchButton = $1('#delete-search');
     const header = $1('header');
     const scrollObject = {x: 0, y: 0};
 
@@ -141,11 +142,21 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         if (search.value.length === 0) return;
         let c;
-        if((c = /^files?:(.+)/.exec(search.value))) {
+        if ((c = /^files?:(.+)/.exec(search.value))) {
             location.href = 'http://localhost:' + PORT + '/wiki/attachments/' + c[1];
         } else {
             location.href = 'http://localhost:' + PORT + '/wiki/index/' + search.value;
         }
+    });
+    addEvent(search, 'input', function () {
+        if (search.value.length > 0) {
+            deleteSearchButton.classList.add('visible');
+        } else {
+            deleteSearchButton.classList.remove('visible');
+        }
+    });
+    addEvent(deleteSearchButton, 'click', function () {
+        search.value = '';
     });
     addEvent(document, 'keydown', function (e) {
         if (e.ctrlKey && e.shiftKey && e.keyCode === 70) { // Ctrl + Shift + F
@@ -155,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
     addEvent(window, 'scroll', function () {
-        if(scrollObject.y < window.pageYOffset)
+        if (scrollObject.y < window.pageYOffset)
             header.classList.add('hide');
         else
             header.classList.remove('hide');

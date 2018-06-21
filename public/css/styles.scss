@@ -89,6 +89,21 @@ header {
 				&[type=submit] {
 					display: none;
 				}
+				& + span {
+					display: none;
+					position: absolute;
+					right: 25px;
+					&.visible {
+						display: inline;
+					}
+					&:before {
+						font-family: 'Font Awesome 5 Free', sans-serif;
+						font-weight: 900;
+						content: '\f00d';
+						color: #fff;
+						cursor: pointer;
+					}
+				}
 			}
 		}
 		.flex {
