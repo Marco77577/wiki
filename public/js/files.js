@@ -262,6 +262,14 @@ addEventListener('DOMContentLoaded', function () {
     let selectedLast = null;
     $('.file-row').forEach(fileRow => {
         addEvent(fileRow, 'click', select);
+        addEvent(fileRow, 'dblclick', function() {
+            if(fileRow.classList.contains('unused')) {
+                $('.file-row').forEach(fr => fr.classList.remove('active'));
+                $('.file-row.unused').forEach(fr => fr.classList.add('active'))
+                selectedLast = fileRow;
+                updateOptionsPane();
+            }
+        });
     });
     addEvent(document, 'click', function () {
         $('.file-row').forEach(fileRow => fileRow.classList.remove('active'));
@@ -318,5 +326,4 @@ addEventListener('DOMContentLoaded', function () {
     });
 
     applyFilter();
-    //todo add files to menu somehow
 });

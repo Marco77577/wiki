@@ -25,6 +25,7 @@
 		padding: 20px;
 	}
 	.row {
+		position: relative;
 		padding: 10px;
 		border: 1px solid $headingBorderColor;
 		border-top: 0;
@@ -63,6 +64,17 @@
 					margin-right: 5px;
 					display: inline-block;
 					content: '\f1f8';
+				}
+			}
+			a.unused {
+				&:after {
+					position: absolute;
+					font-family: 'Font Awesome 5 Free', sans-serif;
+					font-weight: 900;
+					content: '\f127';
+					top: 2px;
+					margin-left: 10px;
+					color: black;
 				}
 			}
 		}

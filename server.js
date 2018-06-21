@@ -100,6 +100,27 @@ const getEntryList = function (search, callback) {
     });
 };
 
+const getEntryListSync = function (search) {
+    const files = fs.readdirSync('./public/wiki');
+    search = decodeURIComponent(search);
+    const list = [];
+    for (let i = 0, j = files.length; i < j; i++) {
+        if (files[i].split('.').pop() !== 'md') continue;
+        try {
+            const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
+            if (!doesSearchTermMatch(search, file)) continue;
+            list.push({
+                title: file.match(/title: (.+)(?:\r\n|\r|\n)/)[1],
+                tags: file.match(/tags: (.*)(?:\r\n|\r|\n)/)[1],
+                slug: files[i].replace('.md', '')
+            });
+        } catch (err) {
+            //ignore
+        }
+    }
+    return list;
+};
+
 const getFileList = function (search, callback) {
     createDirectory('./public/wiki/files');
     fs.readdir('./public/wiki/files', function (err, files) {
@@ -211,7 +232,7 @@ router.register('/wiki/home', loadIndex);
 router.register('/wiki', loadIndex);
 router.register('/', loadIndex);
 
-router.register('\/wiki\/files\/?(.*)', function (req, res, urlOptions) {
+router.register('\/wiki\/attachments\/?(.*)', function (req, res, urlOptions) {
     loadTemplateAsync('files', function (err, html) {
         if (err) throw err;
 
@@ -220,9 +241,17 @@ router.register('\/wiki\/files\/?(.*)', function (req, res, urlOptions) {
 
         getFileList('', function (files) {
             for (let i = 0, j = files.length; i < j; i++) {
+                //get list of entries that are attaching this file
+                const entries = getEntryListSync('all:' + files[i]);
+
                 const stats = fs.statSync('./public/wiki/files/' + files[i]);
                 totalFileSize += stats.size;
-                content += '<div class="row index-row file-row" id="' + files[i].hashCode() + '"><div class="col-12 col-md-8"><a href="wiki/files/' + files[i] + '" target="_blank">' + files[i] + '</a><div class="option-wrapper"><a class="delete" data-filename="' + files[i] + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>';
+                content += '<div class="row index-row file-row ' + (entries.length === 0 ? 'unused' :
+                                                                    '') + '" id="' + files[i].hashCode() + '" title="' + (entries.length === 0 ?
+                                                                                                                          'This file is not attached to any article. It may be obsolete.' :
+                                                                                                                          '') + '"><div class="col-12 col-md-8"><a href="wiki/files/' + files[i] + '" target="_blank" class="' + (entries.length === 0 ?
+                                                                                                                                                                                                                                  'unused' :
+                                                                                                                                                                                                                                  '') + '">' + files[i] + '</a><div class="option-wrapper"><a class="delete" data-filename="' + files[i] + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>';
             }
 
             html = replaceBlock('content', html, content);
@@ -286,8 +315,12 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 
                 html = replaceBlock('slug', html, urlOptions[1], true);
                 html = replaceBlock('filesize', html, '');
-                html = replaceBlock('attachments', html, attachments.length > 0 ? '<div class="attachments"><h1>Attachments</h1>' + attachments.join('') + '</div>' : '');
-                html = replaceBlock('totalattachmentsize', html, attachments.length > 0 ? '<p>Total attachment size: ' + fileSizeConverter(totalAttachmentSize) + '</p>' : '');
+                html = replaceBlock('attachments', html, attachments.length > 0 ?
+                                                         '<div class="attachments"><h1>Attachments</h1>' + attachments.join('') + '</div>' :
+                                                         '');
+                html = replaceBlock('totalattachmentsize', html, attachments.length > 0 ?
+                                                                 '<p>Total attachment size: ' + fileSizeConverter(totalAttachmentSize) + '</p>' :
+                                                                 '');
 
                 preparePageForDisplay(res, html, pageTitle);
             }
@@ -562,7 +595,7 @@ router.register('\/wiki\/upload\/(.+)', function (req, res, urlOptions) {
         }
         else {
             const stats = fs.statSync('./public/wiki/files/' + fileName);
-            res.write('<div class="row index-row file-row entering" id="' + fileName.hashCode() + '"><div class="col-12 col-md-8"><a href="file:///' + __dirname + '/public/wiki/files/' + fileName + '" target="_blank">' + fileName + '</a><div class="option-wrapper"><a class="delete" data-filename="' + fileName + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + fileName.hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>');
+            res.write('<div class="row index-row file-row entering unused" id="' + fileName.hashCode() + '" title="This file is not attached to any article. It may be obsolete."><div class="col-12 col-md-8"><a href="wiki/files/' + fileName + '" target="_blank" class="unused">' + fileName + '</a><div class="option-wrapper"><a class="delete" data-filename="' + fileName + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + fileName.hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>');
         }
         res.end();
     });

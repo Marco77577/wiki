@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (search.value.length === 0) return;
         let c;
         if((c = /^files?:(.+)/.exec(search.value))) {
-            location.href = 'http://localhost:' + PORT + '/wiki/files/' + c[1];
+            location.href = 'http://localhost:' + PORT + '/wiki/attachments/' + c[1];
         } else {
             location.href = 'http://localhost:' + PORT + '/wiki/index/' + search.value;
         }
