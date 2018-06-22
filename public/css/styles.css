@@ -213,14 +213,6 @@ header {
           margin-right: 5px;
           display: inline-block;
           content: '\f1f8'; }
-      .index .row.index-row a.unused:after {
-        position: absolute;
-        font-family: 'Font Awesome 5 Free', sans-serif;
-        font-weight: 900;
-        content: '\f127';
-        top: 2px;
-        margin-left: 10px;
-        color: black; }
     .index .row:hover, .index .row.active {
       background-color: #f6f8fa; }
       .index .row:hover div:first-of-type .option-wrapper, .index .row.active div:first-of-type .option-wrapper {
@@ -238,6 +230,8 @@ header {
     .index .row:last-of-type {
       border-bottom-left-radius: 3px;
       border-bottom-right-radius: 3px; }
+    .index .row div:first-of-type i {
+      margin-left: 10px; }
     .index .row div:first-of-type .option-wrapper {
       display: none;
       position: absolute;
