@@ -64,42 +64,11 @@
 		text-align: justify;
 	}
 
-	a {
+	a:not(.related) {
 		color: #0366d6;
 		text-decoration: none;
 		&:hover {
 			text-decoration: underline;
-		}
-		&.related {
-			display: block;
-			margin: 15px 0;
-			padding: 0 15px;
-			height: 60px;
-			line-height: 60px;
-			background-color: $titleBackgroundColor;
-			border: 1px solid rgba(0, 0, 0, 0.04);
-			border-radius: 4px;
-			box-shadow: 0 1px 7px rgba(0, 0, 0, .05);
-			color: rgba(0, 0, 0, .84) !important;
-			font-size: 1.31em;
-			font-weight: bold;
-			clear: both;
-			overflow: hidden;
-			@include print {
-				display: none;
-			}
-			&:before {
-				position: relative;
-				bottom: 2px;
-				content: '\f35d';
-				font-family: 'Font Awesome 5 Free', sans-serif;
-				font-weight: 900;
-				margin-right: 15px;
-				font-size: 0.75em;
-			}
-			&:hover {
-				text-decoration: none;
-			}
 		}
 	}
 
@@ -247,25 +216,24 @@
 	}
 }
 
-.attachments {
-	a {
+.attachments a, .related {
+	display: block;
+	margin: 10px 0;
+	padding: 10px;
+	color: #24292e;
+	background-color: $headingBorderColor;
+	border: 1px solid $headingBorderColor;
+	font-size: 16px;
+	border-radius: 3px;
+	text-decoration: none;
+	line-height: 1em;
+	&:hover {
+		color: #fff;
+		background-color: $tagFontColor;
+		border-color: $tagFontColor;
+	}
+	span {
 		display: block;
-		margin: 10px 0;
-		padding: 10px;
-		color: #24292e;
-		background-color: $headingBorderColor;
-		border: 1px solid $headingBorderColor;
-		font-size: 1.6em;
-		border-radius: 3px;
-		text-decoration: none;
-		&:hover {
-			color: #fff;
-			background-color: $tagFontColor;
-			border-color: $tagFontColor;
-		}
-		span {
-			display: block;
-			font-size: 0.75em;
-		}
+		font-size: 0.75em;
 	}
 }

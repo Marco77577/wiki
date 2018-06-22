@@ -126,6 +126,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         $1('header').classList.add('fixed');
+
+        $('.related').forEach(related => {
+            const span = document.createElement('span');
+            span.textContent = 'Related Entry';
+
+            related.appendChild(span);
+        })
     };
 
     addEvent(document, 'keydown', function (e) {

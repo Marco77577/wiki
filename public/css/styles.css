@@ -597,39 +597,11 @@ header {
   font-size: 1.6em;
   line-height: 150%;
   text-align: justify; }
-.content a {
+.content a:not(.related) {
   color: #0366d6;
   text-decoration: none; }
-  .content a:hover {
+  .content a:not(.related):hover {
     text-decoration: underline; }
-  .content a.related {
-    display: block;
-    margin: 15px 0;
-    padding: 0 15px;
-    height: 60px;
-    line-height: 60px;
-    background-color: #fafbfc;
-    border: 1px solid rgba(0, 0, 0, 0.04);
-    border-radius: 4px;
-    box-shadow: 0 1px 7px rgba(0, 0, 0, 0.05);
-    color: rgba(0, 0, 0, 0.84) !important;
-    font-size: 1.31em;
-    font-weight: bold;
-    clear: both;
-    overflow: hidden; }
-    @media print {
-      .content a.related {
-        display: none; } }
-    .content a.related:before {
-      position: relative;
-      bottom: 2px;
-      content: '\f35d';
-      font-family: 'Font Awesome 5 Free', sans-serif;
-      font-weight: 900;
-      margin-right: 15px;
-      font-size: 0.75em; }
-    .content a.related:hover {
-      text-decoration: none; }
 .content .code-container {
   position: relative; }
   .content .code-container:hover .clipboard {
@@ -745,21 +717,22 @@ header {
     border-color: #0366d6; }
   100% {
     border-color: transparent; } }
-.attachments a {
+.attachments a, .related {
   display: block;
   margin: 10px 0;
   padding: 10px;
   color: #24292e;
   background-color: #eaecef;
   border: 1px solid #eaecef;
-  font-size: 1.6em;
+  font-size: 16px;
   border-radius: 3px;
-  text-decoration: none; }
-  .attachments a:hover {
+  text-decoration: none;
+  line-height: 1em; }
+  .attachments a:hover, .related:hover {
     color: #fff;
     background-color: #0366d6;
     border-color: #0366d6; }
-  .attachments a span {
+  .attachments a span, .related span {
     display: block;
     font-size: 0.75em; }
 
