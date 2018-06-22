@@ -23,6 +23,7 @@ function once(seconds, callback) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+    let searchMode = true;
     const deleteButtons = $('.delete');
     const tagsContainer = $1('#tag-cloud-container');
     const tagsHeader = $1('#tag-cloud-header');
@@ -121,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const applyFilter = function () {
         $('.entry-row').forEach(entryRow => {
             entryRow.classList.remove('deleted');
-            if ($1('a', entryRow).innerText.match(new RegExp(this.value, 'i')) === null) {
+            if ($1('a', entryRow).innerText.match(new RegExp(search.value, 'i')) === null) {
                 entryRow.classList.add('deleted');
             }
         });
@@ -160,10 +161,19 @@ document.addEventListener('DOMContentLoaded', function () {
     //navigation functionality
     addEvent(document, 'keydown', function (e) {
         const indexRows = $('.index-row:not(.deleted)');
+        const finalizeArrowNavigation = function () {
+            e.preventDefault();
+            searchMode = false;
+            selectedLast.classList.add('active');
+            scrollIt(selectedLast);
+        };
+
 
         switch (e.keyCode) {
             case 13: // enter
                 if (selectedLast === null) return;
+                if (document.activeElement === search && searchMode) return;
+                e.preventDefault();
                 $1('a', selectedLast).click();
                 break;
             case 27: // escape
@@ -181,9 +191,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     selectedLast = indexRows[indexRows.length - 4];
                 }
 
-                e.preventDefault();
-                selectedLast.classList.add('active');
-                scrollIt(selectedLast);
+                finalizeArrowNavigation();
                 break;
             case 39: // arrow right
             case 40: // arrow down
@@ -196,9 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     selectedLast = indexRows[2];
                 }
 
-                e.preventDefault();
-                selectedLast.classList.add('active');
-                scrollIt(selectedLast);
+                finalizeArrowNavigation();
                 break;
             case 68: // (d)elete
                 if (document.activeElement === search || selectedLast === null) return;
@@ -229,7 +235,10 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     //filter functionality
-    addEvent(search, 'input', applyFilter);
+    addEvent(search, 'input', function () {
+        searchMode = true;
+        applyFilter();
+    });
     addEvent(deleteSearchButton, 'click', applyFilter);
 
     $1('header').classList.add('fixed');
