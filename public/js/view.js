@@ -26,8 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const codeArray = [];
     const editButton = $1('.editbutton');
     const deleteButton = $1('.delete');
-    const content = $1('.content');
-    const originalText = content.innerHTML;
     const searchField = $1('#search');
     const deleteEntry = function () {
         const confirm = window.confirm('Are you sure you want to delete this entry?');
@@ -39,16 +37,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.classList.add('error');
             }
         });
-    };
-    const highlightText = function () {
-        const searchFieldValue = searchField.value;
-        if (searchFieldValue.length <= 3) {
-            content.innerHTML = originalText;
-            prepareView();
-        } else {
-            content.innerHTML = originalText.replace(new RegExp('(' + searchFieldValue + ')', 'gi'), '<span class="search-highlight">$1</span>');
-            prepareView();
-        }
     };
     const showClipBoardToast = function () {
         $1('.toast').classList.add('visible');
@@ -145,7 +133,6 @@ document.addEventListener('DOMContentLoaded', function () {
         switch (e.keyCode) {
             case 27: // Esc
                 searchField.value = '';
-                highlightText();
                 break;
             case 68: //(D)elete
                 deleteEntry();
@@ -157,9 +144,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.print();
                 break;
         }
-    });
-    addEvent(searchField, 'input', function () {
-        highlightText();
     });
     addEvent(deleteButton, 'click', function (e) {
         e.preventDefault();

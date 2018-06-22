@@ -35,7 +35,7 @@ const loadWikiEntryAsync = function (slug, callback) {
 
 const replaceBlock = function (blockName, container, substitute, global) {
 	return global ? container.replace(new RegExp('{% block ' + blockName + ' %}', 'g'), substitute)
-	              : container.replace('{% block ' + blockName + ' %}', substitute);
+		: container.replace('{% block ' + blockName + ' %}', substitute);
 };
 
 const prepareUrls = function (container) {
@@ -146,11 +146,11 @@ const fileSizeConverter = function (size) {
 
 const timeToString = function (time) {
 	return (time.getDate() < 10 ? '0' : '') + time.getDate() + '.' + (time.getMonth() + 1 < 10 ? '0' :
-	                                                                  '') + (time.getMonth() + 1) + '.' + time.getFullYear() + ', ' + (time.getHours() < 10 ?
-	                                                                                                                                   '0' :
-	                                                                                                                                   '') + time.getHours() + ':' + (time.getMinutes() < 10 ?
-	                                                                                                                                                                  '0' :
-	                                                                                                                                                                  '') + time.getMinutes();
+		'') + (time.getMonth() + 1) + '.' + time.getFullYear() + ', ' + (time.getHours() < 10 ?
+		'0' :
+		'') + time.getHours() + ':' + (time.getMinutes() < 10 ?
+		'0' :
+		'') + time.getMinutes();
 };
 
 const loadTagCloud = function (files) {
@@ -164,7 +164,7 @@ const loadTagCloud = function (files) {
 		});
 	});
 	return tags.map(tag => '<a class="tag' + (tag === 'publish' ? ' publish' :
-	                                          '') + '" href="wiki/index/' + tag + '">' + tag + '</a>').join(' ');
+		'') + '" href="wiki/index/' + tag + '">' + tag + '</a>').join(' ');
 };
 
 const emptyDirectory = function (path) {
@@ -215,10 +215,10 @@ const loadIndex = function (req, res, urlOptions) {
 			html = replaceBlock('imagesize', html, fileSizeConverter(imageSize));
 			html = replaceBlock('imagesizeinbytes', html, imageSize);
 			html = replaceBlock('tags', html, (urlOptions[1] !== 'undefined' ?
-			                                   '<a class="tag" href="wiki/index"><i class="fas fa-times"></i></a><a class="tag' + (urlOptions[1] === 'publish' ?
-			                                                                                                                       ' publish' :
-			                                                                                                                       '') + '" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' :
-			                                   ''));
+				'<a class="tag" href="wiki/index"><i class="fas fa-times"></i></a><a class="tag' + (urlOptions[1] === 'publish' ?
+				' publish' :
+				'') + '" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' :
+				''));
 			html = replaceBlock('tagcloud', html, loadTagCloud(tagCloudFiles));
 			html = replaceBlock('content', html, list);
 
@@ -247,11 +247,11 @@ router.register('\/wiki\/attachments\/?(.*)', function (req, res, urlOptions) {
 				const stats = fs.statSync('./public/wiki/files/' + files[i]);
 				totalFileSize += stats.size;
 				content += '<div class="row index-row file-row ' + (entries.length === 0 ? 'unused' :
-				                                                    '') + '" id="' + files[i].hashCode() + '" title="' + (entries.length === 0 ?
-				                                                                                                          'This file is not attached to any article. It may be obsolete.' :
-				                                                                                                          '') + '"><div class="col-12 col-md-8"><a href="wiki/files/' + files[i] + '" target="_blank">' + files[i] + '</a>' + (entries.length === 0 ?
-				                                                                                                                                                                                                                               '<i class="fas fa-unlink"></i>' :
-				                                                                                                                                                                                                                               '') + '<div class="option-wrapper"><a class="delete" data-filename="' + files[i] + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>';
+					'') + '" id="' + files[i].hashCode() + '" title="' + (entries.length === 0 ?
+					'This file is not attached to any article. It may be obsolete.' :
+					'') + '"><div class="col-12 col-md-8"><a href="wiki/files/' + files[i] + '" target="_blank">' + files[i] + '</a>' + (entries.length === 0 ?
+					'<i class="fas fa-unlink"></i>' :
+					'') + '<div class="option-wrapper"><a class="delete" data-filename="' + files[i] + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>';
 			}
 
 			html = replaceBlock('content', html, content);
@@ -290,7 +290,7 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 						if (tagArray[i] === '') continue;
 						tagArray[i] = tagArray[i].toLowerCase();
 						tagArray[i] = '<a class="tag' + (tagArray[i] === 'publish' ? ' publish' :
-						                                 '') + '" href="wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
+							'') + '" href="wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
 					}
 
 					html = replaceBlock('tags', html, tagArray.join(''));
@@ -316,11 +316,11 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 				html = replaceBlock('slug', html, urlOptions[1], true);
 				html = replaceBlock('filesize', html, '');
 				html = replaceBlock('attachments', html, attachments.length > 0 ?
-				                                         '<div class="attachments"><h1>Attachments</h1>' + attachments.join('') + '</div>' :
-				                                         '');
+					'<div class="attachments"><h1>Attachments</h1>' + attachments.join('') + '</div>' :
+					'');
 				html = replaceBlock('totalattachmentsize', html, attachments.length > 0 ?
-				                                                 '<p>Total attachment size: ' + fileSizeConverter(totalAttachmentSize) + '</p>' :
-				                                                 '');
+					'<p>Total attachment size: ' + fileSizeConverter(totalAttachmentSize) + '</p>' :
+					'');
 
 				preparePageForDisplay(res, html, pageTitle);
 			}
@@ -405,7 +405,7 @@ router.register('\/wiki\/save\/(.+?)\/(.+?)\/(.*?)\/(.*?)\/((?:.|\s)+)', functio
 	}
 
 	const saveText = "title: " + urlOptions[1] + "\ntags: " + (urlOptions[4].length > 0 ? urlOptions[4] :
-	                                                           '') + "\n\n" + urlOptions[5];
+		'') + "\n\n" + urlOptions[5];
 	const save = function () {
 		fs.writeFile('./public/wiki/' + urlOptions[2] + '.md', saveText, 'utf8', function (err) {
 			if (err) {
