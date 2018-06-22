@@ -152,6 +152,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let selectedLast = null;
     $('.entry-row').forEach(entryRow => {
         addEvent(entryRow, 'click', select);
+        addEvent(entryRow, 'dblclick', function() {
+            $1('a', entryRow).click();
+        });
     });
     addEvent(document, 'click', function () {
         $('.entry-row').forEach(fileRow => fileRow.classList.remove('active'));
