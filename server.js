@@ -474,7 +474,8 @@ router.register('\/wiki\/delete\/(.+)', function (req, res, urlOptions) {
 	//get content of entry and look for images
 	loadWikiEntryAsync(urlOptions[1], function (err, entry) {
 		if (err) {
-			res.write('Error: Could not load file that needs to be deleted.');
+			console.log('Error: Could not load file that needs to be deleted.');
+			res.write('error');
 		} else {
 			//get local images
 			const images = [];
@@ -487,7 +488,8 @@ router.register('\/wiki\/delete\/(.+)', function (req, res, urlOptions) {
 			//delete entry
 			fs.unlink('./public/wiki/' + urlOptions[1] + '.md', function (err) {
 				if (err) {
-					res.write('Error: Could not delete file.');
+					console.log('Error: Could not delete file.');
+					res.write('error');
 				} else {
 					//check if image is used anywhere else
 					images.forEach(image => {
