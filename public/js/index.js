@@ -210,15 +210,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 finalizeArrowNavigation();
                 break;
             case 68: // (d)elete
-                if (document.activeElement === search || selectedLast === null) return;
+                if ((searchMode && document.activeElement === search) || selectedLast === null) return;
 
+                e.preventDefault();
                 const confirm = window.confirm('Are you sure you want to delete these entries?');
                 if (!confirm) return;
 
                 $('.entry-row.active .delete').forEach(entry => deleteEntry(entry.getAttribute('data-slug')));
                 break;
             case 69: // (e)edit
-                if (document.activeElement === search || selectedLast === null) return;
+                if ((searchMode && document.activeElement === search) || selectedLast === null) return;
+                e.preventDefault();
                 $1('a.edit', selectedLast).click();
                 break;
         }
