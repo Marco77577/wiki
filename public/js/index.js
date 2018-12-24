@@ -223,6 +223,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.preventDefault();
                 $1('a.edit', selectedLast).click();
                 break;
+            case 78: //(n)ew
+                if(e.ctrlKey || e.metaKey) location.href = 'http://localhost:' + PORT + '/wiki/new';
+                break;
         }
     });
 

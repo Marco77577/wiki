@@ -147,6 +147,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			case 69: //(E)dit
 				location.href = 'http://localhost:' + PORT + '/wiki/edit/' + editButton.getAttribute('data-slug');
 				break;
+			case 78: //(N)ew
+				if(e.ctrlKey) location.href = 'http://localhost:' + PORT + '/wiki/new';
+				break;
 			case 80: //(P)rint
 				window.print();
 				break;
