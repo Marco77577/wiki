@@ -1422,6 +1422,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const viewButton = $1('#view-button');
 		const viewMaterialButton = $1('#view-material-button');
 		const buttonWrapper = $1('#button-wrapper');
+		const selectAllButton = $1('.select-all');
 
 		const update = function () {
 			preview.innerHTML = marked(content.value);
@@ -1651,6 +1652,11 @@ document.addEventListener('DOMContentLoaded', function () {
 					deleteButton.classList.add('error');
 				}
 			});
+		});
+		addEvent(selectAllButton, 'click', function(e) {
+			content.setSelectionRange(0, content.value.length);
+			content.focus();
+			e.preventDefault();
 		});
 
 		addEvent(displayActivator, 'mouseover', function () {
