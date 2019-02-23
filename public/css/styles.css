@@ -51,7 +51,8 @@ html, body {
   margin: 0;
   padding: 0;
   font-family: 'Work Sans', 'Arial', sans-serif;
-  font-size: 10px; }
+  font-size: 10px;
+  overflow-x: hidden; }
 
 @media print {
   @page {
@@ -671,24 +672,28 @@ header {
     line-height: 150%; }
     .content ul li p, .content ol li p {
       font-size: 1em; }
-.content img {
-  position: relative;
-  max-width: 100%;
-  width: auto;
-  left: 0;
-  float: left;
-  margin-right: 25px;
-  margin-bottom: 15px;
-  cursor: zoom-in;
-  transition: max-width 0.5s, left 0.5s;
-  -webkit-transition: max-width 0.5s, left 0.5s;
-  -moz-transition: max-width 0.5s, left 0.5s;
-  -o-transition: max-width 0.5s, left 0.5s;
-  -ms-transition: max-width 0.5s, left 0.5s; }
-  .content img.zoom {
-    z-index: 1;
-    max-width: 80vw;
-    cursor: zoom-out; }
+.content a.image-link {
+  display: block;
+  text-align: center;
+  cursor: auto; }
+  .content a.image-link img {
+    position: relative;
+    max-width: 100%;
+    width: auto;
+    left: 0;
+    margin-right: 25px;
+    margin-bottom: 15px;
+    cursor: zoom-in;
+    transition: max-width 0.5s, left 0.5s;
+    -webkit-transition: max-width 0.5s, left 0.5s;
+    -moz-transition: max-width 0.5s, left 0.5s;
+    -o-transition: max-width 0.5s, left 0.5s;
+    -ms-transition: max-width 0.5s, left 0.5s; }
+    .content a.image-link img.zoom {
+      z-index: 1;
+      max-width: 80vw;
+      cursor: zoom-out;
+      outline: 20000px solid rgba(0, 0, 0, 0.9); }
 .content .iframe-wrapper {
   text-align: center;
   background-color: #000; }

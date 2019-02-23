@@ -162,20 +162,25 @@
 		}
 	}
 
-	img {
-		position: relative;
-		max-width: 100%;
-		width: auto;
-		left: 0;
-		float: left;
-		margin-right: 25px;
-		margin-bottom: 15px;
-		cursor: zoom-in;
-		@include prefix(transition, (max-width 0.5s, left 0.5s));
-		&.zoom {
-			z-index: 1;
-			max-width: 80vw;
-			cursor: zoom-out;
+	a.image-link {
+		display: block;
+		text-align: center;
+		cursor: auto;
+		img {
+			position: relative;
+			max-width: 100%;
+			width: auto;
+			left: 0;
+			margin-right: 25px;
+			margin-bottom: 15px;
+			cursor: zoom-in;
+			@include prefix(transition, (max-width 0.5s, left 0.5s));
+			&.zoom {
+				z-index: 1;
+				max-width: 80vw;
+				cursor: zoom-out;
+				outline: 20000px solid rgba(0, 0, 0, 0.9);
+			}
 		}
 	}
 

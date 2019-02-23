@@ -82,8 +82,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		$('a img').forEach(function (element) {
+			element.parentNode.classList.add('image-link');
 			addEvent(element, 'click', function (e) {
 				e.preventDefault();
+				e.stopPropagation();
 				if (element.classList.contains('zoom')) {
 					element.classList.remove('zoom');
 					element.style.left = 0;
@@ -99,6 +101,10 @@ document.addEventListener('DOMContentLoaded', function () {
 						element.style.left = (window.innerWidth - rect.width) / 2 - (rect.left + document.body.scrollLeft) + 'px';
 					}
 				}
+			});
+
+			addEvent(element.parentNode, 'click', function(e) {
+				e.preventDefault();
 			});
 		});
 
@@ -135,11 +141,22 @@ document.addEventListener('DOMContentLoaded', function () {
 		})
 	};
 
+	addEvent(document, 'click', function (e) {
+		$('a img').forEach(function (element) {
+			element.classList.remove('zoom');
+			element.style.left = 0;
+		});
+	});
+
 	addEvent(document, 'keydown', function (e) {
 		if (searchField === document.activeElement && e.keyCode !== 27) return;
 		switch (e.keyCode) {
 			case 27: // Esc
 				searchField.value = '';
+				$('a img').forEach(function (element) {
+					element.classList.remove('zoom');
+					element.style.left = 0;
+				});
 				break;
 			case 68: //(D)elete
 				deleteEntry();

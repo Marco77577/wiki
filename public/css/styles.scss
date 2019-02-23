@@ -9,6 +9,7 @@ html, body {
 	padding: 0;
 	font-family: 'Work Sans', 'Arial', sans-serif;
 	font-size: 10px;
+	overflow-x: hidden;
 }
 
 @include print { //prevents automatic margins in Chrome
