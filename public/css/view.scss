@@ -13,13 +13,6 @@
 		&:hover {
 			background-color: $tagHoverBackgroundColor;
 		}
-		&.publish {
-			background-color: #fff8f1;
-			color: #d66603;;
-			&:hover {
-				background-color: #ffecdf;
-			}
-		}
 	}
 }
 
@@ -67,8 +60,14 @@
 	a:not(.related) {
 		color: #0366d6;
 		text-decoration: none;
+
 		&:hover {
 			text-decoration: underline;
+		}
+
+		&.not-available {
+			color: #d66603;
+			text-decoration: underline dashed #d66603;
 		}
 	}
 

@@ -568,11 +568,6 @@ header {
   white-space: nowrap; }
   .tags a:hover {
     background-color: #dfecff; }
-  .tags a.publish {
-    background-color: #fff8f1;
-    color: #d66603; }
-    .tags a.publish:hover {
-      background-color: #ffecdf; }
 
 .content h1 {
   font-size: 3.2em;
@@ -603,6 +598,9 @@ header {
   text-decoration: none; }
   .content a:not(.related):hover {
     text-decoration: underline; }
+  .content a:not(.related).not-available {
+    color: #d66603;
+    text-decoration: underline dashed #d66603; }
 .content .code-container {
   position: relative; }
   .content .code-container:hover .clipboard {

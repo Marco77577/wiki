@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 
-			addEvent(element.parentNode, 'click', function(e) {
+			addEvent(element.parentNode, 'click', function (e) {
 				e.preventDefault();
 			});
 		});
@@ -130,6 +130,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		$('img[src^="wiki"]').forEach(element => {
 			element.setAttribute('src', '/' + element.href);
+		});
+
+		$('a[href^="/wiki/view"]').forEach(element => {
+			getAjax('/wiki/checkslug/' + element.getAttribute('href').replace('/wiki/view/', ''), function (result) {
+				if(result === 'free') {
+					element.classList.add('not-available');
+				}
+			});
 		});
 
 		$('code').forEach(code => {
