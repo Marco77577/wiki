@@ -154,8 +154,14 @@ document.addEventListener('DOMContentLoaded', function () {
         let c;
         if ((c = /^files?:(.+)/.exec(search.value))) {
             location.href = '/wiki/attachments/' + c[1];
+        } else if ((c = /^entries:(.+)/.exec(search.value))) {
+            location.href = '/wiki/index/' + c[1];
         } else {
-            location.href = '/wiki/index/' + search.value;
+            if(location.pathname.startsWith("/wiki/attachments")) {
+	            location.href = '/wiki/attachments/' + search.value;
+            } else {
+	            location.href = '/wiki/index/' + search.value;
+            }
         }
     });
     addEvent(search, 'input', function () {
