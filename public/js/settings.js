@@ -4,7 +4,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const name = $1('#wikiname');
     const saveButton = $1('#save-button');
     const updateButton = $1('#update-button');
-    const publishButton = $1('#publish-button');
 
     const setDirty = function (d) {
         dirty = d;
@@ -61,22 +60,6 @@ document.addEventListener('DOMContentLoaded', function () {
         updateButton.classList.add('saving');
         getAjax('/wiki/update', function () {
             updateButton.classList.remove('saving');
-        });
-    });
-    addEvent(publishButton, 'click', function (e) {
-        e.preventDefault();
-        publishButton.classList.remove('error');
-        publishButton.classList.add('saving');
-        getAjax('/wiki/publish', function (result) {
-            publishButton.classList.remove('saving');
-            if(result !== 'success') {
-                publishButton.classList.add('error');
-            } else {
-                $1('.toast').classList.add('visible');
-                setTimeout(function () {
-                    $1('.toast').classList.remove('visible');
-                }, 1000);
-            }
         });
     });
 

@@ -158,15 +158,7 @@ const loadTagCloud = function (files) {
 			if (!tags.includes(tag)) tags.push(tag);
 		});
 	});
-	return tags.map(tag => '<a class="tag' + (tag === 'publish' ? ' publish' :
-		'') + '" href="/wiki/index/' + tag + '">' + tag + '</a>').join(' ');
-};
-
-const emptyDirectory = function (path) {
-	fs.readdir(path, (err, files) => {
-		if (err) throw err;
-		files.forEach(file => fs.unlink(path + '/' + file));
-	});
+	return tags.map(tag => '<a class="tag" href="/wiki/index/' + tag + '">' + tag + '</a>').join(' ');
 };
 
 const createDirectory = function (path) {
@@ -210,9 +202,7 @@ const loadIndex = function (req, res, urlOptions) {
 			html = replaceBlock('imagesize', html, fileSizeConverter(imageSize));
 			html = replaceBlock('imagesizeinbytes', html, imageSize);
 			html = replaceBlock('tags', html, (urlOptions[1] !== 'undefined' ?
-				'<a class="tag" href="/wiki/index"><i class="fas fa-times"></i></a><a class="tag' + (urlOptions[1] === 'publish' ?
-				' publish' :
-				'') + '" href="/wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' :
+				'<a class="tag" href="/wiki/index"><i class="fas fa-times"></i></a><a class="tag" href="/wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' :
 				''));
 			html = replaceBlock('tagcloud', html, loadTagCloud(tagCloudFiles));
 			html = replaceBlock('content', html, list);
@@ -284,8 +274,7 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 					for (let i = 0, j = tagArray.length; i < j; i++) {
 						if (tagArray[i] === '') continue;
 						tagArray[i] = tagArray[i].toLowerCase();
-						tagArray[i] = '<a class="tag' + (tagArray[i] === 'publish' ? ' publish' :
-							'') + '" href="/wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
+						tagArray[i] = '<a class="tag" href="/wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
 					}
 
 					html = replaceBlock('tags', html, tagArray.join(''));
@@ -620,59 +609,6 @@ router.register('\/wiki\/deleteFile\/(.+)', function (req, res, urlOptions) {
 		} else {
 			res.write('success');
 		}
-		res.end();
-	});
-});
-
-router.register('/wiki/publish', function (req, res) {
-	res.writeHead(200, {'Content-Type': 'text/plain'});
-	createDirectory('./public/publish');
-	emptyDirectory('./public/publish');
-	fs.readdir('./public/wiki', function (err, files) {
-		if (err) throw err;
-		const slugsToBePublished = [];
-		for (let i = 0, j = files.length; i < j; i++) {
-			if (files[i].split('.').pop() !== 'md') continue;
-			try {
-				const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
-				if (!file.match(/tags: (.*)(?:\r\n|\r|\n)/)[1].toLowerCase().replace(/,\s+/g, ',').split(',').includes('publish')) continue;
-				slugsToBePublished.push({path: '/wiki/view/' + files[i].replace('.md', ''), slug: files[i].replace('.md', '')});
-			} catch (err) {
-				//ignore
-			}
-		}
-		slugsToBePublished.push({path: '/wiki/index/publish', slug: 'publishIndex'});
-		slugsToBePublished.forEach(file => {
-			http.get({host: 'localhost', port: config.PORT, path: file.path}, function (http_res) {
-				let data = '';
-				http_res.on('data', chunk => data += chunk);
-				http_res.on('end', () => {
-					//prepare for online use
-					data = data.replace(/http:\/\/localhost:3000\//g, '');
-					data = data.replace(/<a class="button editbutton" href="\/wiki\/edit\/.+" title="E">Edit<\/a>/g, '');
-					data = data.replace(/<a class="button delete" href="#" data-slug="k-test">Delete<\/a>/g, '');
-					data = data.replace(/<a href="\/wiki\/new" class=".+?">.+?<\/a>/g, '');
-					data = data.replace(/<a href="\/wiki\/settings" class=".+?">.+?<\/a>/g, '');
-					// data = data.replace(/<form id="search-form" class="flex">[\s\S]+<\/form>/g, '');
-
-					data = data.replace(/<input type="text" placeholder="Search \.\.\." id="search" title="Ctrl\+F"\/>/g, '<input type="text" placeholder="Search ..." id="search" title="Ctrl+F" style="display: none;"/>');
-					data = data.replace(/href="\/wiki\/index\/?.*?"/g, 'href="?slug=publishIndex"');
-					data = data.replace(/<div class="option-wrapper">.+?<\/div>/g, '');
-					data = data.replace(/href="\/wiki\/view\/(.+?)"/g, 'href="?slug=$1"');
-
-					fs.writeFile('./public/publish/' + file.slug + '.php', data, 'utf8', function (err) {
-						if (err) {
-							res.write('error');
-							res.end();
-						}
-					});
-				});
-			}).on('error', function () {
-				res.write('error');
-				res.end();
-			});
-		});
-		res.write('success');
 		res.end();
 	});
 });

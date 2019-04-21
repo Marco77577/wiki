@@ -23,7 +23,6 @@
 			<div class="col-12 col-md-4">
 				<a href="#" class="button save success" id="save-button" title="Ctrl+S">Saved</a>
 				<a href="#" class="button update" id="update-button">Update Wiki</a>
-				<a href="#" class="button publish" id="publish-button">Publish Wiki</a>
 			</div>
 		</div>
 	</div>
@@ -43,46 +42,6 @@
 					<li><code>tags:searchterm</code> Search <i>only</i> in tags.</li>
 					<li><code>file/files:searchterm</code> Search for files.</li>
 				</ul>
-				<h1>Publish a Wiki</h1>
-				<p>All wiki entries with tag <code>publish</code> are going to be converted to HTML and stored in <code>/public/publish</code>.</p>
-				<p>In order to publish the wiki online, create the following folder structure on your server:</p>
-				<ul>
-					<li>wiki
-						<ul>
-							<li>css
-								<ul>
-									<li>bootstrap-grid.min.css</li>
-									<li>prism.css</li>
-									<li>styles.css</li>
-								</ul>
-							</li>
-							<li>img
-								<ul>
-									<li>favicon.ico</li>
-								</ul>
-							</li>
-							<li>js
-								<ul>
-									<li>functions.js</li>
-									<li>index.js</li>
-									<li>marked.min.js</li>
-									<li>prism.js</li>
-									<li>view.js</li>
-								</ul>
-							</li>
-							<li>publish
-								<ul>
-									<li><em>all published files that are generated when clicking "Publish Wiki"</em></li>
-								</ul>
-							</li>
-							<li>index.php</li>
-						</ul>
-					</li>
-				</ul>
-				<p>Where <em>index.php</em> contains the following code:</p>
-				<pre class="language-php"><code class="language-php">&lt;?php
-require('./publish/' . $_GET['slug'] . '.php');
-?&gt;</code></pre>
 			</div>
 		</div>
 	</div>
