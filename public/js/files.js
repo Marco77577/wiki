@@ -58,14 +58,14 @@ addEventListener('DOMContentLoaded', function () {
 		//send chunks to server
 		let numberOfChunksArrived = 0;
 		for (let k = 0, l = chunks.length; k < l; k++) {
-			getAjax('http://localhost:' + PORT + '/wiki/uploadChunk/' + encodeURIComponent(files[i]['name']) + '/' + chunks[k] + '/' + k, function (result) {
+			getAjax('/wiki/uploadChunk/' + encodeURIComponent(files[i]['name']) + '/' + chunks[k] + '/' + k, function (result) {
 				if (result.split(':')[0] === 'error') console.log('Could not upload chunk ' + result.split(':')[1] + '.');
 				if (++numberOfChunksArrived === l) {
 					//updating user interface
 					$1('.entry-title span.icon').innerText = 'Saving';
 
 					//save to disk
-					getAjax('http://localhost:' + PORT + '/wiki/upload/' + encodeURIComponent(files[i]['name']), function (result) {
+					getAjax('/wiki/upload/' + encodeURIComponent(files[i]['name']), function (result) {
 						if (result === 'error') console.log('Could not save file.');
 
 						//reset user interface
@@ -98,7 +98,7 @@ addEventListener('DOMContentLoaded', function () {
 		}
 	};
 	const deleteFile = function (fileName) {
-		getAjax('http://localhost:' + PORT + '/wiki/deleteFile/' + encodeURIComponent(fileName), function (result) {
+		getAjax('/wiki/deleteFile/' + encodeURIComponent(fileName), function (result) {
 			if (result === 'error') {
 				console.log('Could not delete file.');
 				return;

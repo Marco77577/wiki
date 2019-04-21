@@ -1,7 +1,7 @@
 <html>
 <head>
 	{% block head %}
-	<script src="js/edit.js"></script>
+	<script src="/js/edit.js"></script>
 </head>
 <body>
 {% block header %}
@@ -29,7 +29,7 @@
 			<div class="col-12 col-md-4">
 				<a href="#" class="button save success" id="save-button" title="Ctrl+S">Saved</a>
 				<a href="#" class="button delete" id="delete-button">Delete</a>
-				<a href="wiki/view/{% block slug %}" class="button view" id="view-button">View</a>
+				<a href="/wiki/view/{% block slug %}" class="button view" id="view-button">View</a>
 			</div>
 		</div>
 	</div>
@@ -42,7 +42,7 @@
 					<div id="button-wrapper"></div>
 					<nav>
 						<a class="select-all" href="#" title="Select All"></a>
-						<a class="view" href="wiki/view/{% block slug %}" title="View" id="view-material-button"></a>
+						<a class="view" href="/wiki/view/{% block slug %}" title="View" id="view-material-button"></a>
 					</nav>
 					<label for="content" class="collapse">Content</label>
 					<textarea id="content" tabindex="4">{% block content %}</textarea>

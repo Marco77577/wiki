@@ -560,7 +560,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						if (wizardObject.selected === null) return false;
 
 						//apply wizard
-						const text = '<a class="related" href="wiki/view/' + wizardObject.selected.getAttribute('data-slug') + '">' + wizardObject.selected.getAttribute('data-title') + '</a>';
+						const text = '<a class="related" href="/wiki/view/' + wizardObject.selected.getAttribute('data-slug') + '">' + wizardObject.selected.getAttribute('data-title') + '</a>';
 						const calculatedEnd = wizardObject.start + text.length;
 						content.value = content.value.slice(0, wizardObject.start) + text + content.value.slice(wizardObject.start);
 
@@ -588,7 +588,7 @@ document.addEventListener('DOMContentLoaded', function () {
 								{
 									eventName: 'input',
 									action: function () {
-										getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent($1('#related-search').value), function (result) {
+										getAjax('/wiki/entries/' + encodeURIComponent($1('#related-search').value), function (result) {
 											//define user interface handles
 											const relatedSearchWrapper = $1('#related-search-wrapper');
 
@@ -860,7 +860,7 @@ document.addEventListener('DOMContentLoaded', function () {
 														imageDeleteButton.classList.remove('visible');
 
 														//download image
-														getAjax('http://localhost:' + PORT + '/wiki/download/' + encodeURIComponent(imageUrl.value) + '/' + imageTimestamp.value + '/' + imageQuality.value, function (result) {
+														getAjax('/wiki/download/' + encodeURIComponent(imageUrl.value) + '/' + imageTimestamp.value + '/' + imageQuality.value, function (result) {
 															//update user interface
 															imageDownloadButton.classList.remove('downloading');
 															imageDownloadButton.innerText = "Save Image Locally";
@@ -928,7 +928,7 @@ document.addEventListener('DOMContentLoaded', function () {
 										imageDeleteButton.classList.add('deleting');
 
 										//delete image
-										getAjax('http://localhost:' + PORT + '/wiki/deleteImage/' + imageTimestamp.value, function (result) {
+										getAjax('/wiki/deleteImage/' + imageTimestamp.value, function (result) {
 											//update user interface
 											imageDeleteButton.classList.remove('deleting');
 											if (result === 'error') {
@@ -971,7 +971,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						//validate and prepare input
 						if (wizardObject.selected !== null) {
 							text = '[' + (linkText.value.length <= 0 ? wizardObject.selected.getAttribute('data-title') : linkText.value);
-							link = '](wiki/view/' + wizardObject.selected.getAttribute('data-slug') + ')';
+							link = '](/wiki/view/' + wizardObject.selected.getAttribute('data-slug') + ')';
 						} else {
 							if (!wizardObject.functions.validateNotEmpty(linkText)) return false;
 							if (!wizardObject.functions.validateNotEmpty(linkUrl)) return false;
@@ -1042,7 +1042,7 @@ document.addEventListener('DOMContentLoaded', function () {
 								{
 									eventName: 'input',
 									action: function () {
-										getAjax('http://localhost:' + PORT + '/wiki/entries/' + encodeURIComponent($1('#link-search').value), function (result) {
+										getAjax('/wiki/entries/' + encodeURIComponent($1('#link-search').value), function (result) {
 											//define user interface handles
 											const linkSearchWrapper = $1('#link-search-wrapper');
 
@@ -1357,7 +1357,7 @@ document.addEventListener('DOMContentLoaded', function () {
 								{
 									eventName: 'input',
 									action: function () {
-										getAjax('http://localhost:' + PORT + '/wiki/filelist/' + encodeURIComponent($1('#file-search').value), function (files) {
+										getAjax('/wiki/filelist/' + encodeURIComponent($1('#file-search').value), function (files) {
 											//define user interface handles
 											const fileSearchWrapper = $1('#file-search-wrapper');
 
@@ -1499,7 +1499,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (isOffScreen(cursor)) debounce(scrollIt(cursor), 200);
 		};
 		const checkSlug = function (callback) {
-			getAjax('http://localhost:' + PORT + '/wiki/checkslug/' + slug.value, function (result) {
+			getAjax('/wiki/checkslug/' + slug.value, function (result) {
 				callback(result);
 			});
 		};
@@ -1520,7 +1520,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		};
 		const save = function (callback) {
-			getAjax('http://localhost:' + PORT + '/wiki/save/' + encodeURIComponent(title.value) + '/' + encodeURIComponent(slug.value) + '/' + encodeURIComponent(latestSaveSlug) + '/' + encodeURIComponent(tags.value) + '/' + encodeURIComponent(content.value), function (result) {
+			getAjax('/wiki/save/' + encodeURIComponent(title.value) + '/' + encodeURIComponent(slug.value) + '/' + encodeURIComponent(latestSaveSlug) + '/' + encodeURIComponent(tags.value) + '/' + encodeURIComponent(content.value), function (result) {
 				callback(result);
 			});
 		};
@@ -1645,9 +1645,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			e.preventDefault();
 			const confirm = window.confirm('Are you sure you want to delete this entry?');
 			if (!confirm) return;
-			getAjax('http://localhost:' + PORT + '/wiki/delete/' + latestSaveSlug, function (result) {
+			getAjax('/wiki/delete/' + latestSaveSlug, function (result) {
 				if (result === 'success') {
-					location.href = 'http://localhost:' + PORT + '/wiki/index';
+					location.href = '/wiki/index';
 				} else {
 					deleteButton.classList.add('error');
 				}

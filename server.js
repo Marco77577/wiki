@@ -38,10 +38,6 @@ const replaceBlock = function (blockName, container, substitute, global) {
 		: container.replace('{% block ' + blockName + ' %}', substitute);
 };
 
-const prepareUrls = function (container) {
-	return container.replace(/(href|src)="(?!http|mailto:|tel:|file:|\/wiki\/files)(.+?)"/g, '$1="http://localhost:' + config.PORT + '/$2"');
-};
-
 const loadEnvVarTemplate = function () {
 	return '<script>const PORT = ' + config.PORT + '; const WIKI_NAME = \'' + config.WIKI_NAME + '\';</script>';
 };
@@ -53,7 +49,6 @@ const preparePageForDisplay = function (res, html, pageTitle, defaultSearch = ''
 	html = replaceBlock('envvars', html, loadEnvVarTemplate());
 	html = replaceBlock('header', html, loadTemplateSync('header'));
 	html = replaceBlock('defaultsearch', html, defaultSearch);
-	html = prepareUrls(html);
 	res.writeHead(200, {'Content-Type': 'text/html'});
 	res.write(html);
 	res.end();
@@ -164,7 +159,7 @@ const loadTagCloud = function (files) {
 		});
 	});
 	return tags.map(tag => '<a class="tag' + (tag === 'publish' ? ' publish' :
-		'') + '" href="wiki/index/' + tag + '">' + tag + '</a>').join(' ');
+		'') + '" href="/wiki/index/' + tag + '">' + tag + '</a>').join(' ');
 };
 
 const emptyDirectory = function (path) {
@@ -200,7 +195,7 @@ const loadIndex = function (req, res, urlOptions) {
 					tagCloudFiles.push(files[i]);
 					const stats = fs.statSync('./public/wiki/' + files[i]);
 					entrySize += stats.size;
-					list += '<div class="row index-row entry-row" id="' + files[i].replace('.md', '').hashCode() + '"><div class="col-12 col-md-8"><a href="wiki/view/' + files[i].replace('.md', '') + '">' + file.replace(/title: (.+)(?:.|\s)*/, '$1') + '</a><div class="option-wrapper"><a href="wiki/edit/' + files[i].replace('.md', '') + '" class="edit">Edit</a><a href="#" class="delete" data-slug="' + files[i].replace('.md', '') + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].replace('.md', '').hashCode() + '" data-size="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2" onclick="location.href=\'/wiki/view/' + files[i].replace('.md', '') + '\'">' + timeToString(stats.mtime) + '</div></div>';
+					list += '<div class="row index-row entry-row" id="' + files[i].replace('.md', '').hashCode() + '"><div class="col-12 col-md-8"><a href="/wiki/view/' + files[i].replace('.md', '') + '">' + file.replace(/title: (.+)(?:.|\s)*/, '$1') + '</a><div class="option-wrapper"><a href="/wiki/edit/' + files[i].replace('.md', '') + '" class="edit">Edit</a><a href="#" class="delete" data-slug="' + files[i].replace('.md', '') + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].replace('.md', '').hashCode() + '" data-size="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2" onclick="location.href=\'/wiki/view/' + files[i].replace('.md', '') + '\'">' + timeToString(stats.mtime) + '</div></div>';
 				} catch (ex) {
 					//ignore
 				}
@@ -215,9 +210,9 @@ const loadIndex = function (req, res, urlOptions) {
 			html = replaceBlock('imagesize', html, fileSizeConverter(imageSize));
 			html = replaceBlock('imagesizeinbytes', html, imageSize);
 			html = replaceBlock('tags', html, (urlOptions[1] !== 'undefined' ?
-				'<a class="tag" href="wiki/index"><i class="fas fa-times"></i></a><a class="tag' + (urlOptions[1] === 'publish' ?
+				'<a class="tag" href="/wiki/index"><i class="fas fa-times"></i></a><a class="tag' + (urlOptions[1] === 'publish' ?
 				' publish' :
-				'') + '" href="wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' :
+				'') + '" href="/wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' :
 				''));
 			html = replaceBlock('tagcloud', html, loadTagCloud(tagCloudFiles));
 			html = replaceBlock('content', html, list);
@@ -249,7 +244,7 @@ router.register('\/wiki\/attachments\/?(.*)', function (req, res, urlOptions) {
 				content += '<div class="row index-row file-row ' + (entries.length === 0 ? 'unused' :
 					'') + '" id="' + files[i].hashCode() + '" title="' + (entries.length === 0 ?
 					'This file is not attached to any article. It may be obsolete.' :
-					'') + '"><div class="col-12 col-md-8"><a href="wiki/files/' + files[i] + '" target="_blank">' + files[i] + '</a>' + (entries.length === 0 ?
+					'') + '"><div class="col-12 col-md-8"><a href="/wiki/files/' + files[i] + '" target="_blank">' + files[i] + '</a>' + (entries.length === 0 ?
 					'<i class="fas fa-unlink"></i>' :
 					'') + '<div class="option-wrapper"><a class="delete" data-filename="' + files[i] + '">Delete</a></div></div><div class="col-12 col-md-2" id="_filesize' + files[i].hashCode() + '" data-filesize="' + stats.size + '">' + fileSizeConverter(stats.size) + '</div><div class="col-12 col-md-2">' + timeToString(stats.mtime) + '</div></div>';
 			}
@@ -290,7 +285,7 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 						if (tagArray[i] === '') continue;
 						tagArray[i] = tagArray[i].toLowerCase();
 						tagArray[i] = '<a class="tag' + (tagArray[i] === 'publish' ? ' publish' :
-							'') + '" href="wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
+							'') + '" href="/wiki/index/' + tagArray[i] + '">' + tagArray[i] + '</a>';
 					}
 
 					html = replaceBlock('tags', html, tagArray.join(''));
@@ -299,13 +294,13 @@ router.register('\/wiki\/view\/(.+)', function (req, res, urlOptions) {
 
 				//extract attachments
 				const attachments = [];
-				const attachmentPattern = /<a href="\/wiki\/files\/.+?>(.+?)<\/a>/g;
+				const attachmentPattern = /<a href="\/?wiki\/files\/.+?>(.+?)<\/a>/g;
 				let totalAttachmentSize = 0;
 				let match;
 				while ((match = attachmentPattern.exec(wikiEntry)) !== null) {
 					const size = fs.statSync('./public/wiki/files/' + match[1]).size;
 					totalAttachmentSize += size;
-					attachments.push('<a href="wiki/files/' + match[1] + '" target="_blank">' + match[1] + ' <span>File size: ' + fileSizeConverter(size) + '</span></a>');
+					attachments.push('<a href="/wiki/files/' + match[1] + '" target="_blank">' + match[1] + ' <span>File size: ' + fileSizeConverter(size) + '</span></a>');
 				}
 
 				//fill in data
@@ -654,16 +649,16 @@ router.register('/wiki/publish', function (req, res) {
 				http_res.on('end', () => {
 					//prepare for online use
 					data = data.replace(/http:\/\/localhost:3000\//g, '');
-					data = data.replace(/<a class="button editbutton" href="wiki\/edit\/.+" title="E">Edit<\/a>/g, '');
+					data = data.replace(/<a class="button editbutton" href="\/wiki\/edit\/.+" title="E">Edit<\/a>/g, '');
 					data = data.replace(/<a class="button delete" href="#" data-slug="k-test">Delete<\/a>/g, '');
-					data = data.replace(/<a href="wiki\/new" class=".+?">.+?<\/a>/g, '');
-					data = data.replace(/<a href="wiki\/settings" class=".+?">.+?<\/a>/g, '');
+					data = data.replace(/<a href="\/wiki\/new" class=".+?">.+?<\/a>/g, '');
+					data = data.replace(/<a href="\/wiki\/settings" class=".+?">.+?<\/a>/g, '');
 					// data = data.replace(/<form id="search-form" class="flex">[\s\S]+<\/form>/g, '');
 
 					data = data.replace(/<input type="text" placeholder="Search \.\.\." id="search" title="Ctrl\+F"\/>/g, '<input type="text" placeholder="Search ..." id="search" title="Ctrl+F" style="display: none;"/>');
-					data = data.replace(/href="wiki\/index\/?.*?"/g, 'href="?slug=publishIndex"');
+					data = data.replace(/href="\/wiki\/index\/?.*?"/g, 'href="?slug=publishIndex"');
 					data = data.replace(/<div class="option-wrapper">.+?<\/div>/g, '');
-					data = data.replace(/href="wiki\/view\/(.+?)"/g, 'href="?slug=$1"');
+					data = data.replace(/href="\/wiki\/view\/(.+?)"/g, 'href="?slug=$1"');
 
 					fs.writeFile('./public/publish/' + file.slug + '.php', data, 'utf8', function (err) {
 						if (err) {

@@ -30,11 +30,11 @@ document.addEventListener('DOMContentLoaded', function () {
 	const deleteEntry = function () {
 		const confirm = window.confirm('Are you sure you want to delete this entry?');
 		if (!confirm) return;
-		getAjax('http://localhost:' + PORT + '/wiki/delete/' + editButton.getAttribute('data-slug'), function (result) {
+		getAjax('/wiki/delete/' + editButton.getAttribute('data-slug'), function (result) {
 			if (result === 'error') {
 				this.classList.add('error');
 			} else {
-				location.href = 'http://localhost:' + PORT + '/wiki/index';
+				location.href = '/wiki/index';
 			}
 		});
 	};
@@ -124,6 +124,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			video.parentNode.removeChild(video);
 		});
 
+		$('a[href^="wiki"]').forEach(element => {
+			element.setAttribute('href', '/' + element.getAttribute('href'));
+		});
+
+		$('img[src^="wiki"]').forEach(element => {
+			element.setAttribute('src', '/' + element.href);
+		});
+
 		$('code').forEach(code => {
 			addEvent(code, 'click', function () {
 				copyTextToClipboard(code.innerText);
@@ -162,10 +170,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				deleteEntry();
 				break;
 			case 69: //(E)dit
-				location.href = 'http://localhost:' + PORT + '/wiki/edit/' + editButton.getAttribute('data-slug');
+				location.href = '/wiki/edit/' + editButton.getAttribute('data-slug');
 				break;
 			case 78: //(N)ew
-				if(e.ctrlKey) location.href = 'http://localhost:' + PORT + '/wiki/new';
+				location.href = '/wiki/new';
 				break;
 			case 80: //(P)rint
 				window.print();

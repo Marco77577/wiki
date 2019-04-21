@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
         name.classList.remove('error');
 
         saveButton.classList.add('saving');
-        getAjax('http://localhost:' + PORT + '/wiki/savesettings/' + port.value + '/' + encodeURIComponent(name.value), function (result) {
+        getAjax('/wiki/savesettings/' + port.value + '/' + encodeURIComponent(name.value), function (result) {
             saveButton.classList.remove('saving');
             if (result === 'success') {
                 setDirty(false);
@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function () {
     addEvent(updateButton, 'click', function (e) {
         e.preventDefault();
         updateButton.classList.add('saving');
-        getAjax('http://localhost:' + PORT + '/wiki/update', function () {
+        getAjax('/wiki/update', function () {
             updateButton.classList.remove('saving');
         });
     });
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
         e.preventDefault();
         publishButton.classList.remove('error');
         publishButton.classList.add('saving');
-        getAjax('http://localhost:' + PORT + '/wiki/publish', function (result) {
+        getAjax('/wiki/publish', function (result) {
             publishButton.classList.remove('saving');
             if(result !== 'success') {
                 publishButton.classList.add('error');

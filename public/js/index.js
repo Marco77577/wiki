@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     };
     const deleteEntry = function (slug) {
-        getAjax('http://localhost:' + PORT + '/wiki/delete/' + slug, function (result) {
+        getAjax('/wiki/delete/' + slug, function (result) {
             if (result === 'error') {
                 console.log('Could not delete entry.');
                 return;
@@ -224,7 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $1('a.edit', selectedLast).click();
                 break;
             case 78: //(n)ew
-                if(e.ctrlKey || e.metaKey) location.href = 'http://localhost:' + PORT + '/wiki/new';
+                location.href = '/wiki/new';
                 break;
         }
     });
