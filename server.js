@@ -318,14 +318,14 @@ router.register('\/wiki\/edit\/(.+)', function (req, res, urlOptions) {
 
 		//load wiki entry
 		loadWikiEntryAsync(urlOptions[1], function (wikiErr, wikiEntry) {
-			let pageTitle = "Entry Not Found";
+			let pageTitle = "New";
 			if (wikiErr && wikiErr.code === 'ENOENT') {
 				//fill in data
 				loadTemplateAsync('view', function (errView) {
 					if (errView) throw errView;
 
-					html = replaceBlock('title', html, pageTitle, true);
-					html = replaceBlock('slug', html, '');
+					html = replaceBlock('title', html, '', true);
+					html = replaceBlock('slug', html, urlOptions[1]);
 					html = replaceBlock('tags', html, '');
 					html = replaceBlock('content', html, '');
 
