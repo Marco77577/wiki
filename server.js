@@ -185,7 +185,7 @@ const loadIndex = function (req, res, urlOptions) {
 				try {
 					const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
 					urlOptions[1] = decodeURIComponent(urlOptions[1]);
-					if (urlOptions[1] !== undefined && !doesSearchTermMatch(urlOptions[1], file)) continue;
+					if (urlOptions[1] !== 'undefined' && !doesSearchTermMatch(urlOptions[1], file)) continue;
 					tagCloudFiles.push(files[i]);
 					const stats = fs.statSync('./public/wiki/' + files[i]);
 					entrySize += stats.size;
@@ -195,7 +195,7 @@ const loadIndex = function (req, res, urlOptions) {
 				}
 			}
 
-			const pageTitle = (urlOptions[1] !== undefined ? 'Search' : 'Index');
+			const pageTitle = (urlOptions[1] !== 'undefined' ? 'Search' : 'Index');
 			html = replaceBlock('title', html, pageTitle);
 			html = replaceBlock('totalsize', html, fileSizeConverter(entrySize + imageSize));
 			html = replaceBlock('totalsizeinbytes', html, entrySize + imageSize);
@@ -203,7 +203,7 @@ const loadIndex = function (req, res, urlOptions) {
 			html = replaceBlock('entrysizeinbytes', html, entrySize);
 			html = replaceBlock('imagesize', html, fileSizeConverter(imageSize));
 			html = replaceBlock('imagesizeinbytes', html, imageSize);
-			html = replaceBlock('tags', html, (urlOptions[1] !== undefined ?
+			html = replaceBlock('tags', html, (urlOptions[1] !== 'undefined' ?
 				'<a class="tag" href="/wiki/index"><i class="fas fa-times"></i></a><a class="tag" href="/wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' :
 				''));
 			html = replaceBlock('tagcloud', html, loadTagCloud(tagCloudFiles));
