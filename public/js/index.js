@@ -224,6 +224,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $1('a.edit', selectedLast).click();
                 break;
             case 78: //(n)ew
+	            if (searchMode && document.activeElement === search) return;
                 location.href = '/wiki/new';
                 break;
         }
