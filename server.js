@@ -172,6 +172,8 @@ const loadIndex = function (req, res, urlOptions) {
 		fs.readdir('./public/wiki', function (err2, files) {
 			if (err2) throw err2;
 			let imageSize = 0, entrySize = 0;
+			//guarantee file does not yet exist
+			createDirectory('./public/wiki/img');
 			const images = fs.readdirSync('./public/wiki/img');
 			for (let i = 0, j = images.length; i < j; i++) {
 				imageSize += fs.statSync('./public/wiki/img/' + images[i]).size;
