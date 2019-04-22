@@ -185,7 +185,7 @@ const loadIndex = function (req, res, urlOptions) {
 				try {
 					const file = fs.readFileSync('./public/wiki/' + files[i], 'utf8');
 					urlOptions[1] = decodeURIComponent(urlOptions[1]);
-					if (urlOptions[1] !== 'undefined' && !doesSearchTermMatch(urlOptions[1], file)) continue;
+					if (urlOptions[1] !== undefined && !doesSearchTermMatch(urlOptions[1], file)) continue;
 					tagCloudFiles.push(files[i]);
 					const stats = fs.statSync('./public/wiki/' + files[i]);
 					entrySize += stats.size;
@@ -195,7 +195,7 @@ const loadIndex = function (req, res, urlOptions) {
 				}
 			}
 
-			const pageTitle = (urlOptions[1] !== 'undefined' ? 'Search' : 'Index');
+			const pageTitle = (urlOptions[1] !== undefined ? 'Search' : 'Index');
 			html = replaceBlock('title', html, pageTitle);
 			html = replaceBlock('totalsize', html, fileSizeConverter(entrySize + imageSize));
 			html = replaceBlock('totalsizeinbytes', html, entrySize + imageSize);
