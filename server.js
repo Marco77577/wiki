@@ -203,7 +203,7 @@ const loadIndex = function (req, res, urlOptions) {
 			html = replaceBlock('entrysizeinbytes', html, entrySize);
 			html = replaceBlock('imagesize', html, fileSizeConverter(imageSize));
 			html = replaceBlock('imagesizeinbytes', html, imageSize);
-			html = replaceBlock('tags', html, (urlOptions[1] !== 'undefined' ?
+			html = replaceBlock('tags', html, (urlOptions[1] !== undefined ?
 				'<a class="tag" href="/wiki/index"><i class="fas fa-times"></i></a><a class="tag" href="/wiki/index/' + urlOptions[1] + '">' + urlOptions[1] + '</a>' :
 				''));
 			html = replaceBlock('tagcloud', html, loadTagCloud(tagCloudFiles));
