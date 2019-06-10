@@ -167,7 +167,6 @@
 		cursor: auto;
 		img {
 			position: relative;
-			max-width: 100%;
 			width: auto;
 			left: 0;
 			margin-right: 25px;
@@ -181,6 +180,10 @@
 				outline: 20000px solid rgba(0, 0, 0, 0.9);
 			}
 		}
+	}
+
+	img {
+		max-width: 100%;
 	}
 
 	.iframe-wrapper {
