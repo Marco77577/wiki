@@ -127,6 +127,19 @@ function isOffScreen(el) {
 	);
 }
 
+function configureEditorPosition(editor, content) {
+	const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+	const screenHeight = window.innerHeight;
+	const buttonWrapperHeight = 150;
+	const titleHeight = 240;
+	if (scrollTop > titleHeight) {
+		editor.style.top = '0';
+		content.style.height = (screenHeight - buttonWrapperHeight) + 'px';
+	} else {
+		editor.style.top = titleHeight - scrollTop + 'px';
+		content.style.height = (screenHeight - titleHeight - buttonWrapperHeight + scrollTop) + 'px';
+	}
+}
 
 document.addEventListener('DOMContentLoaded', function () {
 		const md = [
@@ -1629,14 +1642,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				attemptSaving();
 			}
 		});
-		addEvent(document, 'scroll', function () {
-			const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-			if (scrollTop > 240) {
-				editor.style.top = '0';
-			} else {
-				editor.style.top = 240 - scrollTop + 'px';
-			}
-		});
+		addEvent(document, 'scroll', () => configureEditorPosition(editor, content));
+		addEvent(window, 'resize', () => configureEditorPosition(editor, content));
 		addEvent(saveButton, 'click', function (e) {
 			e.preventDefault();
 			attemptSaving();
@@ -1653,7 +1660,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 		});
-		addEvent(selectAllButton, 'click', function(e) {
+		addEvent(selectAllButton, 'click', function (e) {
 			content.setSelectionRange(0, content.value.length);
 			content.focus();
 			e.preventDefault();
@@ -1672,11 +1679,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			content.focus();
 		});
 
-		addEvent(window, 'resize', function () {
-			content.style.height = 'calc(100% - ' + (buttonWrapper.offsetHeight + 50) + 'px)';
-		});
-
-		//add wizards to document
+		// add wizards to document
 		wizardObject['wizards'].filter(wizard => wizard.displayButton).forEach(function (wizard) {
 			//create wizard button
 			const span = document.createElement('span');
@@ -1760,7 +1763,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 		});
 
-		//add markdown shortcuts to document
+		// add markdown shortcuts to document
 		md.filter(fct => fct.displayButton).forEach(function (fct) {
 			const span = document.createElement('span');
 			span.classList.add('icon');
@@ -1776,13 +1779,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			addEvent(span, 'click', () => applyStyle(fct));
 		});
 
-		//update content preview
+		// update content preview
 		update();
 
-		//save document regularly
+		// configure editor
+		configureEditorPosition(editor, content);
+
+		// save document regularly
 		setInterval(attemptSaving, 2000);
 
-		//focus content field
+		// focus content field
 		content.focus();
 	}
 );
