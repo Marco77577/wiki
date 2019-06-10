@@ -6,6 +6,8 @@ public/wiki/img/*.jpeg
 public/wiki/img/*.png
 public/wiki/img/*.gif
 public/publish
+public/css/.sass-cache/
 .idea
 *.log
 *.rsls
+*.css

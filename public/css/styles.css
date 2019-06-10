@@ -88,50 +88,52 @@ header {
   header nav {
     height: 50px;
     overflow: hidden; }
-    header nav a {
-      color: #fff;
-      text-decoration: none;
-      margin-right: 30px; }
-      @media screen and (max-width: 36em) {
-        header nav a {
-          margin-right: 15px; } }
-      header nav a:hover {
-        color: rgba(255, 255, 255, 0.75); }
-      header nav a.icon {
-        font-size: 1.4em; }
-      header nav a:first-of-type {
-        font-size: 1.6em; }
-    header nav form {
-      height: 100%;
-      margin: 0; }
-      header nav form input {
-        font-family: 'Work Sans', 'Arial', sans-serif;
-        font-size: 13px;
-        font-weight: normal;
-        border: none;
-        border-radius: 3px;
-        height: 30px;
-        line-height: 30px;
-        width: 100%;
+    header nav .header-row {
+      height: 50px; }
+      header nav .header-row a {
         color: #fff;
-        background-color: #44474c;
-        padding: 0 8px; }
-        header nav form input:hover, header nav form input:active, header nav form input:focus {
-          outline: none; }
-        header nav form input[type=submit] {
-          display: none; }
-        header nav form input + span {
-          display: none;
-          position: absolute;
-          right: 25px; }
-          header nav form input + span.visible {
-            display: inline; }
-          header nav form input + span:before {
-            font-family: 'Font Awesome 5 Free', sans-serif;
-            font-weight: 900;
-            content: '\f00d';
-            color: #fff;
-            cursor: pointer; }
+        text-decoration: none;
+        margin-right: 30px; }
+        @media screen and (max-width: 36em) {
+          header nav .header-row a {
+            margin-right: 15px; } }
+        header nav .header-row a:hover {
+          color: rgba(255, 255, 255, 0.75); }
+        header nav .header-row a.icon {
+          font-size: 1.4em; }
+        header nav .header-row a:first-of-type {
+          font-size: 1.6em; }
+      header nav .header-row form {
+        height: 100%;
+        margin: 0; }
+        header nav .header-row form input {
+          font-family: 'Work Sans', 'Arial', sans-serif;
+          font-size: 13px;
+          font-weight: normal;
+          border: none;
+          border-radius: 3px;
+          height: 30px;
+          line-height: 30px;
+          width: 100%;
+          color: #fff;
+          background-color: #44474c;
+          padding: 0 8px; }
+          header nav .header-row form input:hover, header nav .header-row form input:active, header nav .header-row form input:focus {
+            outline: none; }
+          header nav .header-row form input[type=submit] {
+            display: none; }
+          header nav .header-row form input + span {
+            display: none;
+            position: absolute;
+            right: 25px; }
+            header nav .header-row form input + span.visible {
+              display: inline; }
+            header nav .header-row form input + span:before {
+              font-family: 'Font Awesome 5 Free', sans-serif;
+              font-weight: 900;
+              content: '\f00d';
+              color: #fff;
+              cursor: pointer; }
     header nav .flex {
       display: flex;
       align-items: center; }

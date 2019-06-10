@@ -52,57 +52,60 @@ header {
 	nav {
 		height: $navHeight;
 		overflow: hidden;
-		a {
-			color: #fff;
-			text-decoration: none;
-			margin-right: 30px;
-			@include responsive(sm) {
-				margin-right: 15px;
-			}
-			&:hover {
-				color: rgba(255, 255, 255, 0.75);
-			}
-			&.icon {
-				font-size: 1.4em;
-			}
-			&:first-of-type {
-				font-size: 1.6em;
-			}
-		}
-		form {
-			height: 100%;
-			margin: 0;
-			input {
-				font-family: 'Work Sans', 'Arial', sans-serif;
-				font-size: 13px;
-				font-weight: normal;
-				border: none;
-				border-radius: 3px;
-				height: 30px;
-				line-height: 30px;
-				width: 100%;
+		.header-row {
+			height: $navHeight;
+			a {
 				color: #fff;
-				background-color: #44474c;
-				padding: 0 8px;
-				&:hover, &:active, &:focus {
-					outline: none;
+				text-decoration: none;
+				margin-right: 30px;
+				@include responsive(sm) {
+					margin-right: 15px;
 				}
-				&[type=submit] {
-					display: none;
+				&:hover {
+					color: rgba(255, 255, 255, 0.75);
 				}
-				& + span {
-					display: none;
-					position: absolute;
-					right: 25px;
-					&.visible {
-						display: inline;
+				&.icon {
+					font-size: 1.4em;
+				}
+				&:first-of-type {
+					font-size: 1.6em;
+				}
+			}
+			form {
+				height: 100%;
+				margin: 0;
+				input {
+					font-family: 'Work Sans', 'Arial', sans-serif;
+					font-size: 13px;
+					font-weight: normal;
+					border: none;
+					border-radius: 3px;
+					height: 30px;
+					line-height: 30px;
+					width: 100%;
+					color: #fff;
+					background-color: #44474c;
+					padding: 0 8px;
+					&:hover, &:active, &:focus {
+						outline: none;
 					}
-					&:before {
-						font-family: 'Font Awesome 5 Free', sans-serif;
-						font-weight: 900;
-						content: '\f00d';
-						color: #fff;
-						cursor: pointer;
+					&[type=submit] {
+						display: none;
+					}
+					& + span {
+						display: none;
+						position: absolute;
+						right: 25px;
+						&.visible {
+							display: inline;
+						}
+						&:before {
+							font-family: 'Font Awesome 5 Free', sans-serif;
+							font-weight: 900;
+							content: '\f00d';
+							color: #fff;
+							cursor: pointer;
+						}
 					}
 				}
 			}
