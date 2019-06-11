@@ -678,7 +678,6 @@ header {
   cursor: auto; }
   .content a.image-link img {
     position: relative;
-    max-width: 100%;
     width: auto;
     left: 0;
     margin-right: 25px;
@@ -694,6 +693,8 @@ header {
       max-width: 80vw;
       cursor: zoom-out;
       outline: 20000px solid rgba(0, 0, 0, 0.9); }
+.content img {
+  max-width: 100%; }
 .content .iframe-wrapper {
   text-align: center;
   background-color: #000; }
